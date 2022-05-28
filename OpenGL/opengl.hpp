@@ -17,6 +17,11 @@ public:
     Object() = default;
     virtual ~Object() = default;
 
+    Object(const Object&) = delete;
+    Object& operator = (const Object&) = delete;
+    Object(Object&&) = default;
+    Object& operator = (Object&&) = default;
+
     virtual void initialize() = 0;
 
     GLuint id() const { return _id; }
@@ -44,6 +49,11 @@ public:
 
 private:
     Context() = default;
+
+    Context(const Context&) = delete;
+    Context& operator = (const Context&) = delete;
+    Context(Context&&) = delete;
+    Context& operator = (Context&&) = delete;
 
 private:
     glm::vec4 _background;
@@ -80,7 +90,7 @@ public:
 
     void initialize() override;
 
-    void bind(float* data, size_t len);
+    void bind(const float* data, size_t len);
     void set_layout(GLuint index, GLuint width, GLsizei stride);
 };
 
@@ -92,7 +102,7 @@ public:
 
     void initialize() override;
 
-    void bind(uint32_t* data, size_t len);
+    void bind(const uint32_t* data, size_t len);
 };
 
 
@@ -104,8 +114,10 @@ public:
 
     void initialize() override;
 
-    void compile(const char* source);
+    void compile(const std::string_view source);
     bool is_compiled() const { return _is_compiled; }
+
+    GLuint shader_type() const { return _shader_type; }
 
 private:
     void is_compiled(bool val) { _is_compiled = val; }
@@ -119,49 +131,47 @@ private:
 
 class Program final : public Object {
 public:
-    Program() = default;
+    enum State {
+        NONE                     = 0x0,
+        INITIALIZED              = 0x1,
+        VERTEX_SHADER_CREATED    = 0x2,
+        FRAGEMENT_SHADER_CREATED = 0x4,
+        LINKED                   = 0x8,
+        BUFFERS_CREATED          = 0x10,
+        ACTIVE                   = 0x20
+    };
+
+public:
+    Program();
     ~Program() override;
 
     void initialize() override;
 
     void attach_shader(const Shader& shader);
+    void attach_shader(GLuint shader_type, const std::string_view src);
+    void create_buffers(const std::vector<float>& vertices,
+                        const std::vector<uint32_t>& indices);
     void link_program();
     void use();
 
+    const Shader& vertex_shader() const { return _vertex_shader; }
+    const Shader& fragment_shader() const { return _fragment_shader; }
+    const VertexArrayBuffer& vao() const { return _vao; }
+    const VertexBuffer& vbo() const { return _vbo; }
+    const ElementBuffer& ebo() const { return _ebo; }
+
 private:
     void check_program() const;
-};
-
-
-class Pipeline {
-public:
-    Pipeline() = default;
-    ~Pipeline() = default;
-
-    Pipeline(const Pipeline&) = delete;
-    Pipeline& operator = (const Pipeline&) = delete;
-    Pipeline(Pipeline&&) = delete;
-    Pipeline& operator = (Pipeline&&) = delete;
-
-    Pipeline& create_vertex_shader(const std::string_view src);
-    Pipeline& create_fragment_shader(const std::string_view src);
-    Pipeline& create_program();
-    Pipeline& create_vao();
-    Pipeline& create_vbo(float* data, size_t len);
-    Pipeline& create_ebo(uint32_t* data, size_t len);
-    Pipeline& set_layot(GLuint index, GLuint width, GLuint stride);
-
-    void draw();
+    void update_state(State new_state);
 
 private:
-    Shader _vrt_shader,
-           _frg_shader;
-    Program _program;
-    VertexArrayBuffer _vertex_array_buffer;
-    VertexBuffer _vertex_buffer_object;
-    ElementBuffer _element_buffer;
+    Shader _vertex_shader, _fragment_shader;
 
-    size_t _vertex_count = 0;
+    VertexArrayBuffer _vao;
+    VertexBuffer _vbo;
+    ElementBuffer _ebo;
+
+    State _current_state;
 };
 
 }

@@ -32,8 +32,7 @@ void APIENTRY gl_debug_output(GLenum source, GLenum type, unsigned int id,
         std::cout << "Source: Other";
         break;
     }
-    switch (type)
-    {
+    switch (type) {
     case GL_DEBUG_TYPE_ERROR:
         std::cout << "Type: Error";
         break;
@@ -101,7 +100,7 @@ GLenum gl_check_error(const char* file, int line) {
             error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
         std::cout << error << " | " << file << " (" << line << ")" << std::endl;
-        //throw std::runtime_error(error);
+        throw std::runtime_error(error);
     }
     return errorCode;
 }

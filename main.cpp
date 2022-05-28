@@ -4,8 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "ui.hpp"
-#include "opengl.hpp"
+#include "UI/ui.hpp"
+#include "OpenGL/opengl.hpp"
 
 
 void process_input(GLFWwindow* window);
@@ -28,6 +28,25 @@ const std::string_view fragment_shader_source =
     "{\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
+const std::string_view fragment_shader_green =
+    "#version 460 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\n\0";
+
+const std::vector<float> vertices{
+     0.5f,  0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+    -0.5f,  0.5f, 0.0f
+};
+const std::vector<float> vertices_2{
+     0.5f, -0.5f, 0.0f
+    - 0.5f, -0.5f, 0.0f,
+    -0.5f,  0.5f, 0.0f,
+};
+const std::vector<uint32_t> indices{ 0, 1, 2 };
 
 
 int main() {
@@ -39,30 +58,20 @@ int main() {
     opengl::Context::instance().dump();
     opengl::Context::instance().background({0.2f, 0.5f, 0.5f, 1.0f});
 
-    std::vector<float> vertices {
-         0.5f,  0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f
-    };
-    std::vector<uint32_t> indices {
-        0, 1, 3,
-        1, 2, 3
-    };
-
-    opengl::Pipeline pipeline;
-    pipeline.create_vertex_shader(vertex_shader_source);
-    pipeline.create_fragment_shader(fragment_shader_source);
-    pipeline.create_program();
-    pipeline.create_vao();
-    pipeline.create_vbo(vertices.data(), vertices.size() * sizeof (float));
-    pipeline.create_ebo(indices.data(), indices.size() * sizeof(uint32_t));
-    pipeline.set_layot(0, 3, 3);
+    opengl::Program program;
+    program.initialize();
+    program.attach_shader(GL_VERTEX_SHADER, vertex_shader_source);
+    program.attach_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
+    program.link_program();
+    program.create_buffers(vertices, indices);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
 
-        pipeline.draw();
+        opengl::Context::instance().draw_background();
+        program.use();
+        glDrawElements(GL_TRIANGLES, indices.size() * sizeof (float),
+                       GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

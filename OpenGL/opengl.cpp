@@ -1,4 +1,5 @@
 #include <iostream>
+#include <bitset>
 
 #include "opengl_utils.hpp"
 #include "opengl.hpp"
@@ -16,6 +17,7 @@ void Context::initialize() {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         std::terminate();
     }
+    glDebugMessageCallback(utils::gl_debug_output, nullptr);
 }
 
 void Context::dump() const {
@@ -27,8 +29,6 @@ void Context::dump() const {
     std::cout << " - Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << " - Shading language version: "
               << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-
-    glDebugMessageCallback(utils::gl_debug_output, nullptr);
 }
 
 void Context::viewport(int width, int height) const {
@@ -70,7 +70,7 @@ void VertexBuffer::initialize() {
     glGenBuffers(1, id_ptr());
 }
 
-void VertexBuffer::bind(float* data, size_t len) {
+void VertexBuffer::bind(const float* data, size_t len) {
     glBindBuffer(GL_ARRAY_BUFFER, id());
     glBufferData(GL_ARRAY_BUFFER, len, data, GL_STATIC_DRAW);
     is_bound(true);
@@ -91,7 +91,7 @@ void ElementBuffer::initialize() {
     glGenBuffers(1, id_ptr());
 }
 
-void ElementBuffer::bind(uint32_t* data, size_t len) {
+void ElementBuffer::bind(const uint32_t* data, size_t len) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id());
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, len, data, GL_STATIC_DRAW);
 }
@@ -111,10 +111,12 @@ Shader::~Shader() {
 
 void Shader::initialize() {
     id(glCreateShader(_shader_type));
+    utils::gl_check_error(__FILE__, __LINE__);
 }
 
-void Shader::compile(const char* source) {
-    glShaderSource(id(), 1, &source, nullptr);
+void Shader::compile(const std::string_view source) {
+    const GLchar* content = source.data();
+    glShaderSource(id(), 1, &content, nullptr);
     glCompileShader(id());
     check_shader();
     is_compiled(true);
@@ -134,20 +136,87 @@ void Shader::check_shader() const {
 }
 
 
+Program::Program() : Object()
+    , _vertex_shader(GL_VERTEX_SHADER)
+    , _fragment_shader(GL_FRAGMENT_SHADER)
+    , _current_state(NONE)
+{}
+
 Program::~Program() {
     glDeleteProgram(id());
 }
 
 void Program::initialize() {
     id(glCreateProgram());
+    update_state(State::INITIALIZED);
 }
 
 void Program::attach_shader(const Shader& shader) {
     glAttachShader(id(), shader.id());
+
+    switch (shader.shader_type()) {
+    case GL_VERTEX_SHADER:
+        update_state(State::VERTEX_SHADER_CREATED);
+        break;
+    case GL_FRAGMENT_SHADER:
+        update_state(State::FRAGEMENT_SHADER_CREATED);
+        break;
+    }
+}
+
+void Program::attach_shader(GLuint shader_type, const std::string_view src) {
+    if (_current_state < State::INITIALIZED) {
+        std::cerr << "[OpenGL] Initialize program before attach shaders"
+                  << std::endl;
+        return;
+    }
+
+    switch (shader_type) {
+    case GL_VERTEX_SHADER:
+        _vertex_shader.initialize();
+        _vertex_shader.compile(src);
+        attach_shader(_vertex_shader);
+        break;
+    case GL_FRAGMENT_SHADER:
+        _fragment_shader.initialize();
+        _fragment_shader.compile(src);
+        attach_shader(_fragment_shader);
+        break;
+    }
+}
+
+void Program::create_buffers(const std::vector<float>& vertices,
+                             const std::vector<uint32_t>& indices) {
+    if (_current_state < State::LINKED) {
+        std::cerr << "[OpenGL] Attach shaders before creating buffers"
+                  << std::endl;
+        return;
+    }
+
+    _vao.initialize();
+    _vao.bind();
+
+    _vbo.initialize();
+    _vbo.bind(vertices.data(), vertices.size() * sizeof (float));
+
+    _ebo.initialize();
+    _ebo.bind(indices.data(), indices.size() * sizeof (uint32_t));
+
+    _vbo.set_layout(0, 3, 3);
+    update_state(State::BUFFERS_CREATED);
 }
 
 void Program::link_program() {
+    if (_current_state < State::FRAGEMENT_SHADER_CREATED) {
+        std::cerr << "[OpenGL] Attach shaders before linking the program"
+                  << std::endl;
+        return;
+    }
+
     glLinkProgram(id());
+    check_program();
+
+    update_state(State::LINKED);
 }
 
 void Program::check_program() const {
@@ -161,65 +230,27 @@ void Program::check_program() const {
 }
 
 void Program::use() {
+    if (_current_state < State::BUFFERS_CREATED) {
+        std::cerr << "[OpenGL] Create buffers before activate the program"
+                  << std::endl;
+        return;
+    }
+
     glUseProgram(id());
+    update_state(State::ACTIVE);
 }
 
+void Program::update_state(State new_state) {
+    static constexpr size_t BITS = sizeof (State) * 8;
 
-Pipeline& Pipeline::create_vertex_shader(const std::string_view src) {
-    _vrt_shader = Shader(GL_VERTEX_SHADER);
-    _vrt_shader.initialize();
-    _vrt_shader.compile(src.data());
-    return *this;
-}
-
-Pipeline& Pipeline::create_fragment_shader(const std::string_view src) {
-    _frg_shader = Shader(GL_FRAGMENT_SHADER);
-    _frg_shader.initialize();
-    _frg_shader.compile(src.data());
-    return *this;
-}
-
-Pipeline& Pipeline::create_program() {
-    _program = Program();
-    _program.initialize();
-    _program.attach_shader(_vrt_shader);
-    _program.attach_shader(_frg_shader);
-    _program.link_program();
-    return *this;
-}
-
-Pipeline& Pipeline::create_vao() {
-    _vertex_array_buffer = VertexArrayBuffer();
-    _vertex_array_buffer.initialize();
-    _vertex_array_buffer.bind();
-    return *this;
-}
-
-Pipeline& Pipeline::create_vbo(float* data, size_t len) {
-    _vertex_buffer_object = VertexBuffer();
-    _vertex_buffer_object.initialize();
-    _vertex_buffer_object.bind(data, len);
-    return *this;
-}
-
-Pipeline& Pipeline::create_ebo(uint32_t* data, size_t len) {
-    _element_buffer = ElementBuffer();
-    _element_buffer.initialize();
-    _element_buffer.bind(data, len);
-    _vertex_count = len;
-    return *this;
-}
-
-Pipeline& Pipeline::set_layot(GLuint index, GLuint width, GLuint stride) {
-    _vertex_buffer_object.set_layout(index, width, stride);
-    return *this;
-}
-
-void Pipeline::draw() {
-    Context::instance().draw_background();
-
-    _program.use();
-    glDrawElements(GL_TRIANGLES, _vertex_count, GL_UNSIGNED_INT, nullptr);
+    State state = (State)(_current_state | new_state);
+    if (state != _current_state) {
+        std::cout << "[OpenGL] old state: "
+                  << std::bitset<BITS>(_current_state);
+        std::cout << ", new state: " << std::bitset<BITS>(state)
+                  << std::endl;
+        _current_state = state;
+    }
 }
 
 

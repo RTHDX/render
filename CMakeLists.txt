@@ -10,15 +10,14 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glad/include")
 add_subdirectory(3rdParty/glm)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm")
 
+add_subdirectory(OpenGL)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/OpenGL")
+
+add_subdirectory(UI)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/UI")
+
 create_executable(
     TARGET render
-    SOURCES
-        main.cpp
-        ui.cpp
-        opengl.cpp
-        opengl_utils.cpp
-    HEADERS
-        ui.hpp
-        opengl.hpp
-        opengl_utils.hpp
+    SOURCES main.cpp
+    LIBS OpenGL UI
 )
