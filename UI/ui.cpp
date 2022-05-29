@@ -16,8 +16,16 @@ bool init_glfw(int major, int minor) {
     return true;
 }
 
+bool init_glfw_lite() {
+    auto result = glfwInit();
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+    return result == GLFW_TRUE;
+}
+
+
 GLFWwindow* create_window(int width, int height, const char* title) {
-    GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr,
+                                          nullptr);
     if (window == nullptr) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();

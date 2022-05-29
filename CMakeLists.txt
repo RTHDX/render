@@ -17,9 +17,3 @@ add_subdirectory(UI)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/UI")
 
 add_subdirectory(Examples)
-
-#create_executable(
-#    TARGET render
-#    SOURCES main.cpp
-#    LIBS OpenGL UI
-#)
