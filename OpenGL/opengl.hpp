@@ -65,7 +65,7 @@ public:
     Buffer();
     ~Buffer() override = default;
 
-    bool is_bound() const { return _is_bound; }
+    bool is_bound()   const { return _is_bound; }
     void is_bound(bool val) { _is_bound = val; }
 
 private:
@@ -79,6 +79,7 @@ public:
     ~VertexArrayBuffer() override;
 
     void bind();
+    void unbind();
     void initialize() override;
 };
 
@@ -142,7 +143,7 @@ public:
     };
 
 public:
-    Program();
+    Program(const std::string_view label="UNKNOWN");
     ~Program() override;
 
     void initialize() override;
@@ -157,6 +158,7 @@ public:
     const Shader& vertex_shader() const { return _vertex_shader; }
     const Shader& fragment_shader() const { return _fragment_shader; }
     const VertexArrayBuffer& vao() const { return _vao; }
+    VertexArrayBuffer& vao() { return _vao; }
     const VertexBuffer& vbo() const { return _vbo; }
     const ElementBuffer& ebo() const { return _ebo; }
 
@@ -165,6 +167,8 @@ private:
     void update_state(State new_state);
 
 private:
+    std::string _label;
+
     Shader _vertex_shader, _fragment_shader;
 
     VertexArrayBuffer _vao;

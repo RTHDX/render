@@ -1,5 +1,6 @@
 #include <iostream>
 #include <bitset>
+#include <format>
 
 #include "opengl_utils.hpp"
 #include "opengl.hpp"
@@ -59,6 +60,11 @@ void VertexArrayBuffer::initialize() {
 void VertexArrayBuffer::bind() {
     glBindVertexArray(id());
     is_bound(true);
+}
+
+void VertexArrayBuffer::unbind() {
+    glBindVertexArray(0);
+    is_bound(false);
 }
 
 
@@ -136,7 +142,8 @@ void Shader::check_shader() const {
 }
 
 
-Program::Program() : Object()
+Program::Program(const std::string_view label) : Object()
+    , _label(label)
     , _vertex_shader(GL_VERTEX_SHADER)
     , _fragment_shader(GL_FRAGMENT_SHADER)
     , _current_state(NONE)
@@ -166,8 +173,9 @@ void Program::attach_shader(const Shader& shader) {
 
 void Program::attach_shader(GLuint shader_type, const std::string_view src) {
     if (_current_state < State::INITIALIZED) {
-        std::cerr << "[OpenGL] Initialize program before attach shaders"
-                  << std::endl;
+        static constexpr char MSG[] =
+            "[OpenGL][{}] Initialize program before attaching shaders.";
+        std::cerr << std::format(MSG, _label) << std::endl;
         return;
     }
 
@@ -188,8 +196,9 @@ void Program::attach_shader(GLuint shader_type, const std::string_view src) {
 void Program::create_buffers(const std::vector<float>& vertices,
                              const std::vector<uint32_t>& indices) {
     if (_current_state < State::LINKED) {
-        std::cerr << "[OpenGL] Attach shaders before creating buffers"
-                  << std::endl;
+        static constexpr char MSG[] =
+            "[OpenGL][{}] Attach shaders before creating buffers";
+        std::cerr << std::format(MSG, _label) << std::endl;
         return;
     }
 
@@ -208,8 +217,9 @@ void Program::create_buffers(const std::vector<float>& vertices,
 
 void Program::link_program() {
     if (_current_state < State::FRAGEMENT_SHADER_CREATED) {
-        std::cerr << "[OpenGL] Attach shaders before linking the program"
-                  << std::endl;
+        static constexpr char MSG[] =
+            "[OpenGL][{}] Attach shaders before linking the program";
+        std::cerr << std::format(MSG, _label) << std::endl;
         return;
     }
 
@@ -220,19 +230,23 @@ void Program::link_program() {
 }
 
 void Program::check_program() const {
+    static constexpr char MSG[] = "[OpenGL][{}] Linking failed: %s";
+    static constexpr size_t BUFF_SIZE = 512;
+
     int success;
-    char infoLog[512];
+    char info_log[BUFF_SIZE];
     glGetProgramiv(id(), GL_LINK_STATUS, &success);
     if (!success) {
-        glGetProgramInfoLog(id(), 512, NULL, infoLog);
-        std::cout << "[OpenGL] Linking failed: \n" << infoLog << std::endl;
+        glGetProgramInfoLog(id(), BUFF_SIZE, nullptr, info_log);
+        std::cout << std::format(MSG, _label, info_log) << std::endl;
     }
 }
 
 void Program::use() {
     if (_current_state < State::BUFFERS_CREATED) {
-        std::cerr << "[OpenGL] Create buffers before activate the program"
-                  << std::endl;
+        static constexpr char MSG[] =
+            "[OpenGL][{}] Create buffers before activate the program";
+        std::cerr << std::format(MSG, _label) << std::endl;
         return;
     }
 
@@ -245,7 +259,7 @@ void Program::update_state(State new_state) {
 
     State state = (State)(_current_state | new_state);
     if (state != _current_state) {
-        std::cout << "[OpenGL] old state: "
+        std::cout << std::format("[OpenGL][{}] old state: ", _label)
                   << std::bitset<BITS>(_current_state);
         std::cout << ", new state: " << std::bitset<BITS>(state)
                   << std::endl;

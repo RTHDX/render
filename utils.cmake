@@ -14,6 +14,13 @@ function (create_executable)
                           glad
                           ${THIS_LIBS}
     )
+    foreach (LIBRARY ${THIS_LIBS})
+        set(DEP_INC_DIR)
+        get_target_property(DEP_INC_DIR ${LIBRARY} INCLUDE_DIRECTORIES)
+        message("Library: ${LIBRARY}, include dirs: ${DEP_INC_DIR}")
+        target_include_directories(${THIS_TARGET} PRIVATE ${DEP_INC_DIR})
+    endforeach ()
+
     set_property(TARGET ${THIS_TARGET} PROPERTY CXX_STANDARD 20)
     set_property(TARGET ${THIS_TARGET} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 endfunction (create_executable)
