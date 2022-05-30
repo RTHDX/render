@@ -36,8 +36,7 @@ const std::vector<float> vertices{
      0.5f, -0.5f, 0.0f,
     -0.5f,  0.5f, 0.0f,
 };
-const std::vector<uint32_t> indices{0, 1, 2, 3};
-
+const std::vector<uint32_t> indices{0, 1, 2};
 
 int main() {
     if (!ui::init_glfw(4, 6)) { return EXIT_FAILURE; }
@@ -60,7 +59,7 @@ int main() {
 
         opengl::Context::instance().draw_background();
         program.use();
-        glDrawElements(GL_TRIANGLES_ADJACENCY, indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
