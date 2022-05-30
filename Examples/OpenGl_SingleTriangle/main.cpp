@@ -27,16 +27,16 @@ const std::string_view fragment_shader_source =
     "out vec4 FragColor;\n"
     "void main()\n"
     "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "   FragColor = vec4(1.0f, 0.0f, 0.2f, 1.0f);\n"
     "}\n\0";
 
 
 const std::vector<float> vertices{
      0.5f,  0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
-    -0.5f,  0.5f, 0.0f
+    -0.5f,  0.5f, 0.0f,
 };
-const std::vector<uint32_t> indices{ 0, 1, 2 };
+const std::vector<uint32_t> indices{0, 1, 2, 3};
 
 
 int main() {
@@ -59,7 +59,8 @@ int main() {
         process_input(window);
 
         opengl::Context::instance().draw_background();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        program.use();
+        glDrawElements(GL_TRIANGLES_ADJACENCY, indices.size(), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
