@@ -29,6 +29,7 @@ struct Material {
     Color diffuse_color;
 
 public:
+    Material() = default;
     Material(const Color& color) : diffuse_color(color) {}
 };
 
@@ -53,63 +54,62 @@ public:
 };
 
 
-class Sphere {
+struct Sphere {
+    Point center;
+    Material material;
+    float radius;
+
 public:
     Sphere(const Point& center, const Material& material, float radius)
-        : _center(center)
-        , _material(material)
-        , _radius(radius)
+        : center(center)
+        , material(material)
+        , radius(radius)
     {}
 
-    Hit ray_intersects(const Ray& ray) const {
-        Hit hit;
-        Vector l = _center - ray.origin;
-        float tca = glm::dot(l, ray.direction);
-        float d2 = glm::dot(l, l) - tca * tca;
-        if (d2 > _radius * _radius) { return hit; }
-        float thc = std::sqrtf(_radius * _radius - d2);
-        hit.hit_near = tca - thc;
+    bool ray_intersect(const Vector& orig, const Vector& dir, float& t0) const {
+        Vector L = center - orig;
+        float tca = glm::dot(L, dir);
+        float d2 = glm::dot(L, L) - tca * tca;
+        if (d2 > radius * radius) return false;
+        float thc = sqrtf(radius * radius - d2);
+        t0 = tca - thc;
         float t1 = tca + thc;
-        if (hit.hit_near < 0) { hit.hit_near = t1; }
-        if (hit.hit_near < 0) { return Hit(); }
-        hit.sphere = this;
-        hit.point = ray.at(hit.hit_near);
-        hit.normal = glm::normalize(hit.point - _center);
-        return hit;
+        if (t0 < 0) t0 = t1;
+        if (t0 < 0) return false;
+        return true;
     }
-
-    const Material& material() const { return _material; }
-
-private:
-    Point _center;
-    Material _material;
-    float _radius;
 };
 
 
-Hit scene_intersects(const Ray& ray, const std::vector<Sphere>& spheres) {
+bool scene_intersect(const Point& orig, const Vector& dir,
+                     const std::vector<Sphere>& spheres,
+                     Point& hit, Vector& N, Material& material) {
     float spheres_dist = std::numeric_limits<float>::max();
-    Hit hit;
-    for (const Sphere& sphere : spheres) {
-        hit = sphere.ray_intersects(ray);
-        if (hit.is_valid() && hit.hit_near < spheres_dist) {
-            spheres_dist = hit.hit_near;
+    for (size_t i = 0; i < spheres.size(); i++) {
+        float dist_i;
+        if (spheres[i].ray_intersect(orig, dir, dist_i) && dist_i < spheres_dist) {
+            spheres_dist = dist_i;
+            hit = orig + dir * dist_i;
+            N = glm::normalize(hit - spheres[i].center);
+            material = spheres[i].material;
         }
     }
-    return hit;
+    return spheres_dist < 1000;
 }
 
 
-Color cast_ray(const Ray& ray, const std::vector<Sphere>& spheres) {
+Color cast_ray(const Point& orig, const Vector& dir,
+               const std::vector<Sphere>& spheres) {
     static constexpr Color BACKGROUND(0.2, 0.7, 0.8);
 
-    float sphere_dist = std::numeric_limits<float>::max();
-    Hit hit = scene_intersects(ray, spheres);
-    if (hit.is_valid()) {
-        return hit.sphere->material().diffuse_color;
+    Vector point, N;
+    Material material;
+
+    if (!scene_intersect(orig, dir, spheres, point, N, material)) {
+        return BACKGROUND;
     }
 
-    return BACKGROUND;
+    return material.diffuse_color;
 }
 
 Ray emit_ray(size_t i, size_t j) {
@@ -127,10 +127,19 @@ size_t eval_index(const size_t h_pos, const size_t w_pos) {
 
 void render(std::vector<Color>& framebuffer,
             const std::vector<Sphere>& spheres) {
+    static constexpr int fov = std::numbers::pi_v<float> / 2.;
+
     for (size_t i = 0; i < HEIGHT; ++i) {
         for (size_t j = 0; j < WIDTH; ++j) {
             const size_t index = eval_index(i, j);
-            framebuffer[index] = cast_ray(emit_ray(i, j), spheres);
+            float x = (2 * (i + 0.5) / (float)WIDTH - 1) * tan(fov / 2.) * WIDTH / (float)HEIGHT;
+            float y = -(2 * (j + 0.5) / (float)HEIGHT - 1) * tan(fov / 2.);
+            Vector direction = glm::normalize(Vector(x, y, -1));
+            framebuffer[index] = cast_ray(
+                Point(0.0, 0.0, 0.0),
+                direction,
+                spheres
+            );
         }
     }
 }

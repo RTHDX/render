@@ -38,11 +38,14 @@ int main() {
     rtx::Sphere red(rtx::Point(0.0, 0.0, -30.0),
                     rtx::Material(rtx::Color(1.0, 0.0, 0.0)),
                     5.0f);
+    rtx::Sphere green(rtx::Point(0.0, 0.0, -40.0),
+                      rtx::Material(rtx::Color(0.0, 1.0, 0.0)),
+                      10.0f);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
 
-        BENCHMARK(rtx::render(framebuffer, {red}));
+        BENCHMARK(rtx::render(framebuffer, {red, green}));
         glDrawPixels(rtx::WIDTH, rtx::HEIGHT, GL_RGB, GL_FLOAT,
                      glm::value_ptr(*framebuffer.data()));
 
