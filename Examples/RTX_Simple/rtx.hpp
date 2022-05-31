@@ -20,9 +20,7 @@ struct Ray {
     Vector direction;
 
 public:
-    Point at(float t) const {
-        return origin + t * direction;
-    }
+    Point at(float t) const { return origin + t * direction; }
 };
 
 struct Material {
@@ -35,21 +33,15 @@ public:
 
 class Sphere;
 struct Hit {
-    float hit_near = std::numeric_limits<float>::min();
-    float hit_far = std::numeric_limits<float>::max();
+    float t = std::numeric_limits<float>::min();
     Sphere const* sphere = nullptr;
     Point point;
     Vector normal;
 
 public:
-    bool is_valid() {
-        const bool is_near_to_min =
-            std::fabs(hit_near - std::numeric_limits<float>::min() <
-                std::numeric_limits<float>::epsilon());
-        const bool is_near_to_max =
-            std::fabs(hit_far - std::numeric_limits<float>::max() <
-                std::numeric_limits<float>::epsilon());
-        return !(is_near_to_max && is_near_to_min);
+    bool is_valid() const {
+        return !std::fabs(t - std::numeric_limits<float>::min() <
+                          std::numeric_limits<float>::epsilon());
     }
 };
 
@@ -66,50 +58,52 @@ public:
         , radius(radius)
     {}
 
-    bool ray_intersect(const Vector& orig, const Vector& dir, float& t0) const {
-        Vector L = center - orig;
-        float tca = glm::dot(L, dir);
+    Hit ray_intersect(const Ray& ray) const {
+        Vector L = center - ray.origin;
+        float tca = glm::dot(L, ray.direction);
         float d2 = glm::dot(L, L) - tca * tca;
-        if (d2 > radius * radius) return false;
+        if (d2 > radius * radius) return Hit();
         float thc = sqrtf(radius * radius - d2);
-        t0 = tca - thc;
+
+        Hit hit;
+        hit.t = tca - thc;
         float t1 = tca + thc;
-        if (t0 < 0) t0 = t1;
-        if (t0 < 0) return false;
-        return true;
+        if (hit.t < 0) hit.t = t1;
+        if (hit.t < 0) return Hit();
+        hit.sphere = this;
+        hit.point = ray.at(hit.t);
+        hit.normal = glm::normalize(hit.point - center);
+        return hit;
     }
 };
 
 
-bool scene_intersect(const Point& orig, const Vector& dir,
-                     const std::vector<Sphere>& spheres,
-                     Point& hit, Vector& N, Material& material) {
+Hit scene_intersect(const Ray& ray, const std::vector<Sphere>& spheres) {
+    static constexpr float LIMIT = 1000.0;
     float spheres_dist = std::numeric_limits<float>::max();
-    for (size_t i = 0; i < spheres.size(); i++) {
-        float dist_i;
-        if (spheres[i].ray_intersect(orig, dir, dist_i) && dist_i < spheres_dist) {
-            spheres_dist = dist_i;
-            hit = orig + dir * dist_i;
-            N = glm::normalize(hit - spheres[i].center);
-            material = spheres[i].material;
+
+    Hit out_hit;
+    for (const Sphere& sphere: spheres) {
+        Hit hit = sphere.ray_intersect(ray);
+        if (hit.is_valid() && hit.t < spheres_dist) {
+            spheres_dist = hit.t;
+            out_hit = hit;
         }
     }
-    return spheres_dist < 1000;
+
+    return spheres_dist < LIMIT ? out_hit : Hit();
 }
 
 
-Color cast_ray(const Point& orig, const Vector& dir,
-               const std::vector<Sphere>& spheres) {
+Color cast_ray(const Ray& ray, const std::vector<Sphere>& spheres) {
     static constexpr Color BACKGROUND(0.2, 0.7, 0.8);
 
-    Vector point, N;
-    Material material;
-
-    if (!scene_intersect(orig, dir, spheres, point, N, material)) {
+    Hit last_hit = scene_intersect(ray, spheres);
+    if (!last_hit.is_valid()) {
         return BACKGROUND;
     }
 
-    return material.diffuse_color;
+    return last_hit.sphere->material.diffuse_color;
 }
 
 Ray emit_ray(size_t i, size_t j) {
@@ -132,14 +126,7 @@ void render(std::vector<Color>& framebuffer,
     for (size_t i = 0; i < HEIGHT; ++i) {
         for (size_t j = 0; j < WIDTH; ++j) {
             const size_t index = eval_index(i, j);
-            float x = (2 * (i + 0.5) / (float)WIDTH - 1) * tan(fov / 2.) * WIDTH / (float)HEIGHT;
-            float y = -(2 * (j + 0.5) / (float)HEIGHT - 1) * tan(fov / 2.);
-            Vector direction = glm::normalize(Vector(x, y, -1));
-            framebuffer[index] = cast_ray(
-                Point(0.0, 0.0, 0.0),
-                direction,
-                spheres
-            );
+            framebuffer[index] = cast_ray(emit_ray(i, j), spheres);
         }
     }
 }
