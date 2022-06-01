@@ -20,16 +20,42 @@ struct Ray {
     Vector direction;
 
 public:
+    Ray(const Point& origin, const Vector& direction)
+        : origin(origin)
+        , direction(direction)
+    {}
+
     Point at(float t) const { return origin + t * direction; }
 };
 
+struct Light {
+    Point position;
+    float intensity;
+
+public:
+    Light(const Point& position, float intensity)
+        : position(position)
+        , intensity(intensity)
+    {}
+};
+
 struct Material {
+    Color albedo;
     Color diffuse_color;
+    float specular_exponent;
 
 public:
     Material() = default;
-    Material(const Color& color) : diffuse_color(color) {}
+    Material(const Color& albedo, const Color& color, float exponent)
+        : albedo(albedo)
+        , diffuse_color(color)
+        , specular_exponent(exponent)
+    {}
 };
+
+Vector reflect(const Vector& input, const Vector& normal) {
+    return input - normal * 2.0f * glm::dot(input, normal);
+}
 
 class Sphere;
 struct Hit {
@@ -95,22 +121,58 @@ Hit scene_intersect(const Ray& ray, const std::vector<Sphere>& spheres) {
 }
 
 
-Color cast_ray(const Ray& ray, const std::vector<Sphere>& spheres) {
-    static constexpr Color BACKGROUND(0.2, 0.7, 0.8);
+Color cast_ray(const Ray& ray,
+               const std::vector<Sphere>& spheres,
+               const std::vector<Light>& lights,
+               size_t depth = 0) {
+    static constexpr Color BACKGROUND(0.2, 0.85, 0.6);
 
     Hit last_hit = scene_intersect(ray, spheres);
-    if (!last_hit.is_valid()) {
-        return BACKGROUND;
+    if (depth > 4 || !last_hit.is_valid()) { return BACKGROUND; }
+
+    Vector reflect_direction = glm::normalize(reflect(ray.direction, last_hit.normal));
+    Vector reflect_origin = glm::dot(reflect_direction, last_hit.normal) < 0.0 ?
+        last_hit.point - last_hit.normal * 0.0001f :
+        last_hit.point + last_hit.normal * 0.0001f;
+    Color reflect_color = cast_ray(Ray(reflect_origin, reflect_direction),
+                                   spheres, lights, depth + 1);
+
+    float diffuse_light_intensity = 0, specular_light_intensity = 0;
+    const Material& material = last_hit.sphere->material;
+    const Vector& normal = last_hit.normal;
+    const Point& hit_point = last_hit.point;
+    float exponent = material.specular_exponent;
+    for (const Light& light : lights) {
+        Vector light_direction = glm::normalize(light.position - last_hit.point);
+        float light_distance = glm::length(light.position - hit_point);
+
+        Point shadow_origin = glm::dot(light_direction, normal) < 0.0f ?
+            hit_point - normal * 0.0001f : hit_point + normal * 0.0001f;
+        Ray shadow_ray(shadow_origin, light_direction);
+        Hit shadow_hit = scene_intersect(shadow_ray, spheres);
+        if (shadow_hit.is_valid() && glm::length(shadow_hit.point - shadow_origin) < light_distance) {
+            continue;
+        }
+
+        diffuse_light_intensity += light.intensity *
+            std::max(0.0f, glm::dot(light_direction, normal));
+        specular_light_intensity +=
+            powf(std::max(0.0f, glm::dot(reflect(light_direction, normal), ray.direction)), exponent) * light.intensity;
     }
 
-    return last_hit.sphere->material.diffuse_color;
+    const Color& albedo = material.albedo;
+    Color total_color = material.diffuse_color *
+                        diffuse_light_intensity * albedo.x +
+                        Color(1.0, 1.0, 1.0) * specular_light_intensity * albedo.y +
+                        reflect_color * albedo.z;
+    return total_color;
 }
 
 Ray emit_ray(size_t i, size_t j) {
-    static constexpr int fov = std::numbers::pi_v<float> / 2.;
+    static constexpr int fov = std::numbers::pi_v<float> / 2.0;
 
     float x = (2 * (i + 0.5) / (float)WIDTH - 1) * tan(fov / 2.) * WIDTH / (float)HEIGHT;
-    float y = -(2 * (j + 0.5) / (float)HEIGHT - 1) * tan(fov / 2.);
+    float y = (2 * (j + 0.5) / (float)HEIGHT - 1) * tan(fov / 2.);
     Vector direction = glm::normalize(Vector(x, y, -1));
     return Ray{Point(0.0, 0.0, 0.0), direction};
 }
@@ -120,13 +182,14 @@ size_t eval_index(const size_t h_pos, const size_t w_pos) {
 }
 
 void render(std::vector<Color>& framebuffer,
-            const std::vector<Sphere>& spheres) {
+            const std::vector<Sphere>& spheres,
+            const std::vector<Light>& lights) {
     static constexpr int fov = std::numbers::pi_v<float> / 2.;
 
     for (size_t i = 0; i < HEIGHT; ++i) {
         for (size_t j = 0; j < WIDTH; ++j) {
             const size_t index = eval_index(i, j);
-            framebuffer[index] = cast_ray(emit_ray(i, j), spheres);
+            framebuffer[index] = cast_ray(emit_ray(i, j), spheres, lights);
         }
     }
 }
