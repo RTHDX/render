@@ -28,25 +28,37 @@ void process_input(GLFWwindow* window);
 
 rtx::Material mirror() {
     return {
-        rtx::Color(0.0, 10.0, 0.8),
+        {0.0, 10.0, 0.8, 0.0},
         rtx::Color(1.0, 1.0, 1.0),
-        1425.0
+        1425.0,
+        1.0
     };
 }
 
 rtx::Material ivory() {
     return {
-        rtx::Color(0.6, 0.3, 0.1),
+        {0.6, 0.3, 0.1, 0.0},
         rtx::Color(0.45, 0.45, 0.35),
-        50.0
+        50.0,
+        1.0
     };
 }
 
 rtx::Material red_rubber() {
     return {
-        rtx::Color(0.9, 0.1, 0.0),
+        {0.9, 0.1, 0.0, 0.0},
         rtx::Color(0.3, 0.1, 0.1),
-        10.0f
+        10.0f,
+        1.0
+    };
+}
+
+rtx::Material glass() {
+    return {
+        {0.0, 0.5, 0.1, 0.8},
+        {0.6, 0.7, 0.8},
+        125.0,
+        1.5
     };
 }
 
@@ -66,16 +78,16 @@ int main() {
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
 
-    std::vector<rtx::Color> framebuffer (rtx::WIDTH * rtx::HEIGHT);
+    std::vector<rtx::Color> framebuffer(rtx::WIDTH * rtx::HEIGHT);
 
-    std::vector<rtx::Sphere> scene{
-        rtx::Sphere({0.0, -10.0, -30.0}, ivory(), 5.0f),
+    std::vector<rtx::Sphere> scene {
+        rtx::Sphere({0.0, -10.0, -30.0}, glass(), 5.0f),
         rtx::Sphere({-5.0, 10.0, -30.0}, ivory(), 3.0),
         rtx::Sphere({0.0, 0.0, -40.0}, mirror(), 10.0f),
         rtx::Sphere({5.0, 20.0, -45.0}, red_rubber(), 5.0f),
         //make_ground(red_rubber(), 10'000'000)
     };
-    std::vector<rtx::Light> lights{
+    std::vector<rtx::Light> lights {
         rtx::Light({10.0, 60.0, 0.0}, 1.0),
         rtx::Light({-10.0, 60.0, 0.0}, 1.1)
     };
