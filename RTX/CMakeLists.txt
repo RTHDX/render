@@ -4,6 +4,6 @@ project(RTX)
 
 create_library(
     TARGET ${PROJECT_NAME}
-    SOURCES rtx.cpp render.cpp
-    HEADERS rtx.hpp utils.hpp render.hpp
+    SOURCES rtx_internal.cpp render.cpp
+    HEADERS rtx_internal.hpp render.hpp utils.hpp
 )
