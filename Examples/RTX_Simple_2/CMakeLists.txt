@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
-project(RTX_Simple)
+project(RTX_Simple_2)
 
 create_executable(
     TARGET ${PROJECT_NAME}
     SOURCES main.cpp
-    LIBS UI OpenGL
+    LIBS RTX UI OpenGL
 )

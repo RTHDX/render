@@ -16,4 +16,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/OpenGL")
 add_subdirectory(UI)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/UI")
 
+add_subdirectory(RTX)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/RTX")
+
 add_subdirectory(Examples)
