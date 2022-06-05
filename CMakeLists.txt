@@ -9,6 +9,8 @@ add_subdirectory(3rdParty/glad)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glad/include")
 add_subdirectory(3rdParty/glm)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm")
+add_subdirectory(3rdParty/assimp)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/include")
 
 add_subdirectory(OpenGL)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/OpenGL")

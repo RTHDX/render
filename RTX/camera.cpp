@@ -10,9 +10,6 @@ Camera::Camera(const Point& position, float fov, size_t width, size_t height)
 {}
 
 Ray Camera::emit_ray(const size_t h_pos, const size_t w_pos) const {
-    //float x = (2 * (i + 0.5) / (float)_width - 1) * tan(_field_of_view / 2.) * _width / (float)_width;
-    //float y = (2 * (j + 0.5) / (float)_height - 1) * tan(_field_of_view / 2.);
-    //Vector direction = glm::normalize(Vector(x, y, -1));
     return Ray(_position, glm::normalize(pixel_camera(h_pos, w_pos)));
 }
 
