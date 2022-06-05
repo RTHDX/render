@@ -104,11 +104,9 @@ void MultiThreadRender::render() {
     for (size_t i = 0; i < _workers.size(); ++i) {
         size_t start = current;
         size_t end = (start + _step) <= width() ? start + _step : width();
-
         _workers[i] = std::thread(&MultiThreadRender::partial_rander,
                                   this, start, end);
-
-        current = end;
+        current = end + 1;
     }
 
     for (std::thread& worker : _workers) {
@@ -118,7 +116,7 @@ void MultiThreadRender::render() {
 
 void MultiThreadRender::partial_rander(size_t w_start, size_t w_end) {
     for (size_t i = 0; i < height(); ++i) {
-        for (size_t j = w_start; j < w_end; ++j) {
+        for (size_t j = w_start; (w_end < width() ? j <= w_end : j < w_end); ++j) {
             const size_t index = eval_index(i, j);
             Ray ray = _camera.emit_ray(i, j);
             _framebuffer[index] = cast_ray(ray);

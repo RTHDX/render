@@ -3,6 +3,7 @@
 #include <thread>
 
 #include "rtx_internal.hpp"
+#include "camera.hpp"
 
 namespace rtx {
 using Framebuffer = std::vector<Color>;

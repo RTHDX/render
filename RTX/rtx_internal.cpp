@@ -10,21 +10,6 @@ Ray::Ray(const Point& origin, const Vector& direction)
 Point Ray::at(float t) const { return origin + t * direction; }
 
 
-Camera::Camera(const Point& position, float fov, size_t width, size_t height)
-    : _position(position)
-    , _field_of_view(fov)
-    , _width(width)
-    , _height(height)
-{}
-
-Ray Camera::emit_ray(const size_t i, const size_t j) const {
-    float x = (2 * (i + 0.5) / (float)_width - 1) * tan(_field_of_view / 2.) * _width / (float)_width;
-    float y = (2 * (j + 0.5) / (float)_height - 1) * tan(_field_of_view / 2.);
-    Vector direction = glm::normalize(Vector(x, y, -1));
-    return Ray{_position, direction};
-}
-
-
 Light::Light(const Point& position, float intensity)
     : position(position)
     , intensity(intensity)

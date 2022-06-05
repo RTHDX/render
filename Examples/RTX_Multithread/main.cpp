@@ -8,7 +8,7 @@ int main() {
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
 
-    rtx::MultiThreadRender render(make_scene(), rtx::Color{0.6, 0.85, 0.80},
+    rtx::MultiThreadRender render(make_scene(), rtx::Color{0.01, 0.05, 0.08},
                                   make_camera());
 
     while (!glfwWindowShouldClose(window)) {
