@@ -150,17 +150,11 @@ public:
 
     void attach_shader(const Shader& shader);
     void attach_shader(GLuint shader_type, const std::string_view src);
-    void create_buffers(const std::vector<float>& vertices,
-                        const std::vector<uint32_t>& indices);
     void link_program();
     void use();
 
     const Shader& vertex_shader() const { return _vertex_shader; }
     const Shader& fragment_shader() const { return _fragment_shader; }
-    const VertexArrayBuffer& vao() const { return _vao; }
-    VertexArrayBuffer& vao() { return _vao; }
-    const VertexBuffer& vbo() const { return _vbo; }
-    const ElementBuffer& ebo() const { return _ebo; }
 
 private:
     void check_program() const;
@@ -170,12 +164,10 @@ private:
     std::string _label;
 
     Shader _vertex_shader, _fragment_shader;
-
-    VertexArrayBuffer _vao;
-    VertexBuffer _vbo;
-    ElementBuffer _ebo;
-
     State _current_state;
 };
+
+GLuint create_program(const std::string_view vertex_shader,
+                      const std::string_view fragment_shader);
 
 }

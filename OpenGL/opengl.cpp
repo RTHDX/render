@@ -22,13 +22,52 @@ void Context::initialize() {
 }
 
 void Context::dump() const {
-    int major, minor;
-    glGetIntegerv(GL_MAJOR_VERSION, &major);
-    glGetIntegerv(GL_MINOR_VERSION, &minor);
-    std::cout << "[Context] Opengl " << major << "." << minor << std::endl;
-    std::cout << " - Vendor: " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << " - Renderer: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << " - Shading language version: "
+    GLenum enums[] = {
+        GL_MAJOR_VERSION,
+        GL_MINOR_VERSION,
+        GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
+        GL_MAX_CUBE_MAP_TEXTURE_SIZE,
+        GL_MAX_DRAW_BUFFERS,
+        GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
+        GL_MAX_TEXTURE_IMAGE_UNITS,
+        GL_MAX_TEXTURE_SIZE,
+        GL_MAX_VARYING_FLOATS,
+        GL_MAX_VERTEX_ATTRIBS,
+        GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
+        GL_MAX_VERTEX_UNIFORM_COMPONENTS,
+        GL_MAX_VIEWPORT_DIMS,
+        GL_STEREO,
+    };
+    const char* names[] = {
+        "GL_MAJOR_VERSION",
+        "GL_MINOR_VERSION",
+        "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS",
+        "GL_MAX_CUBE_MAP_TEXTURE_SIZE",
+        "GL_MAX_DRAW_BUFFERS",
+        "GL_MAX_FRAGMENT_UNIFORM_COMPONENTS",
+        "GL_MAX_TEXTURE_IMAGE_UNITS",
+        "GL_MAX_TEXTURE_SIZE",
+        "GL_MAX_VARYING_FLOATS",
+        "GL_MAX_VERTEX_ATTRIBS",
+        "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS",
+        "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
+        "GL_MAX_VIEWPORT_DIMS",
+        "GL_STEREO",
+    };
+
+    std::cout << "[Context] Opengl ----------------------------- " << std::endl;
+    for (size_t i = 0; i < (sizeof(enums) / sizeof(GLenum)) - 1; ++i) {
+        int int_value;
+        glGetIntegerv (enums[i], &int_value);
+        std::cout << names[i] << ": " << int_value << std::endl;
+    }
+    int values[2];
+    values[0] = values[1] = 0;
+    glGetIntegerv(enums[13], values);
+    std::cout << names[13] << ": " << values[0] << " " << values[1] << std::endl;
+    std::cout << "VENDOR: " << glGetString(GL_VENDOR) << std::endl;
+    std::cout << "RENDERER: " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "SHADING LANGUAGE VERSION: "
               << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 }
 
@@ -193,28 +232,6 @@ void Program::attach_shader(GLuint shader_type, const std::string_view src) {
     }
 }
 
-void Program::create_buffers(const std::vector<float>& vertices,
-                             const std::vector<uint32_t>& indices) {
-    if (_current_state < State::LINKED) {
-        static constexpr char MSG[] =
-            "[OpenGL][{}] Attach shaders before creating buffers";
-        std::cerr << std::format(MSG, _label) << std::endl;
-        return;
-    }
-
-    _vao.initialize();
-    _vao.bind();
-
-    _vbo.initialize();
-    _vbo.bind(vertices.data(), vertices.size() * sizeof (float));
-
-    _ebo.initialize();
-    _ebo.bind(indices.data(), indices.size() * sizeof (uint32_t));
-
-    _vbo.set_layout(0, 3, 3);
-    update_state(State::BUFFERS_CREATED);
-}
-
 void Program::link_program() {
     if (_current_state < State::FRAGEMENT_SHADER_CREATED) {
         static constexpr char MSG[] =
@@ -270,6 +287,27 @@ void Program::update_state(State new_state) {
 
 void framebuffer_size_callback(GLFWwindow*, int width, int height) {
     Context::instance().viewport(width, height);
+}
+
+
+GLuint create_program(const std::string_view vertex_shader_src,
+                      const std::string_view fragment_shader_src) {
+    GLuint program         = glCreateProgram(),
+           vertex_shader   = glCreateShader(GL_VERTEX_SHADER),
+           fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+
+    const auto* src = vertex_shader_src.data();
+    glShaderSource(vertex_shader, 1, &src, nullptr);
+    glCompileShader(vertex_shader);
+
+    src = fragment_shader_src.data();
+    glShaderSource(fragment_shader, 1, &src, nullptr);
+    glCompileShader(fragment_shader);
+
+    glAttachShader(program, vertex_shader);
+    glAttachShader(program, fragment_shader);
+    glLinkProgram(program);
+    return program;
 }
 
 }

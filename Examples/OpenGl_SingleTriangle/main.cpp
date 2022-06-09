@@ -45,14 +45,14 @@ int main() {
 
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
-    opengl::Context::instance().background({ 0.2f, 0.5f, 0.5f, 1.0f });
+    opengl::Context::instance().background({0.2f, 0.5f, 0.5f, 1.0f});
 
     opengl::Program program("orange");
     program.initialize();
     program.attach_shader(GL_VERTEX_SHADER, vertex_shader_source);
     program.attach_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
     program.link_program();
-    program.create_buffers(vertices, indices);
+    //program.create_buffers(vertices, indices);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
