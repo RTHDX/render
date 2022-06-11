@@ -138,8 +138,7 @@ public:
         VERTEX_SHADER_CREATED    = 0x2,
         FRAGEMENT_SHADER_CREATED = 0x4,
         LINKED                   = 0x8,
-        BUFFERS_CREATED          = 0x10,
-        ACTIVE                   = 0x20
+        ACTIVE                   = 0x10
     };
 
 public:

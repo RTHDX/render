@@ -31,13 +31,6 @@ const std::string_view fragment_shader_source =
     "}\n\0";
 
 
-const std::vector<float> vertices{
-     0.5f,  0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-    -0.5f,  0.5f, 0.0f,
-};
-const std::vector<uint32_t> indices{0, 1, 2};
-
 int main() {
     if (!ui::init_glfw(4, 6)) { return EXIT_FAILURE; }
     GLFWwindow* window = ui::create_window(SCR_WIDTH, SCR_HEIGHT, "Test");
@@ -47,12 +40,32 @@ int main() {
     opengl::Context::instance().dump();
     opengl::Context::instance().background({0.2f, 0.5f, 0.5f, 1.0f});
 
+    const std::vector<float> vertices{
+         0.5f,  0.5f, 0.0f,
+         0.5f, -0.5f, 0.0f,
+        -0.5f,  0.5f, 0.0f,
+    };
+    const std::vector<uint32_t> indices{ 0, 1, 2 };
+
     opengl::Program program("orange");
     program.initialize();
     program.attach_shader(GL_VERTEX_SHADER, vertex_shader_source);
     program.attach_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
     program.link_program();
-    //program.create_buffers(vertices, indices);
+
+    opengl::VertexArrayBuffer vao;
+    opengl::VertexBuffer vbo;
+    opengl::ElementBuffer ebo;
+
+    vao.initialize();
+    vbo.initialize();
+    ebo.initialize();
+
+    vao.bind();
+    vbo.bind(vertices.data(), vertices.size() * sizeof (float));
+    vbo.set_layout(0, 3, 3);
+
+    ebo.bind(indices.data(), indices.size() * sizeof (uint32_t));
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);

@@ -260,7 +260,7 @@ void Program::check_program() const {
 }
 
 void Program::use() {
-    if (_current_state < State::BUFFERS_CREATED) {
+    if (_current_state < State::LINKED) {
         static constexpr char MSG[] =
             "[OpenGL][{}] Create buffers before activate the program";
         std::cerr << std::format(MSG, _label) << std::endl;
