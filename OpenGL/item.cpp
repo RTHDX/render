@@ -26,6 +26,7 @@ Item::Item(const Coordinates& coords, const Indices& indices,
     _indices = indices;
     _ebo.initialize();
     _ebo.bind(_indices.data(), _indices.size() * sizeof (Index));
+    _current_state = ELEMENT_BUFFER_BOUND;
 }
 
 void Item::draw(Program& program) {
