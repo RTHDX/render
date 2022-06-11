@@ -22,53 +22,29 @@ void Context::initialize() {
 }
 
 void Context::dump() const {
-    GLenum enums[] = {
-        GL_MAJOR_VERSION,
-        GL_MINOR_VERSION,
-        GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS,
-        GL_MAX_CUBE_MAP_TEXTURE_SIZE,
-        GL_MAX_DRAW_BUFFERS,
-        GL_MAX_FRAGMENT_UNIFORM_COMPONENTS,
-        GL_MAX_TEXTURE_IMAGE_UNITS,
-        GL_MAX_TEXTURE_SIZE,
-        GL_MAX_VARYING_FLOATS,
-        GL_MAX_VERTEX_ATTRIBS,
-        GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS,
-        GL_MAX_VERTEX_UNIFORM_COMPONENTS,
-        GL_MAX_VIEWPORT_DIMS,
-        GL_STEREO,
-    };
-    const char* names[] = {
-        "GL_MAJOR_VERSION",
-        "GL_MINOR_VERSION",
-        "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS",
-        "GL_MAX_CUBE_MAP_TEXTURE_SIZE",
-        "GL_MAX_DRAW_BUFFERS",
-        "GL_MAX_FRAGMENT_UNIFORM_COMPONENTS",
-        "GL_MAX_TEXTURE_IMAGE_UNITS",
-        "GL_MAX_TEXTURE_SIZE",
-        "GL_MAX_VARYING_FLOATS",
-        "GL_MAX_VERTEX_ATTRIBS",
-        "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS",
-        "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
-        "GL_MAX_VIEWPORT_DIMS",
-        "GL_STEREO",
-    };
+    #define PRINT_OPENGL_FEATURE_INTV(FEATURE) \
+        {\
+            int value;\
+            glGetIntegerv(FEATURE, &value);\
+            std::cout << " - " << #FEATURE << ": " << value << std::endl;\
+        }
 
     std::cout << "[Context] Opengl ----------------------------- " << std::endl;
-    for (size_t i = 0; i < (sizeof(enums) / sizeof(GLenum)) - 1; ++i) {
-        int int_value;
-        glGetIntegerv (enums[i], &int_value);
-        std::cout << names[i] << ": " << int_value << std::endl;
-    }
-    int values[2];
-    values[0] = values[1] = 0;
-    glGetIntegerv(enums[13], values);
-    std::cout << names[13] << ": " << values[0] << " " << values[1] << std::endl;
-    std::cout << "VENDOR: " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "RENDERER: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "SHADING LANGUAGE VERSION: "
-              << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    PRINT_OPENGL_FEATURE_INTV(GL_MAJOR_VERSION); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MINOR_VERSION); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_CUBE_MAP_TEXTURE_SIZE); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_DRAW_BUFFERS); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_TEXTURE_IMAGE_UNITS); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_TEXTURE_SIZE); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VARYING_FLOATS); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_ATTRIBS); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_UNIFORM_COMPONENTS); \
+
+    std::cout << std::endl;
+    #undef PRINT_OPENGL_FEATURE_INTV
 }
 
 void Context::viewport(int width, int height) const {
@@ -87,6 +63,8 @@ void Context::draw_background() const {
 
 Buffer::Buffer() : Object(), _is_bound(false) {}
 
+
+VertexArrayBuffer::VertexArrayBuffer() : Buffer() {}
 
 VertexArrayBuffer::~VertexArrayBuffer() {
     glDeleteVertexArrays(1, id_ptr());
@@ -186,15 +164,19 @@ Program::Program(const std::string_view label) : Object()
     , _vertex_shader(GL_VERTEX_SHADER)
     , _fragment_shader(GL_FRAGMENT_SHADER)
     , _current_state(NONE)
-{}
+{
+    initialize();
+}
 
 Program::~Program() {
     glDeleteProgram(id());
 }
 
 void Program::initialize() {
-    id(glCreateProgram());
-    update_state(State::INITIALIZED);
+    if (_current_state < State::INITIALIZED) {
+        id(glCreateProgram());
+        update_state(State::INITIALIZED);
+    }
 }
 
 void Program::attach_shader(const Shader& shader) {

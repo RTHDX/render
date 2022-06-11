@@ -48,7 +48,6 @@ int main() {
     const std::vector<uint32_t> indices{ 0, 1, 2 };
 
     opengl::Program program("orange");
-    program.initialize();
     program.attach_shader(GL_VERTEX_SHADER, vertex_shader_source);
     program.attach_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
     program.link_program();

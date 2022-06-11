@@ -75,7 +75,7 @@ private:
 
 class VertexArrayBuffer final : public Buffer {
 public:
-    VertexArrayBuffer() = default;
+    VertexArrayBuffer();
     ~VertexArrayBuffer() override;
 
     void bind();

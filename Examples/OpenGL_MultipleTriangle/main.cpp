@@ -48,45 +48,39 @@ int main() {
     opengl::Context::instance().dump();
     opengl::Context::instance().background({0.2f, 0.5f, 0.5f, 1.0f});
 
-    GLuint program_orange = opengl::create_program(
-        vertex_shader_source,
-        orange_fragment_source
-    );
-    GLuint program_yellow = opengl::create_program(
-        vertex_shader_source,
-        yellow_fragment_source
-    );
+    opengl::Program program_orange("orange"), program_yellow("yellow");
 
-    uint32_t vao_1, vao_2;
-    glGenVertexArrays(1, &vao_1);
-    glGenVertexArrays(1, &vao_2);
-    uint32_t vbo_1, vbo_2;
-    glGenBuffers(1, &vbo_1);
-    glGenBuffers(1, &vbo_2);
+    program_orange.attach_shader(GL_VERTEX_SHADER, vertex_shader_source);
+    program_orange.attach_shader(GL_FRAGMENT_SHADER, orange_fragment_source);
+    program_orange.link_program();
 
-    glBindVertexArray(vao_1);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_1);
-    glBufferData(GL_ARRAY_BUFFER, sizeof (first_triangle), first_triangle,
-                 GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (float), nullptr);
-    glEnableVertexAttribArray(0);
+    program_yellow.attach_shader(GL_VERTEX_SHADER, vertex_shader_source);
+    program_yellow.attach_shader(GL_FRAGMENT_SHADER, yellow_fragment_source);
+    program_yellow.link_program();
 
-    glBindVertexArray(vao_2);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_2);
-    glBufferData(GL_ARRAY_BUFFER, sizeof (second_triangle), second_triangle,
-                 GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof (float), nullptr);
-    glEnableVertexAttribArray(0);
+    opengl::VertexArrayBuffer vao_1, vao_2;
+    vao_1.initialize(); vao_2.initialize();
+
+    opengl::VertexBuffer vbo_1, vbo_2;
+    vbo_1.initialize(); vbo_2.initialize();
+
+    vao_1.bind();
+    vbo_1.bind(first_triangle, sizeof (first_triangle));
+    vbo_1.set_layout(0, 3, 3);
+
+    vao_2.bind();
+    vbo_2.bind(second_triangle, sizeof (second_triangle));
+    vbo_2.set_layout(0, 3, 3);
 
     while (!glfwWindowShouldClose(window)) {
         opengl::Context::instance().draw_background();
 
-        glUseProgram(program_orange);
-        glBindVertexArray(vao_1);
+        program_orange.use();
+        vao_1.bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glUseProgram(program_yellow);
-        glBindVertexArray(vao_2);
+        program_yellow.use();
+        vao_2.bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
