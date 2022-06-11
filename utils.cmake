@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.20)
 
+function (copy_shaders)
+    cmake_parse_arguments(THIS "" "TARGET" "SHADERS" ${ARGV})
+    foreach (SHADER ${THIS_SHADERS})
+        file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/${SHADER}"
+             DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+    endforeach ()
+endfunction()
+
 function (create_executable)
     set(CMAKE_CUDA_ARCHITECTURES CMAKE_CUDA_ARCHITECTURES_DEFAULT)
 

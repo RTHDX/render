@@ -1,5 +1,6 @@
 #include <ui.hpp>
 #include <opengl.hpp>
+#include <item.hpp>
 
 
 const unsigned int WIDTH = 800;
@@ -29,12 +30,12 @@ const std::string_view yellow_fragment_source =
     "}\n\0";
 
 
-float first_triangle[] = {
+std::vector<float> first_triangle = {
     -0.9f, -0.5f, 0.0f,  // left 
     -0.0f, -0.5f, 0.0f,  // right
     -0.45f, 0.5f, 0.0f,  // top 
 };
-float second_triangle[] = {
+std::vector<float> second_triangle = {
     0.0f, -0.5f, 0.0f,  // left
     0.9f, -0.5f, 0.0f,  // right
     0.45f, 0.5f, 0.0f   // top 
@@ -58,29 +59,16 @@ int main() {
     program_yellow.attach_shader(GL_FRAGMENT_SHADER, yellow_fragment_source);
     program_yellow.link_program();
 
-    opengl::VertexArrayBuffer vao_1, vao_2;
-    vao_1.initialize(); vao_2.initialize();
-
-    opengl::VertexBuffer vbo_1, vbo_2;
-    vbo_1.initialize(); vbo_2.initialize();
-
-    vao_1.bind();
-    vbo_1.bind(first_triangle, sizeof (first_triangle));
-    vbo_1.set_layout(0, 3, 3);
-
-    vao_2.bind();
-    vbo_2.bind(second_triangle, sizeof (second_triangle));
-    vbo_2.set_layout(0, 3, 3);
+    opengl::Item orange_item(first_triangle, opengl::AttribPointer(0, 3, 3)),
+                 yellow_item(second_triangle, opengl::AttribPointer(0, 3, 3));
 
     while (!glfwWindowShouldClose(window)) {
         opengl::Context::instance().draw_background();
 
-        program_orange.use();
-        vao_1.bind();
+        orange_item.draw(program_orange);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        program_yellow.use();
-        vao_2.bind();
+        yellow_item.draw(program_yellow);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);

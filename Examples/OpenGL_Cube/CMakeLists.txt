@@ -7,3 +7,8 @@ create_executable(
     SOURCES main.cpp
     LIBS OpenGL UI
 )
+
+copy_shaders(
+    TARGET ${PROJECT_NAME}
+    SHADERS vertex_shader.vert fragment_shader.frag
+)

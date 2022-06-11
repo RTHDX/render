@@ -6,6 +6,7 @@
 
 #include "ui.hpp"
 #include "opengl.hpp"
+#include "item.hpp"
 
 
 void process_input(GLFWwindow* window);
@@ -45,33 +46,20 @@ int main() {
          0.5f, -0.5f, 0.0f,
         -0.5f,  0.5f, 0.0f,
     };
-    const std::vector<uint32_t> indices{ 0, 1, 2 };
+    const std::vector<uint32_t> indices{0, 1, 2};
 
     opengl::Program program("orange");
     program.attach_shader(GL_VERTEX_SHADER, vertex_shader_source);
     program.attach_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
     program.link_program();
 
-    opengl::VertexArrayBuffer vao;
-    opengl::VertexBuffer vbo;
-    opengl::ElementBuffer ebo;
-
-    vao.initialize();
-    vbo.initialize();
-    ebo.initialize();
-
-    vao.bind();
-    vbo.bind(vertices.data(), vertices.size() * sizeof (float));
-    vbo.set_layout(0, 3, 3);
-
-    ebo.bind(indices.data(), indices.size() * sizeof (uint32_t));
+    opengl::Item triangle(vertices, indices, opengl::AttribPointer(0, 3, 3));
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
 
         opengl::Context::instance().draw_background();
-        program.use();
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        triangle.draw(program);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

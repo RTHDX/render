@@ -4,6 +4,6 @@ project(OpenGL)
 
 create_library(
 	TARGET ${PROJECT_NAME}
-	SOURCES opengl.cpp opengl_utils.cpp
-	HEADERS opengl.hpp opengl_utils.hpp
+	SOURCES opengl.cpp opengl_utils.cpp item.cpp
+	HEADERS opengl.hpp opengl_utils.hpp item.hpp
 )

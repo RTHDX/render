@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 #include "opengl_utils.hpp"
 
@@ -103,6 +104,29 @@ GLenum gl_check_error(const char* file, int line) {
         throw std::runtime_error(error);
     }
     return errorCode;
+}
+
+GLenum convert_to_shader_type(const std::filesystem::path& path) {
+    const auto extension = path.extension();
+    if (extension == std::filesystem::path(".vert")) {
+        return GL_VERTEX_SHADER;
+    }
+    if (extension == std::filesystem::path(".frag")) {
+        return GL_FRAGMENT_SHADER;
+    }
+    return 0;
+}
+
+std::string read_shader(const std::filesystem::path& path) {
+    std::ifstream file(path.c_str());
+    if (!file) {
+        std::cerr << "Could not open" << std::endl;
+        return std::string();
+    }
+    return std::string(
+        (std::istreambuf_iterator<char>(file)),
+         std::istreambuf_iterator<char>()
+    );
 }
 
 }

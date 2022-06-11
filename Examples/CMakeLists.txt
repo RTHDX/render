@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 
 add_subdirectory(OpenGL_SingleTriangle)
 add_subdirectory(OpenGL_MultipleTriangle)
+add_subdirectory(OpenGL_Cube)
 add_subdirectory(RTX_Simple)
 add_subdirectory(RTX_Simple_2)
 add_subdirectory(RTX_Multithread)
