@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <glm/glm.hpp>
+
 #include "opengl.hpp"
 
 
@@ -35,6 +37,8 @@ public:
 
     void draw(Program& program);
 
+    const glm::mat4& model() const { return _model; }
+
 private:
     bool has_indices() const;
 
@@ -48,6 +52,8 @@ private:
     ElementBuffer _ebo;
 
     State _current_state = NONE;
+
+    glm::mat4 _model;
 };
 
 }

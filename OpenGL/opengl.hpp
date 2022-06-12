@@ -155,6 +155,8 @@ public:
     const Shader& vertex_shader() const { return _vertex_shader; }
     const Shader& fragment_shader() const { return _fragment_shader; }
 
+    void set_mat4(const std::string_view name, const glm::mat4& value) const;
+
 private:
     void check_program() const;
     void update_state(State new_state);

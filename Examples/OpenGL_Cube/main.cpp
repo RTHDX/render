@@ -1,12 +1,61 @@
 #include <iostream>
 #include <filesystem>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <ui.hpp>
 #include <opengl.hpp>
+#include <item.hpp>
+#include <camera.hpp>
 #include <opengl_utils.hpp>
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
+
+
+std::vector<float> vertices{
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+
+    -0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f, -0.5f,
+     0.5f, -0.5f,  0.5f,
+     0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f,  0.5f,
+    -0.5f, -0.5f, -0.5f,
+
+    -0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f, -0.5f,
+     0.5f,  0.5f,  0.5f,
+     0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f,  0.5f,
+    -0.5f,  0.5f, -0.5f,
+};
 
 
 int main() {
@@ -26,5 +75,22 @@ int main() {
                           opengl::utils::read_shader(fragment_path));
     program.link_program();
 
+    opengl::Item cube(vertices, opengl::AttribPointer(0, 3, 3));
+    opengl::Camera camera(WIDTH, HEIGHT, glm::radians(45.0));
+
+    while (!glfwWindowShouldClose(window)) {
+        opengl::Context::instance().draw_background();
+
+        cube.draw(program);
+
+        program.set_mat4("model", cube.model());
+        program.set_mat4("view", camera.view());
+        program.set_mat4("projection", camera.projection());
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
     return EXIT_SUCCESS;
 }

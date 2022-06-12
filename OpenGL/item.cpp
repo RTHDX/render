@@ -9,6 +9,7 @@ namespace opengl {
 Item::Item(const Coordinates& coords, const AttribPointer& attribs)
     : _coordinates(coords)
     , _attribs(attribs)
+    , _model(glm::mat4(1.0f))
 {
     _vao.initialize();
     _vbo.initialize();

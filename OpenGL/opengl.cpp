@@ -2,6 +2,8 @@
 #include <bitset>
 #include <format>
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "opengl_utils.hpp"
 #include "opengl.hpp"
 
@@ -30,18 +32,18 @@ void Context::dump() const {
         }
 
     std::cout << "[Context] Opengl ----------------------------- " << std::endl;
-    PRINT_OPENGL_FEATURE_INTV(GL_MAJOR_VERSION); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MINOR_VERSION); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_CUBE_MAP_TEXTURE_SIZE); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_DRAW_BUFFERS); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_TEXTURE_IMAGE_UNITS); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_TEXTURE_SIZE); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VARYING_FLOATS); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_ATTRIBS); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS); \
-    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_UNIFORM_COMPONENTS); \
+    PRINT_OPENGL_FEATURE_INTV(GL_MAJOR_VERSION);
+    PRINT_OPENGL_FEATURE_INTV(GL_MINOR_VERSION);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_CUBE_MAP_TEXTURE_SIZE);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_DRAW_BUFFERS);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_TEXTURE_IMAGE_UNITS);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_TEXTURE_SIZE);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VARYING_FLOATS);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_ATTRIBS);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS);
+    PRINT_OPENGL_FEATURE_INTV(GL_MAX_VERTEX_UNIFORM_COMPONENTS);
 
     std::cout << std::endl;
     #undef PRINT_OPENGL_FEATURE_INTV
@@ -251,6 +253,15 @@ void Program::use() {
 
     glUseProgram(id());
     update_state(State::ACTIVE);
+}
+
+void Program::set_mat4(const std::string_view name, const glm::mat4& value) const {
+    auto location = glGetUniformLocation(id(), name.data());
+    if (location < 0) {
+        std::cerr << "[OpenGL] Could not find uniform " << name << std::endl;
+        return;
+    }
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
 }
 
 void Program::update_state(State new_state) {
