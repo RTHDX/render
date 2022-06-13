@@ -4,6 +4,6 @@ project(UI)
 
 create_library(
 	TARGET ${PROJECT_NAME}
-	SOURCES ui.cpp
-	HEADERS ui.hpp
+	SOURCES ui.cpp application.cpp observer.cpp
+	HEADERS ui.hpp application.hpp observer.hpp
 )

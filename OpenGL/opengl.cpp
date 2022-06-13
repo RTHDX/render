@@ -3,6 +3,7 @@
 #include <format>
 
 #include <glm/gtc/type_ptr.hpp>
+#include <application.hpp>
 
 #include "opengl_utils.hpp"
 #include "opengl.hpp"
@@ -16,11 +17,13 @@ Context& Context::instance() {
 }
 
 void Context::initialize() {
+    auto& app = ui::Application::instance();
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         std::terminate();
     }
     glDebugMessageCallback(utils::gl_debug_output, nullptr);
+    glEnable(GL_MULTISAMPLE);
 }
 
 void Context::dump() const {

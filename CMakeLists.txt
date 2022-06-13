@@ -12,11 +12,11 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm")
 add_subdirectory(3rdParty/assimp)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/include")
 
-add_subdirectory(OpenGL)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/OpenGL")
-
 add_subdirectory(UI)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/UI")
+
+add_subdirectory(OpenGL)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/OpenGL")
 
 add_subdirectory(RTX)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/RTX")

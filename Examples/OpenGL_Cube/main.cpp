@@ -8,6 +8,7 @@
 #include <item.hpp>
 #include <camera.hpp>
 #include <opengl_utils.hpp>
+#include <application.hpp>
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
@@ -59,8 +60,8 @@ std::vector<float> vertices{
 
 
 int main() {
-    if (!ui::init_glfw(4, 6)) { return EXIT_FAILURE; }
-    auto* window = ui::create_window(WIDTH, HEIGHT, "Cube");
+    ui::Application& app = ui::Application::instance();
+    auto* window = app.window();
 
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
@@ -77,6 +78,8 @@ int main() {
 
     opengl::Item cube(vertices, opengl::AttribPointer(0, 3, 3));
     opengl::Camera camera(WIDTH, HEIGHT, glm::radians(45.0));
+    app.subscribe(&camera);
+    camera.bind(&app);
 
     while (!glfwWindowShouldClose(window)) {
         opengl::Context::instance().draw_background();

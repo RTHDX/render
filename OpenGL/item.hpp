@@ -17,6 +17,9 @@ struct AttribPointer {
     size_t index;
     size_t width;
     size_t stride;
+
+public:
+    AttribPointer(size_t i, size_t w, size_t s);
 };
 
 

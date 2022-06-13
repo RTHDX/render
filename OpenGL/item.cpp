@@ -6,6 +6,14 @@
 
 namespace opengl {
 
+
+AttribPointer::AttribPointer(size_t i, size_t w, size_t s)
+    : index(i)
+    , width(w)
+    , stride(s)
+{}
+
+
 Item::Item(const Coordinates& coords, const AttribPointer& attribs)
     : _coordinates(coords)
     , _attribs(attribs)
