@@ -10,3 +10,6 @@
 [submodule "3rdParty/assimp"]
 	path = 3rdParty/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "3rdParty/Nuklear"]
+	path = 3rdParty/Nuklear
+	url = https://github.com/Immediate-Mode-UI/Nuklear.git
