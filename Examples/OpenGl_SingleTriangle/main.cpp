@@ -4,9 +4,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "ui.hpp"
-#include "opengl.hpp"
-#include "item.hpp"
+#include "UI/ui.hpp"
+#include "OpenGL/opengl.hpp"
+#include "OpenGL/item.hpp"
 
 
 void process_input(GLFWwindow* window);
