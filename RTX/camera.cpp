@@ -1,3 +1,5 @@
+#include <cmath>
+#include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "camera.hpp"
@@ -22,19 +24,13 @@ Ray Camera::emit_ray(const size_t h_pos, const size_t w_pos) const {
     glm::vec3 direction = project_view_direction(glm::normalize(
         pixel_camera(h_pos, w_pos)
     ));
-    //return Ray(_position, glm::normalize(pixel_camera(h_pos, w_pos)));
     return Ray(_position, direction);
 }
 
 void Camera::move(Direction direction) {
-    switch (direction) {
-    case Direction::FORWARD: break;
-    case Direction::BACKWARD: break;
-    case Direction::LEFT: break;
-    case Direction::RIGHT: break;
-    case Direction::ROTATE_LEFT: break;
-    case Direction::ROTATE_RIGHT: break;
-    }
+    const auto& transform = transform_mat(direction);
+    glm::vec4 res = transform * glm::vec4(_position, 1.0);
+    _position = glm::vec3(res.x, res.y, res.z);
 }
 
 Point Camera::ndc(size_t h_pos, size_t w_pos) const {
@@ -64,22 +60,118 @@ Point Camera::pixel_camera(size_t h_pos, size_t w_pos) const {
     );
 }
 
-const glm::mat4& Camera::view() const {
-    _view = glm::transpose(glm::lookAt(_position, _target, UP));
-    return _view;
-}
-
-const glm::mat4& Camera::projection() const {
-    _projection = glm::transpose(glm::perspective(_field_of_view,
-                                                  aspect_ratio(), 0.1f,
-                                                  100.0f));
-    return _projection;
+glm::mat4 Camera::view() const {
+    return glm::transpose(glm::lookAt(_position, _target, UP));
 }
 
 glm::vec3 Camera::project_view_direction(const glm::vec3& direction) const {
     glm::vec4 temp(direction.x, direction.y, direction.z, 1.0);
     glm::vec4 res = view() * temp;
     return glm::normalize(glm::vec3(res.x, res.y, res.z));
+}
+
+const glm::mat4& Camera::transform_mat(Direction dir) const {
+    float rot = glm::radians(10.0f);
+    switch (dir) {
+    case Direction::FORWARD: {
+        static glm::mat4 mat {
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 1.0,
+            0.0, 0.0, 0.0, 1.0
+        };
+        return mat;
+    } case Direction::BACKWARD: {
+        static glm::mat4 mat {
+            1.0, 0.0, 0.0,  0.0,
+            0.0, 1.0, 0.0,  0.0,
+            0.0, 0.0, 1.0, -1.0,
+            0.0, 0.0, 0.0,  1.0
+        };
+        return mat;
+    } case Direction::LEFT: {
+        static glm::mat4 mat {
+            1.0, 0.0, 0.0, -1.0,
+            0.0, 1.0, 0.0,  0.0,
+            0.0, 0.0, 1.0,  0.0,
+            0.0, 0.0, 0.0,  1.0
+        };
+        return mat;
+    } case Direction::RIGHT: {
+        static glm::mat4 mat {
+            1.0, 0.0, 0.0, 1.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        };
+        return mat;
+    } case Direction::ROTATE_LEFT: {
+        static glm::mat4 mat {
+            cos(rot),  0.0, sin(rot), 0.0,
+            0.0,       1.0, 0.0,      0.0,
+            -sin(rot), 0.0, cos(rot), 0.0,
+            0.0,       0.0, 0.0,      1.0
+        };
+        return mat;
+    } case Direction::ROTATE_RIGHT: {
+        static glm::mat4 mat {
+            -cos(rot), 0.0, -sin(rot), 0.0,
+            0.0,       1.0, 0.0,       0.0,
+            sin(rot),  0.0, -cos(rot), 0.0,
+            0.0,       0.0, 0.0,       1.0
+        };
+        return mat;
+    } default:;
+    }
+    static glm::mat4 one(1.0);
+    return one;
+}
+
+
+CameraListener::CameraListener(Camera& camera)
+    : ui::Listener(&ui::io::IO::instance())
+    , _camera(camera)
+{}
+
+void CameraListener::consume(const ui::KeyEvent& event) {
+    if (event.action != GLFW_PRESS) return;
+    switch (event.key) {
+    case GLFW_KEY_W:
+        _camera.move(Direction::FORWARD);
+        break;
+    case GLFW_KEY_S:
+        _camera.move(Direction::BACKWARD);
+        break;
+    case GLFW_KEY_A:
+        _camera.move(Direction::LEFT);
+        break;
+    case GLFW_KEY_D:
+        _camera.move(Direction::RIGHT);
+        break;
+    case GLFW_KEY_Q:
+        _camera.move(Direction::ROTATE_LEFT);
+        break;
+    case GLFW_KEY_E:
+        _camera.move(Direction::ROTATE_RIGHT);
+        break;
+    default:;
+    }
+}
+
+void CameraListener::consume(const ui::MouseEvent& event) {
+    ;
+}
+
+void CameraListener::consume(const ui::MouseButtonEvent& event) {
+    ;
+}
+
+void CameraListener::consume(const ui::ScrollEvent& event) {
+    ;
+}
+
+void CameraListener::consume(const ui::DropEvent& event) {
+    ;
 }
 
 }

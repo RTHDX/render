@@ -66,7 +66,7 @@ const std::vector<Light>& make_lights() {
     return lights;
 }
 
-const Camera& make_camera() {
+Camera& make_camera() {
     static Camera camera(
         {30.0f, 30.0f, 30.0f},
         {0.0f, 0.0, 0.0f},

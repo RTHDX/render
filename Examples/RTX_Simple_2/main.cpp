@@ -14,8 +14,9 @@ int main() {
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
 
+    auto& camera = rtx::make_camera();
     rtx::Render render(rtx::make_scene(), rtx::Color{0.6, 0.85, 0.80},
-                       rtx::make_camera());
+                       camera);
 
     while (!glfwWindowShouldClose(window)) {
         //process_input(window);

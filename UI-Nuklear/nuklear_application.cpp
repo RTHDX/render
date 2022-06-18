@@ -17,12 +17,34 @@
 #include <nuklear_glfw_gl4.h>
 
 #include <UI/ui.hpp>
+#include <UI/io.hpp>
+#include <UI/observer.hpp>
 #include <OpenGL/opengl.hpp>
 
 #include "nuklear_application.hpp"
 
 
 namespace ui::nuklear {
+
+static void on_key(GLFWwindow*, int k, int s, int a, int m) {
+    ui::io::IO::instance().emit(KeyEvent(k, s, a, m));
+}
+
+static void on_mouse_moved(GLFWwindow*, double x, double y) {
+    ui::io::IO::instance().emit(MouseEvent(x, y));
+}
+
+static void on_mouse_pressed(GLFWwindow*, int b, int a, int m) {
+    ui::io::IO::instance().emit(MouseButtonEvent(b, a, m));
+}
+
+static void on_scrolled(GLFWwindow*, double x, double y) {
+    ui::io::IO::instance().emit(ScrollEvent(x, y));
+}
+
+static void on_dropped(GLFWwindow*, int count, const char** paths) {
+    ui::io::IO::instance().emit(DropEvent(count, paths));
+}
 
 static constexpr size_t MAX_VERTEX_BUFFER = 512 * 1024;
 static constexpr size_t MAX_ELEMENT_BUFFER = 128 * 1024;
@@ -49,6 +71,12 @@ Application::Application(const std::string_view title, size_t w, size_t h)
     _ctx = nk_glfw3_init(_window, NK_GLFW3_INSTALL_CALLBACKS,
                          MAX_VERTEX_BUFFER, MAX_ELEMENT_BUFFER);
     init_fonts();
+
+    glfwSetKeyCallback(_window, on_key);
+    glfwSetCursorPosCallback(_window, on_mouse_moved);
+    glfwSetMouseButtonCallback(_window, on_mouse_pressed);
+    glfwSetScrollCallback(_window, on_scrolled);
+    glfwSetDropCallback(_window, on_dropped);
 }
 
 Application::~Application() {

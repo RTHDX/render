@@ -58,7 +58,7 @@ class Listener;
 class Publisher {
 public:
     Publisher();
-    ~Publisher();
+    virtual ~Publisher();
 
     void subscribe(Listener* listener);
     void unsubscribe(Listener* listener);
@@ -80,12 +80,13 @@ class Listener {
 public:
     Listener(Publisher* parent = nullptr)
         : _parent(parent)
-    {}
+    {
+        if (_parent) { _parent->subscribe(this); }
+    }
 
-    ~Listener() {
-        if (_parent) {
-            _parent->unsubscribe(this);
-        }
+    ~Listener()
+    {
+        if (_parent) { _parent->unsubscribe(this); }
     }
 
     void bind(Publisher* parent) { _parent = parent; }

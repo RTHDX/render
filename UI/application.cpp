@@ -4,28 +4,29 @@
 
 #include "ui.hpp"
 #include "application.hpp"
+#include "io.hpp"
 
 
 namespace ui {
 
 static void on_key(GLFWwindow*, int k, int s, int a, int m) {
-    Application::instance().emit(KeyEvent(k, s, a, m));
+    ui::io::IO::instance().emit(KeyEvent(k, s, a, m));
 }
 
 static void on_mouse_moved(GLFWwindow*, double x, double y) {
-    Application::instance().emit(MouseEvent(x, y));
+    ui::io::IO::instance().emit(MouseEvent(x, y));
 }
 
 static void on_mouse_pressed(GLFWwindow*, int b, int a, int m) {
-    Application::instance().emit(MouseButtonEvent(b, a, m));
+    ui::io::IO::instance().emit(MouseButtonEvent(b, a, m));
 }
 
 static void on_scrolled(GLFWwindow*, double x, double y) {
-    Application::instance().emit(ScrollEvent(x, y));
+    ui::io::IO::instance().emit(ScrollEvent(x, y));
 }
 
 static void on_dropped(GLFWwindow*, int count, const char** paths) {
-    Application::instance().emit(DropEvent(count, paths));
+    ui::io::IO::instance().emit(DropEvent(count, paths));
 }
 
 

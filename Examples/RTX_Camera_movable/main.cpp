@@ -11,9 +11,10 @@
 #include <UI/ui.hpp>
 #include <UI/property.hpp>
 #include <RTX/rtx.hpp>
-
 #include <UI-Nuklear/nuklear_application.hpp>
 #include <UI-Nuklear/nuklear_widgets.hpp>
+
+#include <Common/rtx_scene_default.hpp>
 
 
 class Label final : public ui::nuklear::Widget {
@@ -53,8 +54,8 @@ int main() {
     const size_t width = 800, height = 600;
     ui::nuklear::Application app("movable cubes");
     
-    rtx::Camera camera({20.0f, 20.0f, 20.0f}, {0.0f, 0.0f, 0.0f},
-                       glm::radians(90.0f), width, height);
+    auto& camera = rtx::make_camera();
+    rtx::CameraListener handler(camera);
     app.append(std::make_unique<CameraBox>(camera, app.ctx()));
     app.run();
     return EXIT_SUCCESS;
