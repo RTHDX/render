@@ -53,7 +53,7 @@ int main() {
     const size_t width = 800, height = 600;
     ui::nuklear::Application app("movable cubes");
     
-    rtx::Camera camera({20.0f, 20.0f, 20.0f},
+    rtx::Camera camera({20.0f, 20.0f, 20.0f}, {0.0f, 0.0f, 0.0f},
                        glm::radians(90.0f), width, height);
     app.append(std::make_unique<CameraBox>(camera, app.ctx()));
     app.run();
