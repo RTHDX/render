@@ -1,18 +1,7 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <ui.hpp>
-#include <opengl.hpp>
-#include <rtx.hpp>
-#include <utils.hpp>
+#include "rtx_scene_default.hpp"
 
 
-void process_input(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
+namespace rtx {
 
 rtx::Material mirror() {
     return {
@@ -58,11 +47,8 @@ rtx::Sphere make_ground(const rtx::Material& material, float radius) {
     };
 }
 
-static constexpr size_t WIDTH = 1280;
-static constexpr size_t HEIGHT = 860;
-
 const std::vector<rtx::Sphere>& make_spheres() {
-    static std::vector<rtx::Sphere> spheres {
+    static std::vector<rtx::Sphere> spheres{
         rtx::Sphere({0.0, 0.0, 0.0}, mirror(), 5.0f),
         rtx::Sphere({15.0, 0.0, 0.0}, ivory(), 5.0),
         rtx::Sphere({0.0, 20.0, 0.0}, red_rubber(), 3.0f),
@@ -73,20 +59,22 @@ const std::vector<rtx::Sphere>& make_spheres() {
 }
 
 const std::vector<rtx::Light>& make_lights() {
-    static std::vector<rtx::Light> lights {
-        rtx::Light({10.0, 60.0, 0.0}, 1.0),
-        rtx::Light({10.0, 60.0, 0.0}, 1.1)
+    static std::vector<rtx::Light> lights{
+        Light({10.0f, 60.0f, 0.0f}, 1.0),
+        Light({10.0f, 60.0f, 0.0f}, 1.1)
     };
     return lights;
 }
 
-const rtx::Camera& make_camera() {
+const Camera& make_camera() {
     static rtx::Camera camera({0.0f, 0.0f, 30.0f},
-                              rtx::utils::to_radians(90), WIDTH, HEIGHT);
+        rtx::utils::to_radians(90), WIDTH, HEIGHT);
     return camera;
 }
 
-const rtx::Scene& make_scene() {
+const Scene& make_scene() {
     static rtx::Scene scene(make_spheres(), make_lights());
     return scene;
+}
+
 }

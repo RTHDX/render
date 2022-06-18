@@ -4,5 +4,5 @@ project(RTX_Multithread)
 create_executable(
     TARGET ${PROJECT_NAME}
     SOURCES main.cpp
-    LIBS RTX UI OpenGL
+    LIBS RTX UI OpenGL Default-RTX-Scene
 )

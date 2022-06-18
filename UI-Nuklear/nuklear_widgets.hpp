@@ -16,6 +16,7 @@ using uWidget = std::unique_ptr<Widget>;
 class Widget {
 public:
     Widget(const std::string_view name, struct nk_context* ctx);
+    virtual ~Widget() = default;
 
     virtual void show() = 0;
 

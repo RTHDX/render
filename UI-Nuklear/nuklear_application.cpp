@@ -16,8 +16,8 @@
 #include <nuklear.h>
 #include <nuklear_glfw_gl4.h>
 
-#include <ui.hpp>
-#include <opengl.hpp>
+#include <UI/ui.hpp>
+#include <OpenGL/opengl.hpp>
 
 #include "nuklear_application.hpp"
 

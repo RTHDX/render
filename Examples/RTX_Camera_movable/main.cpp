@@ -7,13 +7,13 @@
 #include <nuklear_glfw_gl4.h>
 #include <glm/glm.hpp>
 
-#include <opengl.hpp>
-#include <ui.hpp>
-#include <property.hpp>
-#include <rtx.hpp>
+#include <OpenGL/opengl.hpp>
+#include <UI/ui.hpp>
+#include <UI/property.hpp>
+#include <RTX/rtx.hpp>
 
-#include <nuklear_application.hpp>
-#include <nuklear_widgets.hpp>
+#include <UI-Nuklear/nuklear_application.hpp>
+#include <UI-Nuklear/nuklear_widgets.hpp>
 
 
 class Label final : public ui::nuklear::Widget {
@@ -53,7 +53,8 @@ int main() {
     const size_t width = 800, height = 600;
     ui::nuklear::Application app("movable cubes");
     
-    rtx::Camera camera({20.0f, 20.0f, 20.0f}, glm::radians(90.0f), width, height);
+    rtx::Camera camera({20.0f, 20.0f, 20.0f},
+                       glm::radians(90.0f), width, height);
     app.append(std::make_unique<CameraBox>(camera, app.ctx()));
     app.run();
     return EXIT_SUCCESS;

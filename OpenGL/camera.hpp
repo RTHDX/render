@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include <observer.hpp>
+#include <UI/observer.hpp>
 
 
 namespace opengl {

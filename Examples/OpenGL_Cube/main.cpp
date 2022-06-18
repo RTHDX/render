@@ -3,12 +3,12 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <ui.hpp>
-#include <opengl.hpp>
-#include <item.hpp>
-#include <camera.hpp>
-#include <opengl_utils.hpp>
-#include <application.hpp>
+#include <UI/ui.hpp>
+#include <OpenGL/opengl.hpp>
+#include <OpenGL/item.hpp>
+#include <OpenGL/camera.hpp>
+#include <OpenGL/opengl_utils.hpp>
+#include <UI/application.hpp>
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
@@ -78,8 +78,8 @@ int main() {
 
     opengl::Item cube(vertices, opengl::AttribPointer(0, 3, 3));
     opengl::Camera camera(WIDTH, HEIGHT, glm::radians(45.0));
-    //app.subscribe(&camera);
-    //camera.bind(&app);
+    app.subscribe(&camera);
+    camera.bind(&app);
 
     while (!glfwWindowShouldClose(window)) {
         opengl::Context::instance().draw_background();
@@ -87,8 +87,8 @@ int main() {
         cube.draw(program);
 
         program.set_mat4("model", cube.model());
-        //program.set_mat4("view", camera.view());
-        //program.set_mat4("projection", camera.projection());
+        program.set_mat4("view", camera.view());
+        program.set_mat4("projection", camera.projection());
 
         glfwSwapBuffers(window);
         glfwPollEvents();

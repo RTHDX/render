@@ -10,8 +10,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <ui.hpp>
-#include <opengl.hpp>
+#include <UI/ui.hpp>
+#include <OpenGL/opengl.hpp>
 
 #include "rtx.hpp"
 

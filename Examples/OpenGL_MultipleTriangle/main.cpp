@@ -1,6 +1,6 @@
-#include <ui.hpp>
-#include <opengl.hpp>
-#include <item.hpp>
+#include <UI/ui.hpp>
+#include <OpenGL/opengl.hpp>
+#include <OpenGL/item.hpp>
 
 
 const unsigned int WIDTH = 800;

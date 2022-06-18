@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 
+add_subdirectory(Common)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+
 add_subdirectory(OpenGL_SingleTriangle)
 add_subdirectory(OpenGL_MultipleTriangle)
 add_subdirectory(OpenGL_Cube)
