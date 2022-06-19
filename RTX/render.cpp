@@ -10,6 +10,7 @@ BaseRender::BaseRender(const Scene& scene, const Color& back, const Camera& came
     , _framebuffer(camera.width()* camera.height())
     , _background(back)
     , _camera(camera)
+    , _cam_handler(_camera)
 {}
 
 Color BaseRender::cast_ray(const Ray& ray, size_t depth) const {
@@ -95,8 +96,8 @@ MultiThreadRender::MultiThreadRender(const Scene& scene, const Color& background
     , _workers(std::thread::hardware_concurrency())
     , _step(camera.width() / _workers.size())
 {
-    std::cout << "[Render] Threads supported: " << _workers.size() << std::endl;
-    std::cout << "[Render] Step: " << _step << std::endl;
+    std::cout << "Threads supported: " << _workers.size() << std::endl;
+    std::cout << "Step: " << _step << std::endl;
 }
 
 void MultiThreadRender::render() {

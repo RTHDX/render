@@ -1,12 +1,14 @@
 #pragma once
 
 #include <string_view>
+#include <functional>
 
 #include "nuklear_widgets.hpp"
 
 struct nk_context;
 struct GLFWwindow;
 namespace ui::nuklear {
+using RenderCallback = std::function<void(void)>;
 
 class Application {
 public:
@@ -15,7 +17,7 @@ public:
     Application& operator = (const Application&) = delete;
     ~Application();
 
-    void run();
+    void run(RenderCallback& render);
 
     GLFWwindow* window() { return _window; }
     nk_context* ctx() { return _ctx; }

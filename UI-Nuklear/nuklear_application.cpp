@@ -84,14 +84,18 @@ Application::~Application() {
     glfwTerminate();
 }
 
-void Application::run() {
+void Application::run(RenderCallback& render) {
     while (!glfwWindowShouldClose(_window)) {
         glfwPollEvents();
         nk_glfw3_new_frame();
 
+        if (render) {
+            render();
+        } else {
+            opengl::Context::instance().draw_background();
+        }
         for (uWidget& widget : _widgets) { widget->show(); }
 
-        opengl::Context::instance().draw_background();
         nk_glfw3_render(NK_ANTI_ALIASING_ON);
         glfwSwapBuffers(_window);
     }

@@ -1,3 +1,6 @@
+#include <ostream>
+
+#include <glm/gtx/string_cast.hpp>
 #include "rtx_internal.hpp"
 
 namespace rtx {
@@ -8,6 +11,11 @@ Ray::Ray(const Point& origin, const Vector& direction)
 {}
 
 Point Ray::at(float t) const { return origin + t * direction; }
+
+std::ostream& operator << (std::ostream& os, const Ray& ray) {
+    return os << "<Ray .origin: " << glm::to_string(ray.origin)
+              << " .direction: " << glm::to_string(ray.direction);
+}
 
 
 Light::Light(const Point& position, float intensity)

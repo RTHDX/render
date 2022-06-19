@@ -1,5 +1,8 @@
 #include <cmath>
+#include <iostream>
+
 #include <GLFW/glfw3.h>
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "camera.hpp"
@@ -18,19 +21,27 @@ Camera::Camera(const Point& position, const Point& target, float fov,
 
     , _view(glm::mat4(1.0))
     , _projection(glm::mat4(1.0))
-{}
+{ dump(); }
 
 Ray Camera::emit_ray(const size_t h_pos, const size_t w_pos) const {
     glm::vec3 direction = project_view_direction(glm::normalize(
         pixel_camera(h_pos, w_pos)
     ));
-    return Ray(_position, direction);
+    return Ray(position(), direction);
 }
 
 void Camera::move(Direction direction) {
-    const auto& transform = transform_mat(direction);
-    glm::vec4 res = transform * glm::vec4(_position, 1.0);
-    _position = glm::vec3(res.x, res.y, res.z);
+    const auto& transform = glm::transpose(transform_mat(direction));
+
+    _position = transform * glm::vec4(_position, 1.0);
+    if (direction == Direction::FORWARD ||
+        direction == Direction::BACKWARD ||
+        direction == Direction::LEFT ||
+        direction == Direction::RIGHT) {
+        _target = transform * glm::vec4(_target, 1.0);
+    }
+
+    dump();
 }
 
 Point Camera::ndc(size_t h_pos, size_t w_pos) const {
@@ -61,13 +72,14 @@ Point Camera::pixel_camera(size_t h_pos, size_t w_pos) const {
 }
 
 glm::mat4 Camera::view() const {
-    return glm::transpose(glm::lookAt(_position, _target, UP));
+    glm::mat4 out = glm::transpose(glm::lookAt(position(), target(), UP));
+    return out;
 }
 
 glm::vec3 Camera::project_view_direction(const glm::vec3& direction) const {
-    glm::vec4 temp(direction.x, direction.y, direction.z, 1.0);
-    glm::vec4 res = view() * temp;
-    return glm::normalize(glm::vec3(res.x, res.y, res.z));
+    glm::vec4 res = view() * glm::vec4(direction, 1.0f);
+    //std::cout << glm::to_string(res) << std::endl;
+    return glm::normalize(glm::vec3(res));
 }
 
 const glm::mat4& Camera::transform_mat(Direction dir) const {
@@ -77,7 +89,7 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
         static glm::mat4 mat {
             1.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 1.0,
+            0.0, 0.0, 1.0, MOVE_SPEED,
             0.0, 0.0, 0.0, 1.0
         };
         return mat;
@@ -85,13 +97,13 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
         static glm::mat4 mat {
             1.0, 0.0, 0.0,  0.0,
             0.0, 1.0, 0.0,  0.0,
-            0.0, 0.0, 1.0, -1.0,
+            0.0, 0.0, 1.0, -MOVE_SPEED,
             0.0, 0.0, 0.0,  1.0
         };
         return mat;
     } case Direction::LEFT: {
         static glm::mat4 mat {
-            1.0, 0.0, 0.0, -1.0,
+            1.0, 0.0, 0.0, -MOVE_SPEED,
             0.0, 1.0, 0.0,  0.0,
             0.0, 0.0, 1.0,  0.0,
             0.0, 0.0, 0.0,  1.0
@@ -99,7 +111,7 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
         return mat;
     } case Direction::RIGHT: {
         static glm::mat4 mat {
-            1.0, 0.0, 0.0, 1.0,
+            1.0, 0.0, 0.0, MOVE_SPEED,
             0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, 0.0,
             0.0, 0.0, 0.0, 1.0
@@ -125,6 +137,13 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
     }
     static glm::mat4 one(1.0);
     return one;
+}
+
+void Camera::dump() const {
+    std::cout << "Position: " << glm::to_string(_position) << '\n'
+              << "Target: " << glm::to_string(_target) << '\n'
+              << "View:\n" << view()
+              << std::endl;
 }
 
 
@@ -172,6 +191,20 @@ void CameraListener::consume(const ui::ScrollEvent& event) {
 
 void CameraListener::consume(const ui::DropEvent& event) {
     ;
+}
+
+std::ostream& operator << (std::ostream& os, const glm::mat4& mat) {
+    static constexpr char TEMPL[] =
+        "({:6.4f};{:6.4f};{:6.4f};{:6.4f}\n"
+        " {:6.4f};{:6.4f};{:6.4f};{:6.4f}\n"
+        " {:6.4f};{:6.4f};{:6.4f};{:6.4f}\n"
+        " {:6.4f};{:6.4f};{:6.4f};{:6.4f})";
+    os << std::format(TEMPL,
+        mat[0][0], mat[0][1], mat[0][2], mat[0][3],
+        mat[1][0], mat[1][1], mat[1][2], mat[1][3],
+        mat[2][0], mat[2][1], mat[2][2], mat[2][3],
+        mat[3][0], mat[3][1], mat[3][2], mat[3][3]);
+    return os;
 }
 
 }

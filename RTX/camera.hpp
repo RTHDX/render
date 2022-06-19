@@ -8,6 +8,8 @@
 
 namespace rtx {
 
+std::ostream& operator << (std::ostream& os, const glm::mat4&);
+
 enum class Direction {
     FORWARD,
     BACKWARD,
@@ -19,32 +21,36 @@ enum class Direction {
 
 class Camera {
     static const glm::vec3 UP;
-    static constexpr float MOVE_SPEED     = 0.5;
-    static constexpr float ROTATION_SPEED = 0.5;
 
 public:
+    static constexpr float MOVE_SPEED = 5.5;
+
     Camera(const Point& position, const Point& target, float fov,
            size_t width, size_t height);
 
     Ray emit_ray(const size_t h_pos, const size_t w_pos) const;
+    void move(Direction dir);
 
     size_t width() const { return _width; }
     size_t height() const { return _height; }
+    const Point& position() const { return _position; }
+    const Point& target() const { return _target; }
 
     float aspect_ratio() const {
         return float(_width) / float(_height);
     }
 
-    void move(Direction dir);
+    glm::mat4 view() const;
 
 private:
     Point ndc(size_t h_pos, size_t w_pos) const;
     Point pixel_screen(size_t h_pos, size_t w_pos) const;
     Point pixel_camera(size_t h_pos, size_t w_pos) const;
 
-    glm::mat4 view() const;
     glm::vec3 project_view_direction(const glm::vec3& direction) const;
     const glm::mat4& transform_mat(Direction) const;
+
+    void dump() const;
 
 private:
     Point _position, _target;

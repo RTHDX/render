@@ -68,7 +68,7 @@ const std::vector<Light>& make_lights() {
 
 Camera& make_camera() {
     static Camera camera(
-        {30.0f, 30.0f, 30.0f},
+        {0.0f, 0.0f, 40.0f},
         {0.0f, 0.0, 0.0f},
         utils::to_radians(90), WIDTH, HEIGHT);
     return camera;

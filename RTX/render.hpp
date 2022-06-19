@@ -34,6 +34,7 @@ protected:
     Framebuffer _framebuffer;
     Color _background;
     Camera _camera;
+    CameraListener _cam_handler;
 };
 
 

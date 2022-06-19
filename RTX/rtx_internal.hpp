@@ -26,6 +26,7 @@ public:
 
     Point at(float t) const;
 };
+std::ostream& operator << (std::ostream& os, const Ray& ray);
 
 
 struct Light {
