@@ -78,11 +78,10 @@ int main() {
     ui::nuklear::Application app("movable camera", rtx::WIDTH, rtx::HEIGHT);
     
     auto& camera = rtx::make_camera();
-    //rtx::Render render(rtx::make_scene(), {0.8, 0.8, 0.8}, camera);
     rtx::MultiThreadRender render(rtx::make_scene(), {0.8, 0.8, 0.8}, camera);
     ui::nuklear::RenderCallback callback = [&render]() {
-        //BENCHMARK(render.render());
-        render.render();
+        BENCHMARK(render.render());
+        //render.render();
         const auto& buffer = render.buffer();
         glDrawPixels(rtx::WIDTH, rtx::HEIGHT, GL_RGB ,GL_FLOAT,
                      glm::value_ptr(*buffer.data()));

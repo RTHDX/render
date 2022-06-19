@@ -40,8 +40,6 @@ void Camera::move(Direction direction) {
         direction == Direction::RIGHT) {
         _target = transform * glm::vec4(_target, 1.0);
     }
-
-    dump();
 }
 
 Point Camera::ndc(size_t h_pos, size_t w_pos) const {
@@ -78,7 +76,6 @@ glm::mat4 Camera::view() const {
 
 glm::vec3 Camera::project_view_direction(const glm::vec3& direction) const {
     glm::vec4 res = view() * glm::vec4(direction, 1.0f);
-    //std::cout << glm::to_string(res) << std::endl;
     return glm::normalize(glm::vec3(res));
 }
 
@@ -89,7 +86,7 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
         static glm::mat4 mat {
             1.0, 0.0, 0.0, 0.0,
             0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, MOVE_SPEED,
+            0.0, 0.0, 1.0, -MOVE_SPEED,
             0.0, 0.0, 0.0, 1.0
         };
         return mat;
@@ -97,7 +94,7 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
         static glm::mat4 mat {
             1.0, 0.0, 0.0,  0.0,
             0.0, 1.0, 0.0,  0.0,
-            0.0, 0.0, 1.0, -MOVE_SPEED,
+            0.0, 0.0, 1.0, MOVE_SPEED,
             0.0, 0.0, 0.0,  1.0
         };
         return mat;
@@ -127,9 +124,9 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
         return mat;
     } case Direction::ROTATE_RIGHT: {
         static glm::mat4 mat {
-            -cos(rot), 0.0, -sin(rot), 0.0,
+            cos(-rot), 0.0, sin(-rot), 0.0,
             0.0,       1.0, 0.0,       0.0,
-            sin(rot),  0.0, -cos(rot), 0.0,
+            -sin(-rot),  0.0, cos(-rot), 0.0,
             0.0,       0.0, 0.0,       1.0
         };
         return mat;
@@ -153,7 +150,8 @@ CameraListener::CameraListener(Camera& camera)
 {}
 
 void CameraListener::consume(const ui::KeyEvent& event) {
-    if (event.action != GLFW_PRESS) return;
+    if (event.action == GLFW_RELEASE) return;
+
     switch (event.key) {
     case GLFW_KEY_W:
         _camera.move(Direction::FORWARD);

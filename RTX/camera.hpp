@@ -23,7 +23,7 @@ class Camera {
     static const glm::vec3 UP;
 
 public:
-    static constexpr float MOVE_SPEED = 5.5;
+    static constexpr float MOVE_SPEED = 0.5;
 
     Camera(const Point& position, const Point& target, float fov,
            size_t width, size_t height);
