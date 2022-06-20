@@ -21,19 +21,19 @@ Color BaseRender::cast_ray(const Ray& ray, size_t depth) const {
     Color refract_color = cast_ray(refraction_ray(ray, last_hit), depth + 1);
 
     float diffuse_light_intensity = 0, specular_light_intensity = 0;
-    const auto& material = last_hit.sphere->material;
+    const auto* material = last_hit.material;
     for (const Light& light : _scene.lights) {
         if (is_shaded(light, last_hit)) { continue; }
         diffuse_light_intensity += light.diffuse(last_hit.point, last_hit.normal);
         specular_light_intensity += light.specular(last_hit.point,
             last_hit.normal,
             ray.direction,
-            material.specular_exponent);
+            material->specular_exponent);
     }
 
-    auto& albedo = material.albedo;
+    auto& albedo = material->albedo;
     Color total_color =
-        material.diffuse_color * diffuse_light_intensity * albedo.x +
+        material->diffuse_color * diffuse_light_intensity * albedo.x +
         Color(1.0, 1.0, 1.0) * specular_light_intensity * albedo.y +
         reflect_color * albedo.z +
         refract_color * albedo.w;
@@ -53,7 +53,7 @@ Ray BaseRender::reflection_ray(const Ray& primary, const Hit& last_hit) const {
 }
 
 Ray BaseRender::refraction_ray(const Ray& primary, const Hit& last_hit) const {
-    float ref_i = last_hit.sphere->material.refractive_index;
+    float ref_i = last_hit.material->refractive_index;
     Vector direction = refract(primary.direction, last_hit.normal, ref_i);
     Vector origin = glm::dot(direction, last_hit.normal) < 0.0f ?
         last_hit.point - last_hit.normal * DELTA :

@@ -1,6 +1,8 @@
 #include <ostream>
 
 #include <glm/gtx/string_cast.hpp>
+
+#include "utils.hpp"
 #include "rtx_internal.hpp"
 
 namespace rtx {
@@ -66,6 +68,13 @@ Vector refract(const Vector& input, const Vector& normal, float refract) {
 }
 
 
+Hit::Hit(float t, Material const* material, const Point& point, const Vector& n)
+    : t(t)
+    , material(material)
+    , point(point)
+    , normal(n)
+{}
+
 bool Hit::is_valid() const {
     return !std::fabs(t - std::numeric_limits<float>::min() <
             std::numeric_limits<float>::epsilon());
@@ -89,10 +98,37 @@ Hit Sphere::ray_intersect(const Ray& ray) const {
     float t1 = tca + thc;
     if (hit.t < 0) hit.t = t1;
     if (hit.t < 0) return Hit();
-    hit.sphere = this;
+    hit.material = &material;
     hit.point = ray.at(hit.t);
     hit.normal = glm::normalize(hit.point - center);
     return hit;
+}
+
+
+Triangle::Triangle(const Point& a, const Point& b, const Point& c,
+                   const Vector& n, const Material& material)
+    : Object()
+    , a(a)
+    , b(b)
+    , c(c)
+    , normal(n)
+    , material(material)
+{}
+
+Hit Triangle::ray_intersect(const Ray& ray) const {
+    float denominator = glm::dot(ray.direction, normal);
+    /* if denom > 0 -> the same direction -> ray hits surface */
+    if (denominator > 0.0) { return Hit(); }
+
+    float t = glm::dot(normal, (a - ray.origin)) / denominator;
+    Point p = ray.at(t);
+
+    float area = glm::length(glm::cross(c - a, c - b));
+    float u = glm::length(glm::cross(c - a, c - p)) / area;
+    float v = glm::length(glm::cross(a - b, a - p)) / area;
+
+    float w = 1 - u - v;
+    return w > 0.0f ? Hit(t, &material, p, normal) : Hit();
 }
 
 

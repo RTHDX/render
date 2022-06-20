@@ -13,3 +13,9 @@ create_test_executable(
     SOURCES test_render.cpp
     LIBS RTX UI
 )
+
+create_test_executable(
+    TARGET "test-object-intersections"
+    SOURCES test_object_intersections.cpp
+    LIBS RTX UI
+)

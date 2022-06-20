@@ -57,11 +57,14 @@ Vector refract(const Vector& input, const Vector& normal, float refract);
 struct Sphere;
 struct Hit {
     float t = std::numeric_limits<float>::min();
-    Sphere const* sphere = nullptr;
+    Material const* material = nullptr;
     Point point;
     Vector normal;
 
 public:
+    Hit() = default;
+    Hit(float t, Material const* material, const Point& point, const Vector& n);
+
     bool is_valid() const;
 };
 
@@ -83,6 +86,20 @@ public:
 
     Hit ray_intersect(const Ray& ray) const override;
 };
+
+
+struct Triangle : public Object {
+    Point a, b, c;
+    Vector normal;
+    Material material;
+
+public:
+    Triangle(const Point& a, const Point& b, const Point& c, const Vector& n,
+             const Material& material);
+
+    Hit ray_intersect(const Ray& ray) const override;
+};
+
 
 struct Scene final : public Object {
     std::vector<Sphere> spheres;
