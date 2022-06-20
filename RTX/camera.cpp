@@ -124,10 +124,10 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
         return mat;
     } case Direction::ROTATE_RIGHT: {
         static glm::mat4 mat {
-            cos(-rot), 0.0, sin(-rot), 0.0,
-            0.0,       1.0, 0.0,       0.0,
+            cos(-rot),   0.0, sin(-rot), 0.0,
+            0.0,         1.0, 0.0,       0.0,
             -sin(-rot),  0.0, cos(-rot), 0.0,
-            0.0,       0.0, 0.0,       1.0
+            0.0,         0.0, 0.0,       1.0
         };
         return mat;
     } default:;

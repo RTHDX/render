@@ -19,6 +19,7 @@ public:
     size_t width() const { return _camera.width(); }
     size_t height() const { return _camera.height(); }
     const Framebuffer& buffer() const { return _framebuffer; }
+    const Camera& camera() const { return _camera; }
 
 protected:
     Color cast_ray(const Ray& ray, size_t depth = 0) const;

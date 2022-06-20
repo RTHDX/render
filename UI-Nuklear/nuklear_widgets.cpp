@@ -31,7 +31,7 @@ Window::Window(const std::string_view name, struct nk_context* ctx,
 void Window::show() {
     if (nk_begin(ctx(), name().data(), _dim, _flags)) {
         for (auto& child: children()) {
-            nk_layout_row_static(ctx(), _dim.h / children().size(), _dim.w, 1);
+            //nk_layout_row_static(ctx(), _dim.h / children().size(), _dim.w, 1);
             child->show();
         }
     } nk_end(ctx());
