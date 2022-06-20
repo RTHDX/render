@@ -21,7 +21,7 @@ Camera::Camera(const Point& position, const Point& target, float fov,
 
     , _view(glm::mat4(1.0))
     , _projection(glm::mat4(1.0))
-{ dump(); }
+{}
 
 Ray Camera::emit_ray(const size_t h_pos, const size_t w_pos) const {
     glm::vec3 direction = project_view_direction(glm::normalize(

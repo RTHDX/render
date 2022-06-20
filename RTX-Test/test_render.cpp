@@ -74,9 +74,12 @@ bool operator != (const rtx::Framebuffer& lhs, const rtx::Framebuffer& rhs) {
 
 
 TEST_F(RenderTest, move_camera) {
-    auto& camera = make_camera();
+    render.render();
     const auto& buffer_before = render.buffer();
+    while (render.camera().position().x > -10.0) {
+        render.camera().move(rtx::Direction::LEFT);
+    }
     render.render();
     const auto& buffer_after = render.buffer();
-    ASSERT_NE(buffer_before, buffer_after);
+    ASSERT_FALSE(buffer_before == buffer_after);
 }

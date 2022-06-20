@@ -23,7 +23,6 @@ public:
 
     rtx::Ray center_ray() const {
         auto ray = camera.emit_ray(TEST_HEIGHT / 2, TEST_WIDTH / 2);
-        std::cout << ray << std::endl;
         return ray;
     }
 
@@ -42,14 +41,14 @@ public:
 TEST_F(CameraTest, move_forward) {
     camera.move(rtx::Direction::FORWARD);
     glm::vec3 expected {START_POS.x, START_POS.y,
-                        START_POS.z + rtx::Camera::MOVE_SPEED};
+                        START_POS.z - rtx::Camera::MOVE_SPEED};
     ASSERT_EQ(expected, camera.position());
 }
 
 TEST_F(CameraTest, move_backward) {
     camera.move(rtx::Direction::BACKWARD);
     glm::vec3 expected {START_POS.x, START_POS.y,
-                        START_POS.z - rtx::Camera::MOVE_SPEED};
+                        START_POS.z + rtx::Camera::MOVE_SPEED};
     ASSERT_EQ(expected, camera.position());
 }
 
