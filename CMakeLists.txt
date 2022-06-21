@@ -7,14 +7,18 @@ include(utils.cmake)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
+add_subdirectory(3rdParty/assimp)
+set(ASSIMP_INCLUDE_DIRECTORY)
+get_target_property(ASSIMP_INCLUDE_DIRECTORY assimp INCLUDE_DIRECTORIES)
+include_directories(${ASSIMP_INCLUDE_DIRECTORY})
+
+
 add_subdirectory(3rdParty/glfw)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glfw")
 add_subdirectory(3rdParty/glad)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glad/include")
 add_subdirectory(3rdParty/glm)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm")
-add_subdirectory(3rdParty/assimp)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/assimp/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Nuklear")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Nuklear/demo/glfw_opengl4")
 

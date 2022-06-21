@@ -10,12 +10,10 @@ int main() {
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
 
-    rtx::MultiThreadRender render(rtx::make_scene(), rtx::Color{0.01, 0.05, 0.08},
-                                  rtx::make_camera());
+    rtx::MultiThreadRender render(rtx::make_scene(), rtx::make_camera(),
+                                  {0.01, 0.05, 0.08});
 
     while (!glfwWindowShouldClose(window)) {
-        //process_input(window);
-
         BENCHMARK(render.render());
         const auto& framebuffer = render.buffer();
         glDrawPixels(rtx::WIDTH, rtx::HEIGHT, GL_RGB, GL_FLOAT,

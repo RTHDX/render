@@ -1,3 +1,5 @@
+#include <memory>
+
 #include "rtx_scene_default.hpp"
 
 
@@ -47,15 +49,14 @@ Sphere make_ground(const Material& material, float radius) {
     };
 }
 
-const std::vector<Sphere>& make_spheres() {
-    static std::vector<Sphere> spheres{
-        Sphere({0.0, 0.0, 0.0}, mirror(), 5.0f),
-        Sphere({15.0, 0.0, 0.0}, ivory(), 5.0),
-        Sphere({0.0, 20.0, 0.0}, red_rubber(), 3.0f),
-        Sphere({-15.0, 0.0, 0.0}, glass(), 5.0f),
+std::vector<sObject> make_spheres() {
+    return std::vector<sObject> {
+        std::make_shared<Sphere>(Point{0.0, 0.0, 0.0}, mirror(), 5.0f),
+        std::make_shared<Sphere>(Point{15.0, 0.0, 0.0}, ivory(), 5.0),
+        std::make_shared<Sphere>(Point{0.0, 20.0, 0.0}, red_rubber(), 3.0f),
+        std::make_shared<Sphere>(Point{-15.0, 0.0, 0.0}, glass(), 5.0f),
         //make_ground(red_rubber(), 10'000'000)
     };
-    return spheres;
 }
 
 const std::vector<Light>& make_lights() {
@@ -74,9 +75,8 @@ Camera& make_camera() {
     return camera;
 }
 
-const Scene& make_scene() {
-    static Scene scene(make_spheres(), make_lights());
-    return scene;
+Scene make_scene() {
+    return Scene(make_spheres(), make_lights());
 }
 
 }

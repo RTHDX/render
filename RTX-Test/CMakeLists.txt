@@ -19,3 +19,13 @@ create_test_executable(
     SOURCES test_object_intersections.cpp
     LIBS RTX UI
 )
+
+create_test_executable(
+    TARGET "test-mesh-loader"
+    SOURCES test_mesh_loader.cpp
+    LIBS RTX UI
+)
+
+target_compile_options("test-mesh-loader" PRIVATE
+    -DCURRENT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
+)

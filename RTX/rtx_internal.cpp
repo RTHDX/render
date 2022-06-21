@@ -117,8 +117,8 @@ Triangle::Triangle(const Point& a, const Point& b, const Point& c,
 
 Hit Triangle::ray_intersect(const Ray& ray) const {
     float denominator = glm::dot(ray.direction, normal);
-    /* if denom > 0 -> the same direction -> ray hits surface */
-    if (denominator > 0.0) { return Hit(); }
+    /* if denom >= 0 -> the same direction -> ray hits surface */
+    if (denominator >= 0.0) { return Hit(); }
 
     float t = glm::dot(normal, (a - ray.origin)) / denominator;
     Point p = ray.at(t);
@@ -132,10 +132,32 @@ Hit Triangle::ray_intersect(const Ray& ray) const {
 }
 
 
-Scene::Scene(const std::vector<Sphere>& spheres,
+Mesh::Mesh(const std::vector<Triangle>& triangle)
+    : Object()
+    , faces(triangle)
+{}
+
+Hit Mesh::ray_intersect(const Ray& ray) const {
+    static constexpr float LIMIT = 1000.0;
+    float dist = std::numeric_limits<float>::max();
+
+    Hit out_hit;
+    for (const Triangle& face: faces) {
+        Hit hit = face.ray_intersect(ray);
+        if (hit.is_valid() && hit.t < dist) {
+            dist = hit.t;
+            out_hit = hit;
+        }
+    }
+
+    return dist < LIMIT ? out_hit : Hit();
+}
+
+
+Scene::Scene(std::vector<sObject>&& objects,
              const std::vector<Light>& lights)
     : Object()
-    , spheres(spheres)
+    , objects(std::move(objects))
     , lights(lights)
 {}
 
@@ -144,8 +166,8 @@ Hit Scene::ray_intersect(const Ray& ray) const {
     float spheres_dist = std::numeric_limits<float>::max();
 
     Hit out_hit;
-    for (const Sphere& sphere : spheres) {
-        Hit hit = sphere.ray_intersect(ray);
+    for (const auto& object : objects) {
+        Hit hit = object->ray_intersect(ray);
         if (hit.is_valid() && hit.t < spheres_dist) {
             spheres_dist = hit.t;
             out_hit = hit;

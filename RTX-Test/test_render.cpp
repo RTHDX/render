@@ -12,10 +12,10 @@ constexpr size_t TEST_HEIGHT = 200;
 constexpr rtx::Point START_POS{0.0, 0.0, 10.0};
 constexpr rtx::Point START_TAR{0.0, 0.0, 0.0};
 
-std::vector<rtx::Sphere> make_spheres() {
+std::vector<rtx::sObject> make_spheres() {
     return {
-        rtx::Sphere(
-            {0.0, 0.0, 0.0},
+        std::make_shared<rtx::Sphere>(
+            rtx::Point{0.0, 0.0, 0.0},
             rtx::Material(
                 {0.9, 0.1, 0.0, 0.0},
                 rtx::Color(0.3, 0.1, 0.1),
@@ -34,7 +34,7 @@ std::vector<rtx::Light> make_lights() {
 
 rtx::Scene make_scene() {
     return rtx::Scene(
-        make_spheres(),
+        std::move(make_spheres()),
         make_lights()
     );
 }
@@ -54,7 +54,7 @@ class RenderTest : public testing::Test {
 public:
     RenderTest()
         : testing::Test()
-        , render(make_scene(), {0.1, 0.1, 0.1}, make_camera())
+        , render(std::move(make_scene()), make_camera(), {0.1, 0.1, 0.1})
     {}
 
 public:

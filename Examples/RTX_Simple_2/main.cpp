@@ -15,12 +15,9 @@ int main() {
     opengl::Context::instance().dump();
 
     auto& camera = rtx::make_camera();
-    rtx::Render render(rtx::make_scene(), rtx::Color{0.6, 0.85, 0.80},
-                       camera);
+    rtx::Render render(rtx::make_scene(), camera, rtx::Color{0.6, 0.85, 0.80});
 
     while (!glfwWindowShouldClose(window)) {
-        //process_input(window);
-
         BENCHMARK(render.render());
         const auto& framebuffer = render.buffer();
         glDrawPixels(rtx::WIDTH, rtx::HEIGHT, GL_RGB, GL_FLOAT,

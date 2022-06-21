@@ -112,8 +112,9 @@ private:
 int main() {
     ui::nuklear::Application app("movable camera", rtx::WIDTH, rtx::HEIGHT);
 
-    rtx::MultiThreadRender render(rtx::make_scene(), {0.8, 0.8, 0.8},
-                                  rtx::make_camera());
+    rtx::MultiThreadRender render(std::move(rtx::make_scene()),
+                                  rtx::make_camera(),
+                                  {0.8, 0.8, 0.8});
     ui::nuklear::RenderCallback callback = [&render]() {
         BENCHMARK(render.render());
         const auto& buffer = render.buffer();

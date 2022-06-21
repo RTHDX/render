@@ -10,16 +10,11 @@ endfunction()
 
 function (include_deps)
     cmake_parse_arguments(THIS "" "TARGET" "DEPS" ${ARGV})
-    message("Searching source folders of: ${THIS_DEPS} for: ${THIS_TARGET}")
     foreach (DEP ${THIS_DEPS})
         set(DEPS_INCL_DIR)
-        get_target_property(DEPS_INCL_DIR ${DEP} SOURCE_DIR)
-        target_include_directories(${THIS_TARGET} PUBLIC ${DEP_INCL_DIR})
-        message("---------------> dirs: ${DEPS_INCL_DIR}")
+        get_target_property(DEPS_INCL_DIR ${DEP} INCLUDE_DIRECTORIES)
+        target_include_directories(${THIS_TARGET} PRIVATE ${DEP_INCL_DIR})
     endforeach ()
-    set(OUT_INC_DIRS)
-    get_target_property(OUT_INC_DIRS ${THIS_TARGET} INCLUDE_DIRECTORIES)
-    message("Include dirs: ${OUT_INC_DIRS}")
 endfunction ()
 
 function (create_executable)
@@ -34,6 +29,7 @@ function (create_executable)
                           ${OPENGL_LIBRARIES}
                           glfw
                           glad
+                          assimp
                           ${THIS_LIBS}
     )
     set_property(TARGET ${THIS_TARGET} PROPERTY CXX_STANDARD 20)

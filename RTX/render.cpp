@@ -5,8 +5,8 @@
 
 namespace rtx {
 
-BaseRender::BaseRender(const Scene& scene, const Color& back, const Camera& camera)
-    : _scene(scene)
+BaseRender::BaseRender(Scene&& scene, const Camera& camera, const Color& back)
+    : _scene(std::move(scene))
     , _framebuffer(camera.width()* camera.height())
     , _background(back)
     , _camera(camera)
@@ -75,8 +75,8 @@ bool BaseRender::is_shaded(const Light& light, const Hit& hit) const {
 }
 
 
-Render::Render(const Scene& scene, const Color& background, const Camera& camera)
-    : BaseRender(scene, background, camera)
+Render::Render(Scene&& scene, const Camera& camera, const Color& background)
+    : BaseRender(std::move(scene), camera, background)
 {}
 
 void Render::render() {
@@ -90,9 +90,9 @@ void Render::render() {
 }
 
 
-MultiThreadRender::MultiThreadRender(const Scene& scene, const Color& background,
-                                     const Camera& camera)
-    : BaseRender(scene, background, camera)
+MultiThreadRender::MultiThreadRender(Scene&& scene, const Camera& camera,
+                                     const Color& background)
+    : BaseRender(std::move(scene), camera, background)
     , _workers(std::thread::hardware_concurrency())
     , _step(camera.width() / _workers.size())
 {

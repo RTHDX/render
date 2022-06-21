@@ -10,8 +10,8 @@ using Framebuffer = std::vector<Color>;
 
 class BaseRender {
 public:
-    BaseRender(const Scene& scene, const Color& background,
-               const Camera& camera);
+    BaseRender(Scene&& scene, const Camera& camera,
+               const Color& background = {0.5, 0.5, 0.5});
     virtual ~BaseRender() = default;
 
     virtual void render() = 0;
@@ -41,7 +41,8 @@ protected:
 
 class Render final : public BaseRender {
 public:
-    Render(const Scene& scene, const Color& background, const Camera& camera);
+    Render(Scene&& scene, const Camera& camera,
+           const Color& background = {0.5, 0.5, 0.5});
     ~Render() override = default;
 
     void render() override;
@@ -50,8 +51,8 @@ public:
 
 class MultiThreadRender final : public BaseRender {
 public:
-    MultiThreadRender(const Scene& scene, const Color& background,
-                      const Camera& camera);
+    MultiThreadRender(Scene&& scene, const Camera& camera,
+                      const Color& background = {0.5, 0.5, 0.5});
 
     void render() override;
 

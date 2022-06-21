@@ -54,7 +54,6 @@ public:
 Vector reflect(const Vector& input, const Vector& normal);
 Vector refract(const Vector& input, const Vector& normal, float refract);
 
-struct Sphere;
 struct Hit {
     float t = std::numeric_limits<float>::min();
     Material const* material = nullptr;
@@ -75,6 +74,8 @@ public:
 
     virtual Hit ray_intersect(const Ray& ray) const = 0;
 };
+using uObject = std::unique_ptr<Object>;
+using sObject = std::shared_ptr<Object>;
 
 struct Sphere final : public Object {
     Point center;
@@ -88,12 +89,13 @@ public:
 };
 
 
-struct Triangle : public Object {
+struct Triangle final : public Object {
     Point a, b, c;
     Vector normal;
     Material material;
 
 public:
+    Triangle() = default;
     Triangle(const Point& a, const Point& b, const Point& c, const Vector& n,
              const Material& material);
 
@@ -101,12 +103,24 @@ public:
 };
 
 
+struct Mesh final : public Object {
+    std::vector<Triangle> faces;
+
+public:
+    Mesh() = default;
+    Mesh(const std::vector<Triangle>& triangles);
+
+    Hit ray_intersect(const Ray& ray) const override;
+};
+
+
 struct Scene final : public Object {
-    std::vector<Sphere> spheres;
+    std::vector<sObject> objects;
     std::vector<Light> lights;
 
 public:
-    Scene(const std::vector<Sphere>& spheres,
+    Scene() = delete;
+    Scene(std::vector<sObject>&& objects,
           const std::vector<Light>& lights);
 
     Hit ray_intersect(const Ray& ray) const override;
