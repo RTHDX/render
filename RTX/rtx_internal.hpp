@@ -48,7 +48,8 @@ struct Material {
 
 public:
     Material() = default;
-    Material(const Albedo& albedo, const Color& color, float exponent, float ref);
+    Material(const Albedo& albedo, const Color& color, float exponent,
+             float ref);
 };
 
 Vector reflect(const Vector& input, const Vector& normal);
@@ -119,9 +120,9 @@ struct Scene final : public Object {
     std::vector<Light> lights;
 
 public:
-    Scene() = delete;
+    Scene() = default;
     Scene(std::vector<sObject>&& objects,
-          const std::vector<Light>& lights);
+          std::vector<Light>&& lights);
 
     Hit ray_intersect(const Ray& ray) const override;
 };

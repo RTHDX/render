@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.20)
 
-function (copy_shaders)
-    cmake_parse_arguments(THIS "" "TARGET" "SHADERS" ${ARGV})
-    foreach (SHADER ${THIS_SHADERS})
-        file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/${SHADER}"
+function (copy_files)
+    cmake_parse_arguments(THIS "" "TARGET" "FILES" ${ARGV})
+    foreach (FILE ${THIS_FILES})
+        message("Copying ${FILE}")
+        file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}"
              DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
     endforeach ()
 endfunction()

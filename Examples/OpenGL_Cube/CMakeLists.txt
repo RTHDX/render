@@ -8,7 +8,7 @@ create_executable(
     LIBS OpenGL UI
 )
 
-copy_shaders(
+copy_files(
     TARGET ${PROJECT_NAME}
-    SHADERS vertex_shader.vert fragment_shader.frag
+    FILES vertex_shader.vert fragment_shader.frag
 )

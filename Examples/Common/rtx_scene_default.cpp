@@ -59,12 +59,11 @@ std::vector<sObject> make_spheres() {
     };
 }
 
-const std::vector<Light>& make_lights() {
-    static std::vector<Light> lights{
+std::vector<Light> make_lights() {
+    return {
         Light({10.0f, 60.0f, 0.0f}, 1.0),
         Light({10.0f, 60.0f, 0.0f}, 1.1)
     };
-    return lights;
 }
 
 Camera& make_camera() {
@@ -76,7 +75,7 @@ Camera& make_camera() {
 }
 
 Scene make_scene() {
-    return Scene(make_spheres(), make_lights());
+    return Scene(std::move(make_spheres()), std::move(make_lights()));
 }
 
 }

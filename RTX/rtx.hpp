@@ -3,6 +3,7 @@
 #include "rtx_internal.hpp"
 #include "camera.hpp"
 #include "render.hpp"
+#include "model.hpp"
 
 #define BENCHMARK(FUNCTION_CALL)                        \
     {                                                   \

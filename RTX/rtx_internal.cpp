@@ -155,10 +155,10 @@ Hit Mesh::ray_intersect(const Ray& ray) const {
 
 
 Scene::Scene(std::vector<sObject>&& objects,
-             const std::vector<Light>& lights)
+             std::vector<Light>&& lights)
     : Object()
     , objects(std::move(objects))
-    , lights(lights)
+    , lights(std::move(lights))
 {}
 
 Hit Scene::ray_intersect(const Ray& ray) const {
