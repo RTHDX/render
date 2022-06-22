@@ -14,8 +14,9 @@ int main() {
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
 
-    auto& camera = rtx::make_camera();
-    rtx::Render render(rtx::make_scene(), camera, rtx::Color{0.6, 0.85, 0.80});
+    rtx::Render<rtx::Sphere> render(std::move(rtx::make_scene()),
+                                    std::move(rtx::make_camera()),
+                                    rtx::Color{0.6, 0.85, 0.80});
 
     while (!glfwWindowShouldClose(window)) {
         BENCHMARK(render.render());

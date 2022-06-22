@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.20)
 project(RTX-Test)
 
 
+copy_files(
+    FILES mesh-examples/icosphere/icosphere.obj
+          mesh-examples/icosphere/icosphere.mtl
+          mesh-examples/cube/cube.obj
+          mesh-examples/cube/cube.mtl
+)
+
 create_test_executable(
     TARGET "camera-test"
     SOURCES test_camera.cpp
@@ -24,8 +31,4 @@ create_test_executable(
     TARGET "test-mesh-loader"
     SOURCES test_mesh_loader.cpp
     LIBS RTX UI
-)
-
-target_compile_options("test-mesh-loader" PRIVATE
-    -DCURRENT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
 )

@@ -8,6 +8,6 @@ create_executable(
 )
 
 copy_files(
-    TARGET ${PROJECT_NAME}
-    FILES "icosphere/icosphere.obj" "icosphere/icosphere.mtl"
+    "icosphere/icosphere.obj" "icosphere/icosphere.mtl"
+    "cube/cube.obj"           "cube/cube.obj"
 )

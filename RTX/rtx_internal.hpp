@@ -32,6 +32,7 @@ std::ostream& operator << (std::ostream& os, const Ray& ray);
 struct Light {
     Point position;
     float intensity;
+
 public:
     Light(const Point& position, float intensity);
 
@@ -110,19 +111,6 @@ struct Mesh final : public Object {
 public:
     Mesh() = default;
     Mesh(const std::vector<Triangle>& triangles);
-
-    Hit ray_intersect(const Ray& ray) const override;
-};
-
-
-struct Scene final : public Object {
-    std::vector<sObject> objects;
-    std::vector<Light> lights;
-
-public:
-    Scene() = default;
-    Scene(std::vector<sObject>&& objects,
-          std::vector<Light>&& lights);
 
     Hit ray_intersect(const Ray& ray) const override;
 };

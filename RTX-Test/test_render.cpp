@@ -6,15 +6,16 @@
 
 #include <RTX/camera.hpp>
 #include <RTX/render.hpp>
+#include <RTX/rtx.hpp>
 
 constexpr size_t TEST_WIDTH = 200;
 constexpr size_t TEST_HEIGHT = 200;
 constexpr rtx::Point START_POS{0.0, 0.0, 10.0};
 constexpr rtx::Point START_TAR{0.0, 0.0, 0.0};
 
-std::vector<rtx::sObject> make_spheres() {
-    return {
-        std::make_shared<rtx::Sphere>(
+auto make_spheres() {
+    return std::vector<rtx::Sphere> {
+        rtx::Sphere(
             rtx::Point{0.0, 0.0, 0.0},
             rtx::Material(
                 {0.9, 0.1, 0.0, 0.0},
@@ -32,33 +33,32 @@ std::vector<rtx::Light> make_lights() {
     };
 }
 
-rtx::Scene make_scene() {
-    return rtx::Scene(
+auto make_scene() {
+    return rtx::Scene<rtx::Sphere>(
         std::move(make_spheres()),
-        make_lights()
+        std::move(make_lights())
     );
 }
 
-rtx::Camera& make_camera() {
-    static rtx::Camera camera (
+rtx::Camera make_camera() {
+    return rtx::Camera (
         {0.0, 0.0, 10.0},
         {0.0, 0.0, 0.0},
         glm::radians(90.0f),
         TEST_WIDTH,
         TEST_HEIGHT
     );
-    return camera;
 }
 
 class RenderTest : public testing::Test {
 public:
     RenderTest()
         : testing::Test()
-        , render(std::move(make_scene()), make_camera(), {0.1, 0.1, 0.1})
+        , render(std::move(make_scene()), std::move(make_camera()))
     {}
 
 public:
-    rtx::Render render;
+    rtx::Render<rtx::Sphere> render;
 };
 
 bool operator == (const rtx::Framebuffer& lhs, const rtx::Framebuffer& rhs) {

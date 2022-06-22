@@ -1,6 +1,9 @@
+#include <filesystem>
+
 #include <gtest/gtest.h>
 
 #include <RTX/rtx.hpp>
+#include <RTX/scene.hpp>
 
 
 constexpr size_t TEST_WIDTH = 200;
@@ -40,4 +43,18 @@ TEST_F(TriangleTest, surface) {
     auto ray = camera.emit_ray(TEST_HEIGHT / 2, TEST_WIDTH / 2);
     auto hit = triangle.ray_intersect(ray);
     ASSERT_FALSE(hit.is_valid());
+}
+
+auto current_dir() {
+    std::wstring temp(std::filesystem::current_path().c_str());
+    return std::string(temp.begin(), temp.end());
+}
+
+
+TEST(MeshTest, cube) {
+    auto meshes = rtx::model::Loader()
+        .read(std::format(R"({}\{})", current_dir(), "cube.obj"));
+    std::cout << meshes.size() << std::endl;
+
+    rtx::Scene<rtx::Mesh> scene;
 }

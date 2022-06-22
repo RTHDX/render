@@ -21,7 +21,7 @@ size_t HEIGHT = 680;
 
 auto create_camera() {
     return rtx::Camera(
-        {4.0, 4.0, 4.0},
+        {0.0, 0.0, 3.0},
         {0.0, 0.0, 0.0},
         glm::radians(90.0f),
         WIDTH, HEIGHT
@@ -51,10 +51,10 @@ std::vector<rtx::Light> create_lights() {
     };
 }
 
-rtx::Scene create_scene() {
+auto create_scene() {
     auto meshes = rtx::model::Loader().read(
         std::format(R"({}\{})", current_dir(),
-                    R"(icosphere.obj)")
+                    R"(cube.obj)")
     );
     for (auto& mesh: meshes) {
         for (auto& face: mesh.faces) {
@@ -62,20 +62,17 @@ rtx::Scene create_scene() {
         }
     }
 
-    std::vector<rtx::sObject> out_meshes(meshes.size());
-    for (size_t i = 0; i < meshes.size(); ++i) {
-        out_meshes[i] = std::make_shared<rtx::Mesh>(meshes[i]);
-    }
-    return rtx::Scene (
-        std::move(out_meshes),
+    return rtx::Scene<rtx::Mesh> (
+        std::move(meshes),
         std::move(create_lights())
     );
 }
 
 int main() {
     ui::nuklear::Application app("Meshes", WIDTH, HEIGHT);
-    //rtx::Render render(std::move(create_scene()), std::move(create_camera()));
-    rtx::MultiThreadRender render(std::move(create_scene()),
+    //rtx::MultiThreadRender render(std::move(create_scene()),
+    //                              std::move(create_camera()));
+    rtx::Render<rtx::Mesh> render(std::move(create_scene()),
                                   std::move(create_camera()));
     std::function<void()> callback = [&render]() {
         render.render();

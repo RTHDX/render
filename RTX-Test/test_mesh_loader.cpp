@@ -7,8 +7,7 @@
 
 
 TEST(Loader, read_iconsphere) {
-    std::string path = std::format("{}/{}", CURRENT_DIR,
-                                   "mesh-examples/icosphere/icosphere.obj");
+    std::string path("icosphere.obj");
     rtx::model::Loader loader;
     auto meshes = loader.read(path);
     ASSERT_EQ(meshes.size(), 1);

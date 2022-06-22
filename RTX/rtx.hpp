@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "render.hpp"
 #include "model.hpp"
+#include "scene.hpp"
 
 #define BENCHMARK(FUNCTION_CALL)                        \
     {                                                   \

@@ -125,7 +125,9 @@ Hit Triangle::ray_intersect(const Ray& ray) const {
 
     float area = glm::length(glm::cross(c - a, c - b));
     float u = glm::length(glm::cross(c - a, c - p)) / area;
+    if (std::fabs(u) >= 1.0f) { return Hit(); }
     float v = glm::length(glm::cross(a - b, a - p)) / area;
+    if (std::fabs(v) >= 1.0f) { return Hit(); }
 
     float w = 1 - u - v;
     return w > 0.0f ? Hit(t, &material, p, normal) : Hit();
@@ -151,30 +153,6 @@ Hit Mesh::ray_intersect(const Ray& ray) const {
     }
 
     return dist < LIMIT ? out_hit : Hit();
-}
-
-
-Scene::Scene(std::vector<sObject>&& objects,
-             std::vector<Light>&& lights)
-    : Object()
-    , objects(std::move(objects))
-    , lights(std::move(lights))
-{}
-
-Hit Scene::ray_intersect(const Ray& ray) const {
-    static constexpr float LIMIT = 1000.0;
-    float spheres_dist = std::numeric_limits<float>::max();
-
-    Hit out_hit;
-    for (const auto& object : objects) {
-        Hit hit = object->ray_intersect(ray);
-        if (hit.is_valid() && hit.t < spheres_dist) {
-            spheres_dist = hit.t;
-            out_hit = hit;
-        }
-    }
-
-    return spheres_dist < LIMIT ? out_hit : Hit();
 }
 
 }

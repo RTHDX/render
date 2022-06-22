@@ -1,5 +1,7 @@
 #include <memory>
 
+#include <RTX/rtx.hpp>
+
 #include "rtx_scene_default.hpp"
 
 
@@ -49,12 +51,12 @@ Sphere make_ground(const Material& material, float radius) {
     };
 }
 
-std::vector<sObject> make_spheres() {
-    return std::vector<sObject> {
-        std::make_shared<Sphere>(Point{0.0, 0.0, 0.0}, mirror(), 5.0f),
-        std::make_shared<Sphere>(Point{15.0, 0.0, 0.0}, ivory(), 5.0),
-        std::make_shared<Sphere>(Point{0.0, 20.0, 0.0}, red_rubber(), 3.0f),
-        std::make_shared<Sphere>(Point{-15.0, 0.0, 0.0}, glass(), 5.0f),
+std::vector<rtx::Sphere> make_spheres() {
+    return std::vector<rtx::Sphere> {
+        rtx::Sphere(Point{0.0, 0.0, 0.0}, mirror(), 5.0f),
+        rtx::Sphere(Point{15.0, 0.0, 0.0}, ivory(), 5.0),
+        rtx::Sphere(Point{0.0, 20.0, 0.0}, red_rubber(), 3.0f),
+        rtx::Sphere(Point{-15.0, 0.0, 0.0}, glass(), 5.0f),
         //make_ground(red_rubber(), 10'000'000)
     };
 }
@@ -66,16 +68,15 @@ std::vector<Light> make_lights() {
     };
 }
 
-Camera& make_camera() {
-    static Camera camera(
+Camera make_camera() {
+    return Camera (
         {0.0f, 0.0f, 40.0f},
         {0.0f, 0.0, 0.0f},
         utils::to_radians(90), WIDTH, HEIGHT);
-    return camera;
 }
 
-Scene make_scene() {
-    return Scene(std::move(make_spheres()), std::move(make_lights()));
+Scene<Sphere> make_scene() {
+    return Scene<Sphere>(std::move(make_spheres()), std::move(make_lights()));
 }
 
 }

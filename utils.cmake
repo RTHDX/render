@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 function (copy_files)
-    cmake_parse_arguments(THIS "" "TARGET" "FILES" ${ARGV})
+    cmake_parse_arguments(THIS "" "" "FILES" ${ARGV})
     foreach (FILE ${THIS_FILES})
         message("Copying ${FILE}")
         file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/${FILE}"
