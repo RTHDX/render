@@ -10,7 +10,7 @@ namespace rtx {
 Material mirror() {
     return {
         {0.0, 10.0, 0.8, 0.0},
-        Color(1.0, 1.0, 1.0),
+        {1.0, 1.0, 1.0},
         1425.0,
         1.0
     };
@@ -19,7 +19,7 @@ Material mirror() {
 Material ivory() {
     return {
         {0.6, 0.3, 0.1, 0.0},
-        Color(0.45, 0.45, 0.35),
+        {0.45, 0.45, 0.35},
         50.0,
         1.0
     };

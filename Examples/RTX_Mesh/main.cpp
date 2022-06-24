@@ -28,11 +28,20 @@ auto create_camera() {
     );
 }
 
-auto ivory() {
+auto mirror() {
     return rtx::Material{
-        rtx::Albedo{0.6, 0.3, 0.1, 0.0},
-        rtx::Color(0.45, 0.45, 0.35),
-        50.0,
+        {0.0, 0.5, 0.1, 0.8},
+        {0.6, 0.7, 0.8},
+        125.0,
+        1.5
+    };
+}
+
+auto red_rubber(const rtx::Color& color={0.3f, 0.1f, 0.1f}) {
+    return rtx::Material{
+        {0.9, 0.1, 0.0, 0.0},
+        color,
+        10.0f,
         1.0
     };
 }
@@ -46,46 +55,68 @@ std::vector<rtx::Light> create_lights() {
     return {
         rtx::Light {
             {0.0, 30.0, 0.0},
-            20.0
+            4.0
+        },
+        rtx::Light {
+            {30, 30, 30},
+            5.0
         }
     };
 }
 
 std::vector<rtx::Mesh> create_meshes() {
     rtx::model::Loader loader;
-    std::string path(std::format("{}/{}", current_dir(), "cube.obj"));
+    std::string path(std::format("{}/{}", current_dir(), "icosphere.obj"));
     auto meshes = loader.read(path);
     for (auto& mesh : meshes) {
         for (auto& face : mesh.faces) {
-            face.material = ivory();
+            face.material = mirror();
         }
     }
 
     return meshes;
 }
 
-auto create_scene() {
-    rtx::Scene<rtx::Triangle> scene;
-    scene.objects = std::vector<rtx::Triangle>{
-        rtx::Triangle{
-            rtx::Point{0, 2, 0}, rtx::Point{2, 0, 0}, rtx::Point{-2, 0, 0},
-            rtx::Vector{0, 0, 1}, ivory()}
+rtx::Mesh create_ground() {
+    rtx::Mesh ground;
+    ground.faces = {
+        rtx::Triangle(
+            {-100,  -10, 100},
+            { 100,  -10, 100},
+            { 100,  -10, -100},
+            {0, 1, 0},
+            red_rubber({0.1, 0.1, 0.1})
+        ),
+        rtx::Triangle(
+            {-100, -10, -100},
+            {-100, -10, -100},
+            { 100, -10, -100},
+            {0, 1, 0},
+            red_rubber({0.1, 0.1, 0.1})
+        )
     };
-    scene.lights = create_lights();
+    return ground;
+}
 
+auto create_scene() {
+    auto objects = create_meshes();
+    objects.push_back(create_ground());
     return rtx::Scene<rtx::Mesh>(
-        std::move(create_meshes()),
+        std::move(objects),
         std::move(create_lights())
     );
 }
 
 int main() {
+    rtx::Color back {0.5, 0.7, 0.7};
+
     ui::nuklear::Application app("Meshes", WIDTH, HEIGHT);
-    //rtx::MultiThreadRender render(std::move(create_scene()),
-    //                              std::move(create_camera()));
-    rtx::Render<rtx::Mesh> render(std::move(create_scene()),
-                                  std::move(create_camera()),
-                                  {1.0, 0.0, 0.0});
+    rtx::MultiThreadRender<rtx::Mesh> render(std::move(create_scene()),
+                                             std::move(create_camera()),
+                                             back);
+    //rtx::Render<rtx::Mesh> render(std::move(create_scene()),
+    //                              std::move(create_camera()),
+    //                              {1.0, 0.0, 0.0});
     std::function<void()> callback = [&render]() {
         render.render();
         const auto& buffer = render.buffer();

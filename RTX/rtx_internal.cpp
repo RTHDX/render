@@ -146,18 +146,14 @@ bool Triangle::test_geometic(const Point& start, const Point& end,
 }
 
 Hit Triangle::moeller_truembore(const Ray& ray) const {
-    float ray_plate_dir = glm::dot(ray.direction, normal);
-    if (ray_plate_dir > 1e-8) { return Hit(); }
-
     Vector v0v1 = make_edge(a, b);
     Vector v0v2 = make_edge(a, c);
     Vector pvec = glm::cross(ray.direction, v0v2);
     float det = glm::dot(v0v1, pvec);
-    if (det < 1e-8) { return Hit(); }
-
+    if (det < std::numeric_limits<float>::epsilon()) { return Hit(); }
     float inv_det = 1 / det;
-    Vector tvec = ray.origin - a;
 
+    Vector tvec = ray.origin - a;
     float u = glm::dot(tvec, pvec) * inv_det;
     if (u < 0 || u > 1) { return Hit(); }
 
