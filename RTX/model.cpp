@@ -12,10 +12,7 @@ namespace rtx::model {
 
 std::vector<rtx::Mesh> Loader::read(const std::string& file) {
     const aiScene* scene = _importer.ReadFile(file,
-        aiProcess_CalcTangentSpace      |
-        aiProcess_Triangulate           |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_SortByPType
+        aiProcess_Triangulate
     );
 
     if (scene == nullptr) {

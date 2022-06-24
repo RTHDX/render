@@ -116,21 +116,55 @@ Triangle::Triangle(const Point& a, const Point& b, const Point& c,
 {}
 
 Hit Triangle::ray_intersect(const Ray& ray) const {
-    float denominator = glm::dot(ray.direction, normal);
-    /* if denom >= 0 -> the same direction -> ray hits surface */
-    if (denominator >= 0.0) { return Hit(); }
+    return geometric(ray);
+    //return moeller_truembore(ray);
+}
 
-    float t = glm::dot(normal, (a - ray.origin)) / denominator;
+Hit Triangle::geometric(const Ray& ray) const {
+    float n_dot_ray_dir = glm::dot(normal, ray.direction);
+    if (utils::is_close(n_dot_ray_dir, 0.0f)) { return Hit(); }
+
+    float d = -glm::dot(normal, a);
+    float t = -(glm::dot(normal, ray.origin) + d) / n_dot_ray_dir;
+    if (t < 0) { return Hit(); }
     Point p = ray.at(t);
 
-    float area = glm::length(glm::cross(c - a, c - b));
-    float u = glm::length(glm::cross(c - a, c - p)) / area;
-    if (std::fabs(u) >= 1.0f) { return Hit(); }
-    float v = glm::length(glm::cross(a - b, a - p)) / area;
-    if (std::fabs(v) >= 1.0f) { return Hit(); }
+    if (test_geometic(a, b, p)) { return Hit(); }
+    if (test_geometic(b, c, p)) { return Hit(); }
+    if (test_geometic(c, a, p)) { return Hit(); }
 
-    float w = 1 - u - v;
-    return w > 0.0f ? Hit(t, &material, p, normal) : Hit();
+    return Hit(t, &material, p, normal);
+}
+
+bool Triangle::test_geometic(const Point& start, const Point& end,
+                             const Point& hit) const {
+    Vector edge = end - start;
+    Vector temp = hit - start;
+    Vector cross = glm::cross(edge, temp);
+    float dot = glm::dot(normal, cross);
+    return dot < 0.0f;
+}
+
+Hit Triangle::moeller_truembore(const Ray& ray) const {
+    float ray_plate_dir = glm::dot(ray.direction, normal);
+    if (ray_plate_dir > 1e-8) { return Hit(); }
+
+    Vector pvec = glm::cross(ray.direction, make_edge(a, c));
+    float det = glm::dot(make_edge(a, b), pvec);
+    if (det < 1e-8) { return Hit(); }
+
+    float inv_det = 1 / det;
+    Vector tvec = ray.origin - a;
+
+    float u = glm::dot(pvec, tvec) * inv_det;
+    if (u < 0 || u > 1) { return Hit(); }
+
+    Vector qvec = glm::cross(tvec, make_edge(a, b));
+    float v = glm::dot(qvec, ray.direction) * inv_det;
+    if (v < 0 || v > 1) { return Hit(); }
+
+    float t = glm::dot(make_edge(a, c), qvec) * inv_det;
+    return Hit(t, &material, ray.at(t), normal);
 }
 
 
@@ -146,13 +180,16 @@ Hit Mesh::ray_intersect(const Ray& ray) const {
     Hit out_hit;
     for (const Triangle& face: faces) {
         Hit hit = face.ray_intersect(ray);
-        if (hit.is_valid() && hit.t < dist) {
+        bool is_valid = hit.is_valid();
+        if (is_valid && hit.t < dist) {
             dist = hit.t;
             out_hit = hit;
         }
     }
 
     return dist < LIMIT ? out_hit : Hit();
+
+    return Hit();
 }
 
 }

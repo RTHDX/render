@@ -90,6 +90,7 @@ public:
     Hit ray_intersect(const Ray& ray) const override;
 };
 
+inline Vector make_edge(Point start, Point end) { return end - start; }
 
 struct Triangle final : public Object {
     Point a, b, c;
@@ -102,6 +103,15 @@ public:
              const Material& material);
 
     Hit ray_intersect(const Ray& ray) const override;
+
+    Vector tr_cross() const { return glm::cross(make_edge(a, b),
+                                                make_edge(b, c)); }
+
+private:
+    Hit moeller_truembore(const Ray& ray) const;
+    Hit geometric(const Ray& ray) const;
+    bool test_geometic(const Point& start, const Point& end,
+                       const Point& hit) const;
 };
 
 

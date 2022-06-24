@@ -21,9 +21,9 @@ size_t HEIGHT = 680;
 
 auto create_camera() {
     return rtx::Camera(
-        {0.0, 0.0, 3.0},
+        {3.0, 3.0, 3.0},
         {0.0, 0.0, 0.0},
-        glm::radians(90.0f),
+        glm::radians(60.0f),
         WIDTH, HEIGHT
     );
 }
@@ -51,19 +51,30 @@ std::vector<rtx::Light> create_lights() {
     };
 }
 
-auto create_scene() {
-    auto meshes = rtx::model::Loader().read(
-        std::format(R"({}\{})", current_dir(),
-                    R"(cube.obj)")
-    );
-    for (auto& mesh: meshes) {
-        for (auto& face: mesh.faces) {
+std::vector<rtx::Mesh> create_meshes() {
+    rtx::model::Loader loader;
+    std::string path(std::format("{}/{}", current_dir(), "cube.obj"));
+    auto meshes = loader.read(path);
+    for (auto& mesh : meshes) {
+        for (auto& face : mesh.faces) {
             face.material = ivory();
         }
     }
 
-    return rtx::Scene<rtx::Mesh> (
-        std::move(meshes),
+    return meshes;
+}
+
+auto create_scene() {
+    rtx::Scene<rtx::Triangle> scene;
+    scene.objects = std::vector<rtx::Triangle>{
+        rtx::Triangle{
+            rtx::Point{0, 2, 0}, rtx::Point{2, 0, 0}, rtx::Point{-2, 0, 0},
+            rtx::Vector{0, 0, 1}, ivory()}
+    };
+    scene.lights = create_lights();
+
+    return rtx::Scene<rtx::Mesh>(
+        std::move(create_meshes()),
         std::move(create_lights())
     );
 }
@@ -73,7 +84,8 @@ int main() {
     //rtx::MultiThreadRender render(std::move(create_scene()),
     //                              std::move(create_camera()));
     rtx::Render<rtx::Mesh> render(std::move(create_scene()),
-                                  std::move(create_camera()));
+                                  std::move(create_camera()),
+                                  {1.0, 0.0, 0.0});
     std::function<void()> callback = [&render]() {
         render.render();
         const auto& buffer = render.buffer();

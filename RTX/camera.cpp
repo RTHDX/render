@@ -24,9 +24,8 @@ Camera::Camera(const Point& position, const Point& target, float fov,
 {}
 
 Ray Camera::emit_ray(const size_t h_pos, const size_t w_pos) const {
-    glm::vec3 direction = project_view_direction(glm::normalize(
-        pixel_camera(h_pos, w_pos)
-    ));
+    auto raw_directin = pixel_camera(h_pos, w_pos);
+    auto direction = project_view_direction(glm::normalize(raw_directin));
     return Ray(position(), direction);
 }
 
@@ -92,10 +91,10 @@ const glm::mat4& Camera::transform_mat(Direction dir) const {
         return mat;
     } case Direction::BACKWARD: {
         static glm::mat4 mat {
-            1.0, 0.0, 0.0,  0.0,
-            0.0, 1.0, 0.0,  0.0,
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
             0.0, 0.0, 1.0, MOVE_SPEED,
-            0.0, 0.0, 0.0,  1.0
+            0.0, 0.0, 0.0, 1.0
         };
         return mat;
     } case Direction::LEFT: {
