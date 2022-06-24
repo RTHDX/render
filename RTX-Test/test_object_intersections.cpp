@@ -8,7 +8,7 @@
 
 constexpr size_t TEST_WIDTH = 200;
 constexpr size_t TEST_HEIGHT = 200;
-constexpr rtx::Point START_POS{0.0, 0.0, 3.0};
+constexpr rtx::Point START_POS{0.0, 0.0, 2.0};
 constexpr rtx::Point START_TAR{0.0, 0.0, 0.0};
 
 auto create_camera(const rtx::Point& pos=START_POS) {
@@ -74,7 +74,7 @@ TEST(Square, test) {
     ASSERT_TRUE(hit.is_valid());
 }
 
-
+/*
 TEST(MeshTest, cube) {
     rtx::model::Loader loader;
     std::string path = std::format(R"({}\{})", current_dir(), "cube.obj");
@@ -85,4 +85,4 @@ TEST(MeshTest, cube) {
     auto ray = camera.emit_ray(TEST_HEIGHT / 2, TEST_WIDTH / 2);
     auto hit = cube.ray_intersect(ray);
 }
-
+*/

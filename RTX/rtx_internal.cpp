@@ -116,8 +116,8 @@ Triangle::Triangle(const Point& a, const Point& b, const Point& c,
 {}
 
 Hit Triangle::ray_intersect(const Ray& ray) const {
-    return geometric(ray);
-    //return moeller_truembore(ray);
+    //return geometric(ray);
+    return moeller_truembore(ray);
 }
 
 Hit Triangle::geometric(const Ray& ray) const {
@@ -139,8 +139,8 @@ Hit Triangle::geometric(const Ray& ray) const {
 bool Triangle::test_geometic(const Point& start, const Point& end,
                              const Point& hit) const {
     Vector edge = end - start;
-    Vector temp = hit - start;
-    Vector cross = glm::cross(edge, temp);
+    Vector temp = hit - end;
+    Vector cross = glm::cross(temp, edge);
     float dot = glm::dot(normal, cross);
     return dot < 0.0f;
 }
@@ -149,22 +149,25 @@ Hit Triangle::moeller_truembore(const Ray& ray) const {
     float ray_plate_dir = glm::dot(ray.direction, normal);
     if (ray_plate_dir > 1e-8) { return Hit(); }
 
-    Vector pvec = glm::cross(ray.direction, make_edge(a, c));
-    float det = glm::dot(make_edge(a, b), pvec);
+    Vector v0v1 = make_edge(a, b);
+    Vector v0v2 = make_edge(a, c);
+    Vector pvec = glm::cross(ray.direction, v0v2);
+    float det = glm::dot(v0v1, pvec);
     if (det < 1e-8) { return Hit(); }
 
     float inv_det = 1 / det;
     Vector tvec = ray.origin - a;
 
-    float u = glm::dot(pvec, tvec) * inv_det;
+    float u = glm::dot(tvec, pvec) * inv_det;
     if (u < 0 || u > 1) { return Hit(); }
 
-    Vector qvec = glm::cross(tvec, make_edge(a, b));
-    float v = glm::dot(qvec, ray.direction) * inv_det;
-    if (v < 0 || v > 1) { return Hit(); }
+    Vector qvec = glm::cross(tvec, v0v1);
+    float v = glm::dot(ray.direction, qvec) * inv_det;
+    if (v < 0 || u + v > 1) { return Hit(); }
 
-    float t = glm::dot(make_edge(a, c), qvec) * inv_det;
-    return Hit(t, &material, ray.at(t), normal);
+    float t = glm::dot(v0v2, qvec) * inv_det;
+    auto p = ray.at(t);
+    return Hit(t, &material, p, normal);
 }
 
 
