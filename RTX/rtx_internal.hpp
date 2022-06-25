@@ -79,6 +79,7 @@ public:
 using uObject = std::unique_ptr<Object>;
 using sObject = std::shared_ptr<Object>;
 
+
 struct Sphere final : public Object {
     Point center;
     Material material;
@@ -117,10 +118,11 @@ private:
 
 struct Mesh final : public Object {
     std::vector<Triangle> faces;
+    std::string name;
 
 public:
     Mesh() = default;
-    Mesh(const std::vector<Triangle>& triangles);
+    Mesh(const std::vector<Triangle>& triangles, const std::string& name={});
 
     Hit ray_intersect(const Ray& ray) const override;
 };

@@ -1,27 +1,15 @@
 #include <iostream>
 
+#include <UI/ui.hpp>
+#include <OpenGL/opengl.hpp>
+#include <UI/io.hpp>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#define NK_INCLUDE_FIXED_TYPES
-#define NK_INCLUDE_STANDARD_IO
-#define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
-#define NK_INCLUDE_FONT_BAKING
-#define NK_INCLUDE_DEFAULT_FONT
-#define NK_IMPLEMENTATION
-#define NK_GLFW_GL4_IMPLEMENTATION
-#define NK_KEYSTATE_BASED_INPUT
 #include <nuklear.h>
 #include <nuklear_glfw_gl4.h>
 
-#include <UI/ui.hpp>
-#include <UI/io.hpp>
-#include <UI/observer.hpp>
-#include <OpenGL/opengl.hpp>
-
-#include "nuklear_application.hpp"
+#include "base_application.hpp"
 
 
 namespace ui::nuklear {
@@ -55,13 +43,21 @@ static void init_fonts() {
     nk_glfw3_font_stash_end();
 }
 
-Application::Application(const std::string_view title, size_t w, size_t h)
+BApplication::BApplication(const std::string_view title, size_t width,
+                           size_t height)
     : _title(title)
-    , _width(w)
-    , _height(h) {
-    if (!ui::init_glfw_lite()) {
-        std::cout << "Unable initialize glfw" << std::endl;
-        std::exit(EXIT_FAILURE);
+    , _width(width)
+    , _height(height)
+{}
+
+BApplication::~BApplication() {
+    glfwTerminate();
+}
+
+void BApplication::initialize() {
+    if (!custom_initialize()) {
+        std::cerr << "Custom initialization failed" << std::endl;
+        return;
     }
 
     _window = ui::create_window(_width, _height, _title.data());
@@ -79,30 +75,14 @@ Application::Application(const std::string_view title, size_t w, size_t h)
     glfwSetDropCallback(_window, on_dropped);
 }
 
-Application::~Application() {
-    nk_glfw3_shutdown();
-    glfwTerminate();
+void BApplication::pre_render() {
+    glfwPollEvents();
+    nk_glfw3_new_frame();
 }
 
-void Application::run(RenderCallback& render) {
-    while (!glfwWindowShouldClose(_window)) {
-        glfwPollEvents();
-        nk_glfw3_new_frame();
-
-        if (render) {
-            render();
-        } else {
-            opengl::Context::instance().draw_background();
-        }
-        for (uWidget& widget : _widgets) { widget->show(); }
-
-        nk_glfw3_render(NK_ANTI_ALIASING_ON);
-        glfwSwapBuffers(_window);
-    }
-}
-
-void Application::append(uWidget&& widget) {
-    _widgets.push_back(std::move(widget));
+void BApplication::post_render() {
+    nk_glfw3_render(NK_ANTI_ALIASING_ON);
+    glfwSwapBuffers(_window);
 }
 
 }

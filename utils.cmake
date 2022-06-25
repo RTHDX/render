@@ -35,6 +35,8 @@ function (create_executable)
     )
     set_property(TARGET ${THIS_TARGET} PROPERTY CXX_STANDARD 20)
     set_property(TARGET ${THIS_TARGET} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+    target_compile_definitions(${THIS_TARGET} PRIVATE
+                               "DEBUG=$<IF:$<CONFIG:Debug>,1,0>")
 endfunction (create_executable)
 
 
@@ -54,6 +56,8 @@ function (create_library)
     )
     set_property(TARGET ${THIS_TARGET} PROPERTY CXX_STANDARD 20)
     set_property(TARGET ${THIS_TARGET} PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+    target_compile_definitions(${THIS_TARGET} PRIVATE
+                               "DEBUG=$<IF:$<CONFIG:Debug>,1,0>")
 endfunction (create_library)
 
 

@@ -13,7 +13,7 @@
 #include <UI/ui.hpp>
 #include <UI/property.hpp>
 #include <RTX/rtx.hpp>
-#include <UI-Nuklear/nuklear_application.hpp>
+#include <UI-Nuklear/rtx_application.hpp>
 #include <UI-Nuklear/nuklear_widgets.hpp>
 
 size_t WIDTH = 860;
@@ -21,7 +21,7 @@ size_t HEIGHT = 680;
 
 auto create_camera() {
     return rtx::Camera(
-        {3.0, 3.0, 3.0},
+        {2.0, 2.0, 2.0},
         {0.0, 0.0, 0.0},
         glm::radians(60.0f),
         WIDTH, HEIGHT
@@ -56,21 +56,17 @@ std::vector<rtx::Light> create_lights() {
         rtx::Light {
             {0.0, 30.0, 0.0},
             4.0
-        },
-        rtx::Light {
-            {30, 30, 30},
-            5.0
         }
     };
 }
 
 std::vector<rtx::Mesh> create_meshes() {
     rtx::model::Loader loader;
-    std::string path(std::format("{}/{}", current_dir(), "icosphere.obj"));
+    std::string path(std::format("{}/{}", current_dir(), "stone_5.obj"));
     auto meshes = loader.read(path);
     for (auto& mesh : meshes) {
         for (auto& face : mesh.faces) {
-            face.material = mirror();
+            face.material = red_rubber();
         }
     }
 
@@ -100,30 +96,30 @@ rtx::Mesh create_ground() {
 
 auto create_scene() {
     auto objects = create_meshes();
-    objects.push_back(create_ground());
     return rtx::Scene<rtx::Mesh>(
         std::move(objects),
         std::move(create_lights())
     );
 }
 
+auto create_render() {
+    rtx::Color back{ 0.5, 0.7, 0.7 };
+
+#if(DEBUG)
+    return rtx::Render<rtx::Mesh> (std::move(create_scene()),
+                                   std::move(create_camera()),
+                                   back);
+#else
+    return rtx::MultiThreadRender<rtx::Mesh> (std::move(create_scene()),
+                                              std::move(create_camera()),
+                                              back);
+#endif
+}
+
 int main() {
-    rtx::Color back {0.5, 0.7, 0.7};
-
-    ui::nuklear::Application app("Meshes", WIDTH, HEIGHT);
-    rtx::MultiThreadRender<rtx::Mesh> render(std::move(create_scene()),
-                                             std::move(create_camera()),
-                                             back);
-    //rtx::Render<rtx::Mesh> render(std::move(create_scene()),
-    //                              std::move(create_camera()),
-    //                              {1.0, 0.0, 0.0});
-    std::function<void()> callback = [&render]() {
-        render.render();
-        const auto& buffer = render.buffer();
-        glDrawPixels(WIDTH, HEIGHT, GL_RGB, GL_FLOAT,
-                     glm::value_ptr(*buffer.data()));
-    };
-
-    app.run(callback);
+    ui::nuklear::RTX_App app("Meshes", WIDTH, HEIGHT);
+    app.initialize();
+    auto render = create_render();
+    app.run(render);
     return 0;
 }

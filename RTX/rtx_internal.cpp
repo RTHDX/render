@@ -146,10 +146,10 @@ bool Triangle::test_geometic(const Point& start, const Point& end,
 }
 
 Hit Triangle::moeller_truembore(const Ray& ray) const {
-    Vector v0v1 = make_edge(a, b);
-    Vector v0v2 = make_edge(a, c);
-    Vector pvec = glm::cross(ray.direction, v0v2);
-    float det = glm::dot(v0v1, pvec);
+    Vector ab = make_edge(a, b);
+    Vector ac = make_edge(a, c);
+    Vector pvec = glm::cross(ray.direction, ac);
+    float det = glm::dot(ab, pvec);
     if (det < std::numeric_limits<float>::epsilon()) { return Hit(); }
     float inv_det = 1 / det;
 
@@ -157,19 +157,20 @@ Hit Triangle::moeller_truembore(const Ray& ray) const {
     float u = glm::dot(tvec, pvec) * inv_det;
     if (u < 0 || u > 1) { return Hit(); }
 
-    Vector qvec = glm::cross(tvec, v0v1);
+    Vector qvec = glm::cross(tvec, ab);
     float v = glm::dot(ray.direction, qvec) * inv_det;
     if (v < 0 || u + v > 1) { return Hit(); }
 
-    float t = glm::dot(v0v2, qvec) * inv_det;
+    float t = glm::dot(ac, qvec) * inv_det;
     auto p = ray.at(t);
     return Hit(t, &material, p, normal);
 }
 
 
-Mesh::Mesh(const std::vector<Triangle>& triangle)
+Mesh::Mesh(const std::vector<Triangle>& triangle, const std::string& name)
     : Object()
     , faces(triangle)
+    , name(name)
 {}
 
 Hit Mesh::ray_intersect(const Ray& ray) const {

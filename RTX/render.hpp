@@ -22,6 +22,7 @@ public:
     size_t height() const { return _camera.height(); }
     const Framebuffer& buffer() const { return _framebuffer; }
     Camera& camera() { return _camera; }
+    const Camera& camera() const { return _camera; }
     const Scene<T>& scene() const { return _scene; }
 
 protected:
@@ -40,7 +41,6 @@ protected:
     Camera _camera;
     CameraListener _cam_handler;
 };
-
 
 template <Traceable T>
 BaseRender<T>::BaseRender(Scene<T>&& scene, Camera&& camera,

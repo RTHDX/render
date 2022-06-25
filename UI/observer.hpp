@@ -84,7 +84,7 @@ public:
         if (_parent) { _parent->subscribe(this); }
     }
 
-    ~Listener()
+    virtual ~Listener()
     {
         if (_parent) { _parent->unsubscribe(this); }
     }

@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <UI/io.hpp>
+
 #include "camera.hpp"
 
 
@@ -11,11 +13,15 @@ namespace opengl {
 const glm::vec3 Camera::UP(0.0, 1.0, 0.0);
 const glm::vec3 Camera::FORWARD(0.0, 0.0, -1.0);
 
+static float MOVE_SPEED = 0.1;
+static float ROTATION_SPEED = 10;
+static glm::mat4 move_modifiers(Direction dir);
+static Direction convert(int key);
+
 
 Camera::Camera(float width, float height, float fov,
                const glm::vec3& position, const glm::vec3& look_at)
-    : ui::Listener()
-    , _width(width)
+    : _width(width)
     , _height(height)
     , _projection(glm::perspective(fov, aspect_ratio(), 0.1f, 100.0f))
     , _position(position)
@@ -42,29 +48,93 @@ glm::vec3 Camera::direction() const {
     return glm::normalize(_position - _target);
 }
 
-void Camera::consume(const ui::KeyEvent& event) {
-    if (event.action == GLFW_RELEASE) { return; }
-    switch (event.key) {
-    case GLFW_KEY_W: move_forward(); break;
-    case GLFW_KEY_S: move_backward(); break;
-    case GLFW_KEY_A: move_left(); break;
-    case GLFW_KEY_D: move_right(); break;
-    case GLFW_KEY_Q: rotate_left(); break;
-    case GLFW_KEY_E: rotate_right(); break;
-    default:;
+void Camera::move(Direction direction) {
+    auto mat = move_modifiers(direction);
+    _position = glm::vec4(_position, 1.0) * mat;
+    if (direction == Direction::FORWARD || direction == Direction::BACKWARD ||
+        direction == Direction::LEFT || direction == Direction::RIGHT) {
+        _target = glm::vec4(_target, 1.0) * mat;
     }
 }
 
-void Camera::consume(const ui::MouseEvent& event) {}
-void Camera::consume(const ui::MouseButtonEvent& event) {}
-void Camera::consume(const ui::ScrollEvent& event) {}
-void Camera::consume(const ui::DropEvent& event) {}
 
-void Camera::move_forward() { _position.z -= 0.5f; }
-void Camera::move_backward() { _position.z += 0.5f; }
-void Camera::move_left() { _position.x -= 0.5f; _target.x -= 0.5f; }
-void Camera::move_right() { _position.x += 0.5f; _target.x += 0.5f; }
-void Camera::rotate_left() { _position.x -= 0.3f; }
-void Camera::rotate_right() { _position.x += 0.3f; }
+CameraHandler::CameraHandler(Camera& camera)
+    : ui::Listener(&ui::io::IO::instance())
+    , _camera(camera)
+{}
+
+void CameraHandler::consume(const ui::KeyEvent& event) {
+    if (event.action == GLFW_RELEASE) { return; }
+
+    _camera.move(convert(event.key));
+}
+
+void CameraHandler::consume(const ui::MouseEvent& event) {}
+void CameraHandler::consume(const ui::MouseButtonEvent& event) {}
+void CameraHandler::consume(const ui::ScrollEvent& event) {}
+void CameraHandler::consume(const ui::DropEvent& event) {}
+
+
+static glm::mat4 move_modifiers(Direction dir) {
+    float rot = glm::radians(ROTATION_SPEED);
+    switch (dir) {
+    case Direction::FORWARD:
+        return glm::mat4 {
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, -MOVE_SPEED,
+            0.0, 0.0, 0.0, 1.0
+        };
+    case Direction::BACKWARD:
+        return glm::mat4 {
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, MOVE_SPEED,
+            0.0, 0.0, 0.0, 1.0
+        };
+    case Direction::LEFT:
+        return glm::mat4 {
+            1.0, 0.0, 0.0, -MOVE_SPEED,
+            0.0, 1.0, 0.0,  0.0,
+            0.0, 0.0, 1.0,  0.0,
+            0.0, 0.0, 0.0,  1.0
+        };
+    case Direction::RIGHT:
+        return glm::mat4 {
+            1.0, 0.0, 0.0, MOVE_SPEED,
+            0.0, 1.0, 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        };
+    case Direction::ROTATE_LEFT:
+        return glm::mat4 {
+            cos(rot),  0.0, sin(rot), 0.0,
+            0.0,       1.0, 0.0,      0.0,
+            -sin(rot), 0.0, cos(rot), 0.0,
+            0.0,       0.0, 0.0,      1.0
+        };
+    case Direction::ROTATE_RIGHT:
+        return glm::mat4 {
+            cos(-rot),   0.0, sin(-rot), 0.0,
+            0.0,         1.0, 0.0,       0.0,
+            -sin(-rot),  0.0, cos(-rot), 0.0,
+            0.0,         0.0, 0.0,       1.0
+        };
+    default:;
+    }
+    return glm::mat4(1.0);
+}
+
+static Direction convert(int key) {
+    switch (key) {
+    case GLFW_KEY_W: return Direction::FORWARD;
+    case GLFW_KEY_S: return Direction::BACKWARD;
+    case GLFW_KEY_A: return Direction::LEFT;
+    case GLFW_KEY_D: return Direction::RIGHT;
+    case GLFW_KEY_Q: return Direction::ROTATE_LEFT;
+    case GLFW_KEY_E: return Direction::ROTATE_RIGHT;
+    }
+    return Direction::NONE;
+}
 
 }

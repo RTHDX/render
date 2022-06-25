@@ -36,7 +36,7 @@ rtx::Mesh Loader::process_mesh(const aiMesh* mesh) const {
         faces[i] = process_face(face, mesh, mesh->mNormals[i]);
     }
 
-    return rtx::Mesh(faces);
+    return rtx::Mesh(faces, std::string(mesh->mName.C_Str()));
 }
 
 rtx::Triangle Loader::process_face(const aiFace& face, const aiMesh* mesh,

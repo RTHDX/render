@@ -13,6 +13,7 @@ template <typename T> concept Traceable = std::is_base_of<Object, T>::value;
 template <Traceable T> struct Scene final : public Object {
     std::vector<T> objects;
     std::vector<Light> lights;
+    size_t active_ray_count = 0;
 
 public:
     Scene() = default;

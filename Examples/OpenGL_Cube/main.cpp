@@ -9,6 +9,7 @@
 #include <OpenGL/camera.hpp>
 #include <OpenGL/opengl_utils.hpp>
 #include <UI/application.hpp>
+#include <UI-Nuklear/opengl_application.hpp>
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
@@ -59,13 +60,16 @@ std::vector<float> vertices{
 };
 
 
-int main() {
-    ui::Application& app = ui::Application::instance();
-    auto* window = app.window();
+auto create_camera() {
+    return opengl::Camera {
+        WIDTH, HEIGHT, glm::radians(45.0)
+    };
+}
 
-    opengl::Context::instance().initialize();
-    opengl::Context::instance().dump();
-    opengl::Context::instance().background({0.2f, 0.5f, 0.5f, 1.0f});
+int main() {
+    ui::nuklear::OpenGL_App app("cube", WIDTH, HEIGHT,
+                                std::move(create_camera()));
+    app.initialize();
 
     const std::filesystem::path vertex_path(R"(.\vertex_shader.vert)");
     const std::filesystem::path fragment_path(R"(.\fragment_shader.frag)");
@@ -78,22 +82,13 @@ int main() {
 
     opengl::Item cube(vertices, opengl::AttribPointer(0, 3, 3));
     opengl::Camera camera(WIDTH, HEIGHT, glm::radians(45.0));
-    app.subscribe(&camera);
-    camera.bind(&app);
-
-    while (!glfwWindowShouldClose(window)) {
-        opengl::Context::instance().draw_background();
-
+    auto callback = [&app, &program, &cube]() {
         cube.draw(program);
-
         program.set_mat4("model", cube.model());
-        program.set_mat4("view", camera.view());
-        program.set_mat4("projection", camera.projection());
+        program.set_mat4("view", app.camera().view());
+        program.set_mat4("projection", app.camera().projection());
+    };
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
+    app.run(callback);
     return EXIT_SUCCESS;
 }
