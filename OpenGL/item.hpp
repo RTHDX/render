@@ -34,6 +34,7 @@ class Item {
 
 public:
     Item(const Coordinates& coords, const AttribPointer& attribs);
+    Item(Coordinates&& coords, Coordinates&& normals, AttribPointer&& attribs);
     Item(const Coordinates& coords, const Indices& indices,
          const AttribPointer& attribs);
     ~Item() = default;
@@ -46,12 +47,12 @@ private:
     bool has_indices() const;
 
 private:
-    Coordinates _coordinates;
+    Coordinates _coordinates, _normals;
     Indices _indices;
     AttribPointer _attribs;
 
     VertexArrayBuffer _vao;
-    VertexBuffer _vbo;
+    VertexBuffer _vbo, _vbo_2;
     ElementBuffer _ebo;
 
     State _current_state = NONE;

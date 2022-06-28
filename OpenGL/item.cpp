@@ -28,6 +28,26 @@ Item::Item(const Coordinates& coords, const AttribPointer& attribs)
     _current_state = ATTRIBS_SET;
 }
 
+Item::Item(Coordinates&& coords, Coordinates&& normals, AttribPointer&& attrs)
+    : _coordinates(std::move(coords))
+    , _normals(std::move(normals))
+    , _attribs(std::move(attrs))
+    , _model(glm::mat4(1.0f))
+{
+    _vao.initialize();
+
+    _vbo.initialize();
+    _vbo_2.initialize();
+
+    _vao.bind();
+    _vbo.bind(_coordinates.data(), _coordinates.size() * sizeof (float));
+    _vbo_2.bind(_normals.data(), _normals.size() * sizeof (float));
+    _vbo.set_layout(_attribs.index, _attribs.width, _attribs.stride);
+    _vbo_2.set_layout(_attribs.index + 1, _attribs.width, _attribs.stride);
+
+    _current_state = ATTRIBS_SET;
+}
+
 Item::Item(const Coordinates& coords, const Indices& indices,
            const AttribPointer& attribs)
     : Item(coords, attribs)

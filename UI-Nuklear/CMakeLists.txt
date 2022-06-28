@@ -11,5 +11,5 @@ create_library(
             rtx_application.hpp
             opengl_application.hpp
             base_application.hpp
-    LIBS UI OpenGL
+    LIBS UI RTX OpenGL
 )

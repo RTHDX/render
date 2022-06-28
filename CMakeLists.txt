@@ -27,6 +27,7 @@ add_subdirectory(OpenGL)
 add_subdirectory(3rdParty/Nuklear/demo/glfw_opengl4)
 add_subdirectory(UI-Nuklear)
 add_subdirectory(RTX)
+add_subdirectory(Loader)
 add_subdirectory(Examples)
 
 
@@ -41,4 +42,5 @@ if (${RENDER_ENABLE_TESTING})
     )
     enable_testing()
     add_subdirectory("RTX-Test")
+    add_subdirectory("Loader-Test")
 endif ()

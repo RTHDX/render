@@ -3,6 +3,8 @@
 #include <string>
 #include <string_view>
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include <RTX/scene.hpp>
 #include <RTX/render.hpp>
 
