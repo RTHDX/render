@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(Render)
 
 option(RENDER_ENABLE_TESTING OFF)
+option(RENDER_ENABLE_BENCHMARK OFF)
 
 include(utils.cmake)
 
@@ -43,4 +44,12 @@ if (${RENDER_ENABLE_TESTING})
     enable_testing()
     add_subdirectory("RTX-Test")
     add_subdirectory("Loader-Test")
+endif ()
+
+if (${RENDER_ENABLE_BENCHMARK})
+    message("!!! ---Benchmark enabled--- !!!")
+    add_subdirectory(3rdParty/benchmark)
+    include_directories(
+        "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/benchmark/include"
+    )
 endif ()

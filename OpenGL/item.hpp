@@ -25,11 +25,12 @@ public:
 
 class Item {
     enum State {
-        NONE = 0x0,
-        VERTEX_ARRAY_BOUND = 0x1,
-        VERTEX_BUFFER_BOUND = 0x2,
-        ATTRIBS_SET = 0x4,
-        ELEMENT_BUFFER_BOUND = 0x8
+        NONE                 = 0x0,
+        VERTEX_ARRAY_SET     = 0x1,
+        VERTEX_BUFFER_SET    = 0x2,
+        ELEMNT_BUFFER_SET    = 0x4,
+        ATTRIBS_SET          = 0x8,
+        ELEMENT_BUFFER_BOUND = 0x10
     };
 
 public:
@@ -46,14 +47,15 @@ public:
 private:
     bool has_indices() const;
 
+    void set_up_vertex_array();
+    void set_up_vertex_buffer();
+    void set_up_element_buffer();
+
 private:
     Coordinates _coordinates, _normals;
     Indices _indices;
     AttribPointer _attribs;
-
-    VertexArrayBuffer _vao;
-    VertexBuffer _vbo, _vbo_2;
-    ElementBuffer _ebo;
+    GLuint _vao, _vbo_coordinates, _vbo_normals;
 
     State _current_state = NONE;
 

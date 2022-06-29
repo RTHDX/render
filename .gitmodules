@@ -13,3 +13,6 @@
 [submodule "3rdParty/Nuklear"]
 	path = 3rdParty/Nuklear
 	url = https://github.com/Immediate-Mode-UI/Nuklear.git
+[submodule "3rdParty/benchmark"]
+	path = 3rdParty/benchmark
+	url = https://github.com/google/benchmark.git
