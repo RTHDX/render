@@ -19,7 +19,14 @@ struct AttribPointer {
     size_t stride;
 
 public:
+    AttribPointer() = default;
     AttribPointer(size_t i, size_t w, size_t s);
+};
+
+
+struct VertexData {
+    glm::vec3 position;
+    glm::vec3 normal;
 };
 
 
@@ -34,32 +41,27 @@ class Item {
     };
 
 public:
-    Item(const Coordinates& coords, const AttribPointer& attribs);
-    Item(Coordinates&& coords, Coordinates&& normals, AttribPointer&& attribs);
-    Item(const Coordinates& coords, const Indices& indices,
-         const AttribPointer& attribs);
+    Item() = default;
+    Item(std::vector<VertexData>&& vertices);
     ~Item() = default;
 
     void draw(Program& program);
 
     const glm::mat4& model() const { return _model; }
+    const std::vector<VertexData>& vertices() const { return _vertices; }
 
 private:
-    bool has_indices() const;
-
     void set_up_vertex_array();
     void set_up_vertex_buffer();
     void set_up_element_buffer();
 
 private:
-    Coordinates _coordinates, _normals;
-    Indices _indices;
-    AttribPointer _attribs;
-    GLuint _vao, _vbo_coordinates, _vbo_normals;
+    std::vector<VertexData> _vertices;
+    glm::mat4 _model;
+
+    GLuint _vao = 0, _vbo_coordinates = 0, _vbo_normals = 0;
 
     State _current_state = NONE;
-
-    glm::mat4 _model;
 };
 
 }

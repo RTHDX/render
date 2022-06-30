@@ -1,60 +1,32 @@
 #include "opengl_converter.hpp"
 
-namespace loader{
+namespace loader {
 
-void Converter::read(const std::string path) {
+std::vector<opengl::Item> Converter::read(const std::string path) {
     auto meshes = loader.read(path);
-}
-
-opengl::Coordinates Converter::convert_vertices(const Mesh& mesh) const {
-    const size_t stride = 3;
-    opengl::Coordinates vertices(mesh.vertices.size() * stride);
-
-    for (size_t i = 0; i < mesh.vertices.size(); ++i) {
-        vertices[stride * i] = mesh.vertices[i].x;
-        vertices[stride * i + 1] = mesh.vertices[i].y;
-        vertices[stride * i + 2] = mesh.vertices[i].z;
+    std::vector<opengl::Item> out(meshes.size());
+    for (size_t i = 0; i < out.size(); ++i) {
+        out[i] = convert(meshes[i]);
     }
-
-    return vertices;
-}
-
-opengl::Coordinates Converter::convert_normals(const Mesh& mesh) const {
-    const size_t stride = 3;
-    opengl::Coordinates normals(mesh.faces.size() * stride);
-
-    for (size_t i = 0; i < mesh.faces.size() * stride; ++i) {
-        normals[stride * i] = mesh.vertices[i].x;
-        normals[stride * i + 1] = mesh.vertices[i].y;
-        normals[stride * i + 2] = mesh.vertices[i].z;
-    }
-
-    return normals;
+    return out;
 }
 
 opengl::Item Converter::convert(const Mesh& mesh) {
     constexpr size_t stride = 3;
-    opengl::Coordinates vertices(mesh.vertices.size() * stride);
 
+    std::vector<opengl::VertexData> vertex_data(mesh.vertices.size());
     for (size_t i = 0; i < mesh.vertices.size(); ++i) {
-        vertices[stride * i]     = mesh.vertices[i].x;
-        vertices[stride * i + 1] = mesh.vertices[i].y;
-        vertices[stride * i + 2] = mesh.vertices[i].z;
+        vertex_data[i].position = mesh.vertices[i];
     }
 
-    opengl::Coordinates normals(mesh.normals.size() * stride);
     for (size_t i = 0; i < mesh.normals.size(); ++i) {
-        size_t current = stride * i;
-        normals[current]     = mesh.normals[i].x;
-        normals[current + 1] = mesh.normals[i].y;
-        normals[current + 2] = mesh.normals[i].z;
+        const auto& normal = mesh.normals[i];
+        vertex_data[i * 3].normal     = normal;
+        vertex_data[i * 3 + 1].normal = normal;
+        vertex_data[i * 3 + 2].normal = normal;
     }
 
-    return {
-        std::move(vertices),
-        std::move(normals),
-        std::move(opengl::AttribPointer(0, 3, 3))
-    };
+    return {std::move(vertex_data)};
 }
 
 }

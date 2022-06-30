@@ -12,7 +12,7 @@ public:
     Converter() = default;
     ~Converter() = default;
 
-    void read(const std::string path);
+    std::vector<opengl::Item> read(const std::string path);
 
     void visit(const Face& face);
     opengl::Item convert(const Mesh& mesh);
