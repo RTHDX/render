@@ -14,16 +14,17 @@ std::vector<opengl::Item> Converter::read(const std::string path) {
 opengl::Item Converter::convert(const Mesh& mesh) {
     constexpr size_t stride = 3;
 
-    std::vector<opengl::VertexData> vertex_data(mesh.vertices.size());
-    for (size_t i = 0; i < mesh.vertices.size(); ++i) {
-        vertex_data[i].position = mesh.vertices[i];
-    }
+    std::vector<opengl::VertexData> vertex_data(mesh.faces.size() * stride);
+    for (size_t i = 0; i < mesh.faces.size(); ++i) {
+        const Face& face = mesh.faces[i];
 
-    for (size_t i = 0; i < mesh.normals.size(); ++i) {
-        const auto& normal = mesh.normals[i];
-        vertex_data[i * 3].normal     = normal;
-        vertex_data[i * 3 + 1].normal = normal;
-        vertex_data[i * 3 + 2].normal = normal;
+        vertex_data[i * stride].position = mesh.vertices[face.indices[0]];
+        vertex_data[i * stride + 1].position = mesh.vertices[face.indices[1]];
+        vertex_data[i * stride + 2].position = mesh.vertices[face.indices[2]];
+
+        vertex_data[i * stride].normal = mesh.normals[face.normal_index];
+        vertex_data[i * stride + 1].normal = mesh.normals[face.normal_index];
+        vertex_data[i * stride + 2].normal = mesh.normals[face.normal_index];
     }
 
     return {std::move(vertex_data)};

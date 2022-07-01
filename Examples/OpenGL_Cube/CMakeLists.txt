@@ -5,7 +5,8 @@ project(${PROJECT_NAME})
 create_executable(
     TARGET ${PROJECT_NAME}
     SOURCES main.cpp
-    LIBS OpenGL UI UI-Nuklear
+    LIBS OpenGL UI UI-Nuklear OpenGL-Loader
 )
 
 copy_files(FILES vertex_shader.vert fragment_shader.frag)
+copy_files(FILES "meshes/cube.obj" "meshes/cube.mtl")

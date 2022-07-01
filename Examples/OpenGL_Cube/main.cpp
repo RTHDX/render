@@ -8,6 +8,7 @@
 #include <OpenGL/item.hpp>
 #include <OpenGL/camera.hpp>
 #include <OpenGL/opengl_utils.hpp>
+#include <Loader/opengl_converter.hpp>
 #include <UI/application.hpp>
 #include <UI-Nuklear/opengl_application.hpp>
 
@@ -66,6 +67,11 @@ auto create_camera() {
     };
 }
 
+auto read_cube() {
+    auto items = loader::Converter().read("./cube.obj");
+    return items;
+}
+
 int main() {
     ui::nuklear::OpenGL_App app("cube", WIDTH, HEIGHT,
                                 std::move(create_camera()));
@@ -80,15 +86,16 @@ int main() {
                           opengl::utils::read_shader(fragment_path));
     program.link_program();
 
-    opengl::Item cube(vertices, opengl::AttribPointer(0, 3, 3));
+    std::vector<opengl::Item> scene = read_cube();
     opengl::Camera camera(WIDTH, HEIGHT, glm::radians(45.0));
-    auto callback = [&app, &program, &cube]() {
-        cube.draw(program);
-        program.set_mat4("model", cube.model());
+    auto callback = [&app, &program, &scene]() {
         program.set_mat4("view", app.camera().view());
         program.set_mat4("projection", app.camera().projection());
+        for (auto& item: scene) {
+            item.draw(program);
+            program.set_mat4("model", item.model());
+        }
     };
-
     app.run(callback);
     return EXIT_SUCCESS;
 }

@@ -53,6 +53,10 @@ Mesh Loader::process_mesh(const aiMesh* mesh) const {
 Face Loader::process_face(const aiFace& face, Mesh* mesh,
                           size_t normal_index) const {
     std::vector<size_t> indices(face.mNumIndices);
+    assert(indices.size() == 3);
+    for (size_t i = 0; i < 3; ++i) {
+        indices[i] = face.mIndices[i];
+    }
     return {
         std::move(indices),
         normal_index,

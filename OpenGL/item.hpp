@@ -13,18 +13,10 @@ using Index = uint32_t;
 using Indices = std::vector<Index>;
 using Coordinates = std::vector<float>;
 
-struct AttribPointer {
-    size_t index;
-    size_t width;
-    size_t stride;
-
-public:
-    AttribPointer() = default;
-    AttribPointer(size_t i, size_t w, size_t s);
-};
-
 
 struct VertexData {
+    static constexpr size_t STRIDE = 3;
+
     glm::vec3 position;
     glm::vec3 normal;
 };
@@ -32,12 +24,14 @@ struct VertexData {
 
 class Item {
     enum State {
-        NONE                 = 0x0,
-        VERTEX_ARRAY_SET     = 0x1,
-        VERTEX_BUFFER_SET    = 0x2,
-        ELEMNT_BUFFER_SET    = 0x4,
-        ATTRIBS_SET          = 0x8,
-        ELEMENT_BUFFER_BOUND = 0x10
+        NONE = 0x0,
+        VERTEX_ARRAY_GENERATED = 0x1,
+        VERTEX_POS_GENERATED = 0x2,
+        VERTEX_POS_BOUND = 0x4,
+        VERTEX_POS_ATTRIB_SET = 0x8,
+        VERTEX_NORMAL_GENERATED = 0x10,
+        VERTEX_NORMAL_BOUND = 0x20,
+        VERTEX_NORMAL_ATTRIB_SET = 0x30,
     };
 
 public:
@@ -45,6 +39,7 @@ public:
     Item(std::vector<VertexData>&& vertices);
     ~Item() = default;
 
+    void initialize();
     void draw(Program& program);
 
     const glm::mat4& model() const { return _model; }
@@ -53,7 +48,13 @@ public:
 private:
     void set_up_vertex_array();
     void set_up_vertex_buffer();
-    void set_up_element_buffer();
+
+    void bind_vertex_array();
+    void unbind_vertex_array();
+
+    void update_state(State new_state) {
+        _current_state = State(_current_state | new_state);
+    }
 
 private:
     std::vector<VertexData> _vertices;
