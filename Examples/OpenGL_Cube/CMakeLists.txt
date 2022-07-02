@@ -4,8 +4,8 @@ project(${PROJECT_NAME})
 
 create_executable(
     TARGET ${PROJECT_NAME}
-    SOURCES main.cpp
-    LIBS OpenGL UI UI-Nuklear OpenGL-Loader
+    SOURCES main.cpp ui-imgui.hpp
+    LIBS OpenGL UI UI-Nuklear ImGui OpenGL-Loader
 )
 
 copy_files(FILES vertex_shader.vert fragment_shader.frag)

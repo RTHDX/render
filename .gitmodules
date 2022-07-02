@@ -16,3 +16,6 @@
 [submodule "3rdParty/benchmark"]
 	path = 3rdParty/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "3rdParty/imgui"]
+	path = 3rdParty/imgui
+	url = https://github.com/ocornut/imgui.git

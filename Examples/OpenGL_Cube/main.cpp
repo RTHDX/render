@@ -1,5 +1,5 @@
 #include "common.hpp"
-#include "ui-nuk.hpp"
+#include "ui-imgui.hpp"
 
 
 int main() {
@@ -8,7 +8,7 @@ int main() {
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
     init_io(window);
-    auto* ctx = init_context(window);
+    auto& io_imgui = init_imgui(window, "#version 460");
 
     auto program = create_program();
 
@@ -17,10 +17,10 @@ int main() {
     std::vector<opengl::Item> scene = read_cube();
 
     while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-        nk_glfw3_new_frame();
-
-        opengl::Context::instance().draw_background();
+        pre_process();
+        ImGui::Begin("Hello window");
+        ImGui::End();
+        render_imgui();
 
         program.set_mat4("view", camera.view());
         program.set_mat4("projection", camera.projection());
@@ -29,9 +29,9 @@ int main() {
             program.set_mat4("model", item.model());
         }
 
-        //nk_glfw3_render(NK_ANTI_ALIASING_ON);
         glfwSwapBuffers(window);
     }
 
+    cleanup(window);
     return EXIT_SUCCESS;
 }

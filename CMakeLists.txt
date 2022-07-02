@@ -16,12 +16,29 @@ include_directories(${ASSIMP_INCLUDE_DIRECTORY})
 
 add_subdirectory(3rdParty/glfw)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glfw")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glfw/include")
 add_subdirectory(3rdParty/glad)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glad/include")
 add_subdirectory(3rdParty/glm)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Nuklear")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Nuklear/demo/glfw_opengl4")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/backends")
+
+add_library(ImGui STATIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/imgui.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/imgui_draw.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/imgui_widgets.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/imgui_tables.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/backends/imgui_impl_glfw.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/backends/imgui_impl_opengl3.cpp"
+
+    "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/imgui.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/backends/imgui_impl_glfw.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/backends/imgui_impl_opengl3.h"
+)
+
 
 add_subdirectory(UI)
 add_subdirectory(OpenGL)
