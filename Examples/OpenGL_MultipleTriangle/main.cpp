@@ -10,6 +10,7 @@ const unsigned int HEIGHT = 600;
 const std::string_view vertex_shader_source =
     "#version 330 core\n"
     "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec3 aNorm;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
@@ -30,16 +31,29 @@ const std::string_view yellow_fragment_source =
     "}\n\0";
 
 
-std::vector<float> first_triangle = {
-    -0.9f, -0.5f, 0.0f,  // left 
-    -0.0f, -0.5f, 0.0f,  // right
-    -0.45f, 0.5f, 0.0f,  // top 
-};
-std::vector<float> second_triangle = {
-    0.0f, -0.5f, 0.0f,  // left
-    0.9f, -0.5f, 0.0f,  // right
-    0.45f, 0.5f, 0.0f   // top 
-};
+auto create_first_triangle() {
+    glm::vec3 normal(0, 0, 1);
+    return std::vector<opengl::VertexData> {
+        {glm::vec3(-0.9f, -0.5f, 0.0f), normal},
+        {glm::vec3(-0.0f, -0.5f, 0.0f), normal},
+        {glm::vec3(-0.45f, 0.5f, 0.0f), normal}
+    };
+}
+
+auto create_second_triangle() {
+    glm::vec3 normal(0, 0, 1);
+    return std::vector<opengl::VertexData> {
+        {glm::vec3(0.0f, -0.5f, 0.0f), normal},
+        {glm::vec3(0.9f, -0.5f, 0.0f), normal},
+        {glm::vec3(0.45f, 0.5f, 0.0f), normal}
+    };
+}
+
+auto create_item(auto&& data) {
+    opengl::Item item(std::move(data));
+    item.initialize();
+    return item;
+}
 
 int main() {
     if (!ui::init_glfw(4, 6)) { return EXIT_FAILURE; }
@@ -59,17 +73,17 @@ int main() {
     program_yellow.attach_shader(GL_FRAGMENT_SHADER, yellow_fragment_source);
     program_yellow.link_program();
 
-    opengl::Item orange_item(first_triangle, opengl::AttribPointer(0, 3, 3)),
-                 yellow_item(second_triangle, opengl::AttribPointer(0, 3, 3));
+    opengl::Item orange_item = create_item(std::move(create_first_triangle())),
+                 yellow_item = create_item(std::move(create_second_triangle()));
 
     while (!glfwWindowShouldClose(window)) {
         opengl::Context::instance().draw_background();
 
         orange_item.draw(program_orange);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
 
         yellow_item.draw(program_yellow);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

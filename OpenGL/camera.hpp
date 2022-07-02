@@ -53,6 +53,8 @@ public:
     CameraHandler(Camera& camera);
     ~CameraHandler() override = default;
 
+    const Camera& impl() const { return _camera; }
+
     virtual void consume(const ui::KeyEvent& event);
     virtual void consume(const ui::MouseEvent& event);
     virtual void consume(const ui::MouseButtonEvent& event);

@@ -38,6 +38,7 @@ void Item::set_up_vertex_buffer() {
     glGenBuffers(1, &_vbo_normals);
     update_state(State::VERTEX_NORMAL_GENERATED);
 
+    bind_vertex_array();
     glBindBuffer(GL_ARRAY_BUFFER, _vbo_coordinates);
     glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(VertexData),
                  _vertices.data(),
@@ -61,18 +62,10 @@ void Item::set_up_vertex_buffer() {
 }
 
 void Item::draw(Program& program) {
-    bind_vertex_array();
     program.use();
+    bind_vertex_array();
     glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
     unbind_vertex_array();
-    //if (has_indices()) {
-    //    assert(_current_state == ELEMENT_BUFFER_BOUND);
-    //    glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, nullptr);
-    //} else {
-    //    assert(_current_state == ATTRIBS_SET);
-    //    _vao.bind();
-    //    glDrawArrays(GL_TRIANGLES, 0, _coordinates.size() / _attribs.stride);
-    //}
 }
 
 }
