@@ -17,10 +17,10 @@ public:
     Object() = default;
     virtual ~Object() = default;
 
-    Object(const Object&) = delete;
-    Object& operator = (const Object&) = delete;
-    Object(Object&&) = default;
-    Object& operator = (Object&&) = default;
+    //Object(const Object&) = delete;
+    //Object& operator = (const Object&) = delete;
+    //Object(Object&&) = default;
+    //Object& operator = (Object&&) = default;
 
     virtual void initialize() = 0;
 
@@ -35,14 +35,8 @@ private:
 };
 
 
-using Point = glm::vec3;
-using Vector = glm::vec3;
 class Context final : public Object {
 public:
-    static constexpr GLuint VERTEX_COORDINATE_INDEX = 0;
-    static constexpr GLuint VERTTEX_NORMAL_INDEX = 1;
-    static constexpr GLuint VERTEX_DATA_STRIDE = sizeof(Point) / sizeof(float);
-
     static Context& instance();
 
     void initialize() override;
