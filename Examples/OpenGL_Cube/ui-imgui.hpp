@@ -30,7 +30,6 @@ void cleanup(GLFWwindow* window) {
 }
 
 void pre_process() {
-    glfwPollEvents();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -38,6 +37,5 @@ void pre_process() {
 
 void render_imgui() {
     ImGui::Render();
-    opengl::Context::instance().draw_background();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
