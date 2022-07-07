@@ -22,6 +22,8 @@ void Context::initialize() {
     }
     glDebugMessageCallback(utils::gl_debug_output, nullptr);
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_STENCIL_TEST);
+    glEnable(GL_DEPTH_TEST);
 }
 
 void Context::dump() const {
@@ -60,7 +62,7 @@ void Context::background(const glm::vec4& color) {
 
 void Context::draw_background() const {
     glClearColor(_background.r, _background.g, _background.b, _background.a);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 
@@ -264,6 +266,16 @@ void Program::set_vec4(const std::string_view name, const glm::vec4& val) const 
     }
 
     glUniform4f(loc, val.r, val.g, val.b, val.a);
+}
+
+void Program::set_vec3(const std::string_view name, const glm::vec3& val) const {
+    auto loc = glGetUniformLocation(id(), name.data());
+    if (loc < 0) {
+        std::cerr << "Could not find uniform: " << name << std::endl;
+        return;
+    }
+
+    glUniform3f(loc, val.x, val.y, val.z);
 }
 
 void Program::set_mat4(const std::string_view name, const glm::mat4& value) const {

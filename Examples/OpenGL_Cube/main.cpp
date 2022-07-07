@@ -4,6 +4,13 @@
 #include "ui-imgui.hpp"
 
 
+glm::vec4 background = { 0.5, 0.8, 0.8, 1.0 };
+glm::vec4 item_color = { 1.0, 0.5, 0.31, 1.0 };
+
+glm::vec4 light_color = { 0.8, 0.8, 1.0, 1.0 };
+glm::vec3 light_pos = { 20.0, 20.0, 20.0 };
+
+
 struct Scene {
     opengl::Camera camera;
     std::vector<opengl::Item> objects;
@@ -19,31 +26,48 @@ private:
     opengl::CameraHandler handler;
 };
 
+struct UI {
+    bool background_opened = false;
+    bool items_visible     = false;
+};
 
-void background_edit(glm::vec4& color) {
-    auto w_flags = ImGuiColorEditFlags_NoOptions;
+static UI ui_state;
 
+
+void background_edit() {
+    IM_ASSERT(ImGui::GetCurrentContext() != NULL && "Missing dear imgui context. Refer to examples app!");
+    auto& color = opengl::Context::instance().background();
     if (ImGui::CollapsingHeader("Background")) {
-        if (ImGui::ColorEdit4("", glm::value_ptr(color), w_flags)) {
+        if (ImGui::ColorEdit4("", glm::value_ptr(color))) {
             opengl::Context::instance().background(color);
         }
     }
 }
 
+void item_info() {
+    IM_ASSERT(ImGui::GetCurrentContext() != NULL && "Missing dear imgui context. Refer to examples app!");
+    auto w_flags = ImGuiColorEditFlags_NoOptions;
+    auto color = item_color;
+    if (ImGui::ColorEdit4("", glm::value_ptr(color))) {
+        std::cout << "Color changed" << std::endl;
+        item_color = color;
+    }
+}
+
 void scene_info(const std::vector<opengl::Item>& items) {
     if (ImGui::CollapsingHeader("Scene")) {
-        for (size_t i = 0; i < 5; ++i) {
-            ImGui::BulletText("Text");
+        for (size_t i = 0; i < items.size(); ++i) {
+            item_info();
         }
     }
 }
 
-void show_window(glm::vec4& color) {
+void show_window(const Scene& scene) {
     ImGui::SetWindowPos(ImVec2(0.0, 0.0));
     ImGui::Begin("window");
     ImGui::SetWindowSize(ImVec2(200.0, 400.0));
-    background_edit(color);
-    scene_info({});
+    background_edit();
+    scene_info(scene.objects);
     ImGui::End();
 }
 
@@ -68,10 +92,6 @@ auto create_scene() {
 
 
 int main() {
-    glm::vec4 background = {0.5, 0.8, 0.8, 1.0};
-    glm::vec4 item_color = {1.0, 0.5, 0.31, 1.0};
-    glm::vec4 light_color = {0.8, 0.8, 1.0, 1.0};
-
     auto* window = init(background);
 
     auto scene = create_scene();
@@ -83,6 +103,7 @@ int main() {
         pre_process();
 
         program.set_vec4("color", item_color);
+        program.set_vec3("light_position", light_pos);
         program.set_vec4("light_color", light_color);
         program.set_mat4("view", scene.camera.view());
         program.set_mat4("projection", scene.camera.projection());
@@ -91,7 +112,7 @@ int main() {
             program.set_mat4("model", item.model());
         }
 
-        show_window(background);
+        show_window(scene);
 
         render_imgui();
 

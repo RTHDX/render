@@ -43,6 +43,7 @@ public:
     void dump() const;
 
     void viewport(int width, int height) const;
+    glm::vec4& background() { return _background; }
     void background(const glm::vec4& color);
 
     void draw_background() const;
@@ -156,6 +157,7 @@ public:
     const Shader& fragment_shader() const { return _fragment_shader; }
 
     void set_vec4(const std::string_view name, const glm::vec4& val) const;
+    void set_vec3(const std::string_view name, const glm::vec3& val) const;
     void set_mat4(const std::string_view name, const glm::mat4& value) const;
 
 private:

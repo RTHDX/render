@@ -16,14 +16,14 @@ vec4 eval_ambient_color() {
     return intencity * light_color;
 }
 
-vec3 eval_diffuse_color() {
+vec4 eval_diffuse_color() {
     vec3 light_dir = normalize(light_position - position);
     float diff = max(dot(normal, light_dir), 0.0);
     return diff * light_color;
 }
 
 void main() {
-    vec4 ambient = vec4(eval_ambient_color(), 1.0);
-    vec4 diffuse = vec4(eval_diffuse_color(), 1.0);
+    vec4 ambient = eval_ambient_color();
+    vec4 diffuse = eval_diffuse_color();
     FragColor = (ambient + diffuse) * color;
 };
