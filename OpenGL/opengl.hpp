@@ -155,6 +155,7 @@ public:
     const Shader& vertex_shader() const { return _vertex_shader; }
     const Shader& fragment_shader() const { return _fragment_shader; }
 
+    void set_vec4(const std::string_view name, const glm::vec4& val) const;
     void set_mat4(const std::string_view name, const glm::mat4& value) const;
 
 private:

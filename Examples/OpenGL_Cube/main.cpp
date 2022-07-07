@@ -3,13 +3,25 @@
 #include "common.hpp"
 #include "ui-imgui.hpp"
 
-void background_edit(glm::vec4& color) {
-    //IM_ASSERT(ImGui::GetCurrentContext() != nullptr &&
-    //          "Missing dear imgui context!");
 
-    auto w_flags = ImGuiColorEditFlags_NoLabel |
-                   ImGuiColorEditFlags_NoSidePreview |
-        ImGuiColorEditFlags_NoOptions;
+struct Scene {
+    opengl::Camera camera;
+    std::vector<opengl::Item> objects;
+
+public:
+    Scene(opengl::Camera&& cam, std::vector<opengl::Item>&& objects)
+        : camera(std::move(cam))
+        , objects(std::move(objects))
+        , handler(camera)
+    {}
+
+private:
+    opengl::CameraHandler handler;
+};
+
+
+void background_edit(glm::vec4& color) {
+    auto w_flags = ImGuiColorEditFlags_NoOptions;
 
     if (ImGui::CollapsingHeader("Background")) {
         if (ImGui::ColorEdit4("", glm::value_ptr(color), w_flags)) {
@@ -35,32 +47,46 @@ void show_window(glm::vec4& color) {
     ImGui::End();
 }
 
-
-
-int main() {
-    glm::vec4 background = {0.5, 0.8, 0.8, 1.0};
+GLFWwindow* init(const auto& background) {
     ui::init_glfw(4, 6);
     auto* window = ui::create_window(WIDTH, HEIGHT, "mesh");
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
     opengl::Context::instance().background(background);
     init_io(window);
-    auto& io_imgui = init_imgui(window, "#version 460");
+    init_imgui(window, "#version 460");
+    return window;
+}
 
+auto create_scene() {
+    return Scene {
+        std::move(create_camera()),
+        std::move(read_cube())
+    };
+}
+
+
+
+int main() {
+    glm::vec4 background = {0.5, 0.8, 0.8, 1.0};
+    glm::vec4 item_color = {1.0, 0.5, 0.31, 1.0};
+    glm::vec4 light_color = {0.8, 0.8, 1.0, 1.0};
+
+    auto* window = init(background);
+
+    auto scene = create_scene();
     auto program = create_program();
-
-    auto camera = create_camera();
-    opengl::CameraHandler handler(camera);
-    std::vector<opengl::Item> scene = read_cube();
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
         pre_process();
 
-        program.set_mat4("view", camera.view());
-        program.set_mat4("projection", camera.projection());
-        for (auto& item: scene) {
+        program.set_vec4("color", item_color);
+        program.set_vec4("light_color", light_color);
+        program.set_mat4("view", scene.camera.view());
+        program.set_mat4("projection", scene.camera.projection());
+        for (auto& item: scene.objects) {
             item.draw(program);
             program.set_mat4("model", item.model());
         }

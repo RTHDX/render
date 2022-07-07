@@ -256,10 +256,20 @@ void Program::use() {
     update_state(State::ACTIVE);
 }
 
+void Program::set_vec4(const std::string_view name, const glm::vec4& val) const {
+    auto loc = glGetUniformLocation(id(), name.data());
+    if (loc < 0) {
+        std::cerr << "Could not find uniform: " << name << std::endl;
+        return;
+    }
+
+    glUniform4f(loc, val.r, val.g, val.b, val.a);
+}
+
 void Program::set_mat4(const std::string_view name, const glm::mat4& value) const {
     auto location = glGetUniformLocation(id(), name.data());
     if (location < 0) {
-        std::cerr << "[OpenGL] Could not find uniform " << name << std::endl;
+        std::cerr << "Could not find uniform " << name << std::endl;
         return;
     }
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
