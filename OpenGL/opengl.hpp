@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string_view>
+#include <filesystem>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -171,7 +172,14 @@ private:
     State _current_state;
 };
 
-GLuint create_program(const std::string_view vertex_shader,
-                      const std::string_view fragment_shader);
+
+GLuint create_program(const std::filesystem::path& vertex_path,
+                      const std::filesystem::path& fragment_path);
+GLuint create_program(const std::string& vertex_shader,
+                      const std::string& fragment_shader);
+
+bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
+bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);
+bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val);
 
 }

@@ -62,10 +62,10 @@ auto create_program() {
     const std::filesystem::path vertex_path(R"(.\vertex_shader.vert)");
     const std::filesystem::path fragment_path(R"(.\fragment_shader.frag)");
     opengl::Program program("cube");
-    program.attach_shader(GL_VERTEX_SHADER,
-        opengl::utils::read_shader(vertex_path));
-    program.attach_shader(GL_FRAGMENT_SHADER,
-        opengl::utils::read_shader(fragment_path));
+    auto vertex_shader_src = opengl::utils::read_shader(vertex_path);
+    auto fragment_shader_src = opengl::utils::read_shader(fragment_path);
+    program.attach_shader(GL_VERTEX_SHADER, vertex_shader_src);
+    program.attach_shader(GL_FRAGMENT_SHADER, fragment_shader_src);
     program.link_program();
 
     return program;

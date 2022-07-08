@@ -4,11 +4,13 @@
 #include "ui-imgui.hpp"
 
 
-glm::vec4 background = { 0.5, 0.8, 0.8, 1.0 };
-glm::vec4 item_color = { 1.0, 0.5, 0.31, 1.0 };
+glm::vec4 background = {0.5, 0.8, 0.8, 1.0};
+glm::vec4 item_color = {1.0, 0.5, 0.31, 1.0};
+glm::vec4 light_color = {0.8, 0.8, 1.0, 1.0};
+glm::vec3 light_pos = {20.0, 20.0, 20.0 };
 
-glm::vec4 light_color = { 0.8, 0.8, 1.0, 1.0 };
-glm::vec3 light_pos = { 20.0, 20.0, 20.0 };
+const std::filesystem::path vertex_path(R"(.\vertex_shader.vert)");
+const std::filesystem::path fragment_path(R"(.\fragment_shader.frag)");
 
 
 struct Scene {
@@ -95,21 +97,23 @@ int main() {
     auto* window = init(background);
 
     auto scene = create_scene();
-    auto program = create_program();
+    auto program = opengl::create_program(vertex_path, fragment_path);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
         pre_process();
 
-        program.set_vec4("color", item_color);
-        program.set_vec3("light_position", light_pos);
-        program.set_vec4("light_color", light_color);
-        program.set_mat4("view", scene.camera.view());
-        program.set_mat4("projection", scene.camera.projection());
+        glUseProgram(program);
+
+        opengl::set_vec4(program, "color", item_color);
+        opengl::set_vec3(program, "light_position", light_pos);
+        opengl::set_vec4(program, "light_color", light_color);
+        opengl::set_mat4(program, "view", scene.camera.view());
+        opengl::set_mat4(program, "projection", scene.camera.projection());
         for (auto& item: scene.objects) {
-            item.draw(program);
-            program.set_mat4("model", item.model());
+            item.draw();
+            opengl::set_mat4(program, "model", item.model());
         }
 
         show_window(scene);

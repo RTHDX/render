@@ -306,8 +306,8 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height) {
 }
 
 
-GLuint create_program(const std::string_view vertex_shader_src,
-                      const std::string_view fragment_shader_src) {
+GLuint create_program(const std::string& vertex_shader_src,
+                      const std::string& fragment_shader_src) {
     GLuint program         = glCreateProgram(),
            vertex_shader   = glCreateShader(GL_VERTEX_SHADER),
            fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -324,6 +324,43 @@ GLuint create_program(const std::string_view vertex_shader_src,
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
     return program;
+}
+
+GLuint create_program(const std::filesystem::path& vertex_path,
+                      const std::filesystem::path& fragment_path) {
+    auto vertex_src = opengl::utils::read_shader(vertex_path);
+    auto fragment_src = opengl::utils::read_shader(fragment_path);
+    return create_program(vertex_src, fragment_src);
+}
+
+static int find_location(GLuint id, const std::string_view name) {
+    auto location = glGetUniformLocation(id, name.data());
+    if (location < 0) {
+        std::cerr << "Could not find uniform " << name << std::endl;
+    }
+    return location;
+}
+
+bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val) {
+    auto loc = find_location(id, name);
+    if (loc < 0) return false;
+    glUniform3f(loc, val.x, val.y, val.z);
+    return true;
+
+}
+
+bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val) {
+    auto loc = find_location(id, name);
+    if (loc < 0) return false;
+    glUniform4f(loc, val.r, val.g, val.b, val.a);
+    return true;
+}
+
+bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val) {
+    auto loc = find_location(id, name);
+    if (loc < 0) return false;
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(val));
+    return true;
 }
 
 }

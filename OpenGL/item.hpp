@@ -40,7 +40,7 @@ public:
     ~Item() = default;
 
     void initialize();
-    void draw(Program& program);
+    void draw();
 
     const glm::mat4& model() const { return _model; }
     const std::vector<VertexData>& vertices() const { return _vertices; }

@@ -8,9 +8,20 @@
 
 namespace opengl {
 
+static glm::mat4 rotate_mat() {
+    float rot = glm::radians(1.0f);
+    return glm::mat4{
+        cos(rot),  0.0, sin(rot), 0.0,
+        0.0,       1.0, 0.0,      0.0,
+        -sin(rot), 0.0, cos(rot), 0.0,
+        0.0,       0.0, 0.0,      1.0
+    };
+}
+
 Item::Item(std::vector<VertexData>&& vertices)
     : _vertices(std::move(vertices))
-    , _model(glm::mat4(1.0))
+    //, _model(glm::mat4(1.0))
+    , _model(rotate_mat())
 {}
 
 void Item::initialize() {
@@ -61,8 +72,8 @@ void Item::set_up_vertex_buffer() {
     unbind_vertex_array();
 }
 
-void Item::draw(Program& program) {
-    program.use();
+void Item::draw() {
+    _model = _model * rotate_mat();
     bind_vertex_array();
     glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
     unbind_vertex_array();
