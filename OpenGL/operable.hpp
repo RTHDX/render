@@ -9,6 +9,7 @@ class Operator;
 class Operable {
 public:
     Operable() = default;
+    virtual ~Operable() = default;
 
     void visit(Operator* op);
 };
@@ -17,6 +18,7 @@ public:
 class Operator {
 public:
     Operator() = default;
+    virtual ~Operator() = default;
 
     void accept(Item& item);
 };

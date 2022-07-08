@@ -52,7 +52,8 @@ void Camera::move(Direction direction) {
     auto mat = move_modifiers(direction);
     _position = glm::vec4(_position, 1.0) * mat;
     if (direction == Direction::FORWARD || direction == Direction::BACKWARD ||
-        direction == Direction::LEFT || direction == Direction::RIGHT) {
+        direction == Direction::LEFT || direction == Direction::RIGHT ||
+        direction == Direction::UP || direction == Direction::DOWN) {
         _target = glm::vec4(_target, 1.0) * mat;
     }
 }
@@ -71,7 +72,13 @@ void CameraHandler::consume(const ui::KeyEvent& event) {
 
 void CameraHandler::consume(const ui::MouseEvent& event) {}
 void CameraHandler::consume(const ui::MouseButtonEvent& event) {}
-void CameraHandler::consume(const ui::ScrollEvent& event) {}
+
+void CameraHandler::consume(const ui::ScrollEvent& event) {
+    Direction direction = event.yoffset > 0 ? Direction::UP :
+                                              Direction::DOWN;
+    _camera.move(direction);
+}
+
 void CameraHandler::consume(const ui::DropEvent& event) {}
 
 
@@ -119,6 +126,20 @@ static glm::mat4 move_modifiers(Direction dir) {
             0.0,         1.0, 0.0,       0.0,
             -sin(-rot),  0.0, cos(-rot), 0.0,
             0.0,         0.0, 0.0,       1.0
+        };
+    case Direction::UP:
+        return glm::mat4 {
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, MOVE_SPEED,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+        };
+    case Direction::DOWN:
+        return glm::mat4{
+            1.0, 0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0, -MOVE_SPEED,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
         };
     default:;
     }

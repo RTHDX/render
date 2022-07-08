@@ -14,7 +14,9 @@ enum class Direction {
     LEFT,
     RIGHT,
     ROTATE_LEFT,
-    ROTATE_RIGHT
+    ROTATE_RIGHT,
+    UP,
+    DOWN
 };
 
 

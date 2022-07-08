@@ -43,6 +43,7 @@ public:
     void draw();
 
     const glm::mat4& model() const { return _model; }
+    void model(const glm::mat4& val) { _model = val; }
     const std::vector<VertexData>& vertices() const { return _vertices; }
 
 private:

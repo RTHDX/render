@@ -1,5 +1,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
+#include <OpenGL/operators.hpp>
+
 #include "common.hpp"
 #include "ui-imgui.hpp"
 
@@ -37,7 +39,8 @@ static UI ui_state;
 
 
 void background_edit() {
-    IM_ASSERT(ImGui::GetCurrentContext() != NULL && "Missing dear imgui context. Refer to examples app!");
+    IM_ASSERT(ImGui::GetCurrentContext() != NULL &&
+              "Missing dear imgui context. Refer to examples app!");
     auto& color = opengl::Context::instance().background();
     if (ImGui::CollapsingHeader("Background")) {
         if (ImGui::ColorEdit4("", glm::value_ptr(color))) {
@@ -47,7 +50,8 @@ void background_edit() {
 }
 
 void item_info() {
-    IM_ASSERT(ImGui::GetCurrentContext() != NULL && "Missing dear imgui context. Refer to examples app!");
+    IM_ASSERT(ImGui::GetCurrentContext() != NULL &&
+              "Missing dear imgui context. Refer to examples app!");
     auto w_flags = ImGuiColorEditFlags_NoOptions;
     auto color = item_color;
     if (ImGui::ColorEdit4("", glm::value_ptr(color))) {
@@ -56,20 +60,41 @@ void item_info() {
     }
 }
 
-void scene_info(const std::vector<opengl::Item>& items) {
+void item_operators(opengl::Item& item) {
+    static bool rotate = false;
+    if (rotate) {
+        static opengl::Rotate rotor(glm::radians(5.0f));
+        rotor.accept(item);
+    } ImGui::Checkbox("Rotation", &rotate);
+
+    static bool move_forward = false;
+    if (move_forward) {
+        static opengl::Move forward(opengl::Move::Direction::FORWARD, .01);
+        forward.accept(item);
+    } ImGui::Checkbox("Move foward", &move_forward);
+
+    static bool move_back = false;
+    if (move_back) {
+        static opengl::Move back(opengl::Move::Direction::BACKWARD, 0.01);
+        back.accept(item);
+    } ImGui::Checkbox("Move back", &move_back);
+}
+
+void scene_info(Scene& scene) {
     if (ImGui::CollapsingHeader("Scene")) {
-        for (size_t i = 0; i < items.size(); ++i) {
-            item_info();
+        for (size_t i = 0; i < scene.objects.size(); ++i) {
+            //item_info();
+            item_operators(scene.objects[i]);
         }
     }
 }
 
-void show_window(const Scene& scene) {
+void show_window(Scene& scene) {
     ImGui::SetWindowPos(ImVec2(0.0, 0.0));
     ImGui::Begin("window");
     ImGui::SetWindowSize(ImVec2(200.0, 400.0));
     background_edit();
-    scene_info(scene.objects);
+    scene_info(scene);
     ImGui::End();
 }
 
