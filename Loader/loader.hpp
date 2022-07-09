@@ -9,6 +9,7 @@
 
 struct aiMesh;
 struct aiFace;
+struct aiMaterial;
 namespace loader {
 
 class Loader {
@@ -18,7 +19,7 @@ public:
     std::vector<Mesh> read(const std::string& path);
 
 private:
-    Mesh process_mesh(const aiMesh* mesh) const;
+    Mesh process_mesh(const aiMesh* mesh, const aiMaterial* material) const;
     Face process_face(const aiFace& face, Mesh* parent,
                       size_t normal_index) const;
     glm::vec3 process_vector(const aiVector3D& vector, bool n = false) const;

@@ -386,6 +386,7 @@ GLuint create_vbo(GLuint vao, VertexBufferAttrib attribs) {
     glVertexAttribPointer(attribs.index, attribs.stride, GL_FLOAT, GL_FALSE,
                           attribs.width, attribs.offset);
     bind_vao(0);
+    return id;
 }
 
 }

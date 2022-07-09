@@ -49,7 +49,7 @@ void background_edit() {
     }
 }
 
-void item_info() {
+void item_color_edit() {
     IM_ASSERT(ImGui::GetCurrentContext() != NULL &&
               "Missing dear imgui context. Refer to examples app!");
     auto w_flags = ImGuiColorEditFlags_NoOptions;
@@ -83,7 +83,7 @@ void item_operators(opengl::Item& item) {
 void scene_info(Scene& scene) {
     if (ImGui::CollapsingHeader("Scene")) {
         for (size_t i = 0; i < scene.objects.size(); ++i) {
-            //item_info();
+            item_color_edit();
             item_operators(scene.objects[i]);
         }
     }

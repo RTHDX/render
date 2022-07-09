@@ -4,14 +4,14 @@ project(Loader)
 
 create_library(
     TARGET "RTX-${PROJECT_NAME}"
-    SOURCES loader.cpp mesh.cpp rtx_converter.cpp
-    HEADERS loader.hpp mesh.hpp rtx_converter.hpp visitor.hpp
+    SOURCES loader.cpp mesh.cpp rtx_converter.cpp material.cpp
+    HEADERS loader.hpp mesh.hpp rtx_converter.hpp material.hpp visitor.hpp
     LIBS RTX
 )
 
 create_library(
     TARGET "OpenGL-${PROJECT_NAME}"
-    SOURCES loader.cpp mesh.cpp opengl_converter.cpp
-    HEADERS loader.hpp mesh.hpp opengl_converter.hpp visitor.hpp
+    SOURCES loader.cpp mesh.cpp opengl_converter.cpp material.cpp
+    HEADERS loader.hpp mesh.hpp opengl_converter.hpp material.hpp visitor.hpp
     LIBS OpenGL
 )
