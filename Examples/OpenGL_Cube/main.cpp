@@ -149,6 +149,8 @@ int main() {
         glfwGetFramebufferSize(window, &w, &h);
         glViewport(0, 0, w, h);
         glfwSwapBuffers(window);
+        scene.camera.width(w);
+        scene.camera.height(h);
     }
 
     cleanup(window);

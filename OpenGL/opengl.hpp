@@ -173,10 +173,23 @@ private:
 };
 
 
+struct VertexBufferAttrib {
+    GLuint index;
+    GLuint stride;
+    size_t width;
+    size_t total_width;
+    float* data;
+    void* offset;
+};
+
+
 GLuint create_program(const std::filesystem::path& vertex_path,
                       const std::filesystem::path& fragment_path);
 GLuint create_program(const std::string& vertex_shader,
                       const std::string& fragment_shader);
+GLuint create_vao();
+void bind_vao(GLuint);
+GLuint create_vbo(GLuint vao, VertexBufferAttrib attribs);
 
 bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);

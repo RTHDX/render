@@ -363,4 +363,29 @@ bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val) {
     return true;
 }
 
+GLuint create_vao() {
+    GLuint id;
+    glGenVertexArrays(1, &id);
+    return id;
+}
+
+void bind_vao(GLuint id) {
+    glBindVertexArray(id);
+}
+
+GLuint create_vbo(GLuint vao, VertexBufferAttrib attribs) {
+    GLuint id;
+    glGenBuffers(1, &id);
+
+    bind_vao(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, id);
+    glBufferData(GL_ARRAY_BUFFER, attribs.total_width, attribs.data,
+                 GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(attribs.index);
+    glVertexAttribPointer(attribs.index, attribs.stride, GL_FLOAT, GL_FALSE,
+                          attribs.width, attribs.offset);
+    bind_vao(0);
+}
+
 }
