@@ -64,3 +64,15 @@ parselib::Parser& new_mtl_parser() {
 }
 
 }
+
+namespace parselib {
+
+void Visitor::take(loader::Material* material) {
+    _material = material;
+}
+
+void Visitor::release() {
+    _material = nullptr;
+}
+
+}

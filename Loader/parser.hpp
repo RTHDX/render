@@ -123,6 +123,7 @@ public:
     Int_AST(const std::string& c);
     NO_POP
     NO_APPEND
+    virtual void accept(parselib::Visitor*) const override;
 
     int value() const { return _value; }
 
@@ -135,6 +136,7 @@ public:
     Float_AST(const std::string& c);
     NO_POP
     NO_APPEND
+    virtual void accept(parselib::Visitor*) const override;
 
     float value() const { return _value; }
 
@@ -142,11 +144,28 @@ private:
     float _value;
 };
 
+class Vector3f_AST final : public parselib::AST {
+public:
+    Vector3f_AST();
+
+    void pop(parselib::AST* ast) const override;
+    void append(parselib::AST* ast) const override;
+    void accept(parselib::Visitor* v) const override;
+
+    const parselib::uAST& x() const { return _x; }
+    const parselib::uAST& y() const { return _y; }
+    const parselib::uAST& z() const { return _z; }
+
+private:
+    parselib::uAST _x, _y, _z;
+};
+
 class String_AST final : public parselib::AST {
 public:
     String_AST(const std::string& c);
     NO_POP
     NO_APPEND
+    void accept(parselib::Visitor*) const override;
 
     const std::string& value() const { return _value; }
 
@@ -156,7 +175,128 @@ private:
 
 class NewMtl_AST final : public parselib::AST {
 public:
-    NewMtl_AST();
+    NewMtl_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) const override;
+
+    const parselib::uAST& name() const { return _name; }
+
+private:
+    parselib::uAST _name;
+};
+
+class Ka_AST final : public parselib::AST {
+public:
+    Ka_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::AST* ast) override;
+
+    const parselib::uAST& vector() const { return _vector; }
+
+private:
+    parselib::uAST _vector;
+};
+
+class Kd_AST final : public parselib::AST {
+public:
+    Kd_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) override;
+
+    const parselib::uAST& vector() const { return _vector; }
+
+private:
+    parselib::uAST _vector;
+};
+
+class Ks_AST final : public parselib::AST {
+public:
+    Ks_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) override;
+
+    const parselib::uAST& vector() const { return _vector; }
+
+private:
+    parselib::uAST _vector;
+};
+
+class Ns_AST final : public parselib::AST {
+public:
+    Ns_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) override;
+
+    const parselib::uAST& value() const { return _value; }
+
+private:
+    parselib::uAST _value;
+};
+
+class Ni_AST final : public parselib::AST {
+public:
+    Ni_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) override;
+
+    const parselib::uAST& value() const { return _value; }
+
+private:
+    parselib::uAST _value;
+};
+
+class D_AST final : public parselib::AST {
+public:
+    D_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    const accept(parselib::Visitor* v) override;
+
+    const parselib::uAST& value() const { return _value; }
+
+private:
+    parselib::uAST _value;
+};
+
+class Illm_AST final : public parselib::AST {
+public:
+    Illm_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) override;
+
+    const parselib::uAST& value() const { return _value; }
+
+private:
+    parselib::uAST _value;
+};
+
+class MapKd_AST final : public parselib::AST {
+public:
+    MapKd_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) override;
+
+    const parselib::uAST& value() const { return _value; }
+
+private:
+    parselib::uAST _value;
 };
 
 parselib::Parser& integer_parser();
@@ -180,5 +320,20 @@ parselib::Parser& d_parser();
 parselib::Parser& illum_parser();
 // map_Kd = 'map_Kd' + string
 parselib::Parser& map_kd_parser();
+
+}
+
+namespace parselib {
+
+class Visitor {
+public:
+    Visitor() = default;
+
+    void take(loader::Material* material);
+    void release();
+
+private:
+    loader::Material* _material;
+};
 
 }
