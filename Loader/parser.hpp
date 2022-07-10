@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include <glm/glm.hpp>
+#include <parselib/parselib.hpp>
 
 #include "material.hpp"
 
@@ -95,5 +96,89 @@ IluminationModel illumination_converter(const std::string& in) {
     ss >> temp >> out;
     return (IluminationModel)out;
 }
+
+
+struct LexemType {
+    enum Tag {
+        INTEGER = 0,
+        FLOAT,
+        STRING,
+
+        NEW_MTL = 10,
+        KA,
+        KD,
+        KS,
+        NS,
+        NI,
+        D,
+        ILLUM,
+        MAP_KD
+    };
+};
+
+parselib::Rules create_rules();
+
+class Int_AST final : public parselib::AST {
+public:
+    Int_AST(const std::string& c);
+    NO_POP
+    NO_APPEND
+
+    int value() const { return _value; }
+
+private:
+    int _value;
+};
+
+class Float_AST final : public parselib::AST {
+public:
+    Float_AST(const std::string& c);
+    NO_POP
+    NO_APPEND
+
+    float value() const { return _value; }
+
+private:
+    float _value;
+};
+
+class String_AST final : public parselib::AST {
+public:
+    String_AST(const std::string& c);
+    NO_POP
+    NO_APPEND
+
+    const std::string& value() const { return _value; }
+
+private:
+    std::string _value;
+};
+
+class NewMtl_AST final : public parselib::AST {
+public:
+    NewMtl_AST();
+};
+
+parselib::Parser& integer_parser();
+parselib::Parser& float_parser();
+parselib::Parser& string_parser();
+// newmtl = 'newmtl' + string
+parselib::Parser& new_mtl_parser();
+// Ka = 'Ka' + float + float + float
+parselib::Parser& ka_parser();
+// Kd = 'Kd' + float + float + float
+parselib::Parser& kd_parser();
+// Ks = 'Ks' + float + float + float
+parselib::Parser& ks_parser();
+// Ns = 'Ns' + float
+parselib::Parser& ns_parser();
+// Ni = 'Ni' + float
+parselib::Parser& ni_parser();
+// d = 'd' + float
+parselib::Parser& d_parser();
+// illum = illum + integer
+parselib::Parser& illum_parser();
+// map_Kd = 'map_Kd' + string
+parselib::Parser& map_kd_parser();
 
 }

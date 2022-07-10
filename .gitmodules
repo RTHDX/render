@@ -19,3 +19,6 @@
 [submodule "3rdParty/imgui"]
 	path = 3rdParty/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "3rdParty/parselib"]
+	path = 3rdParty/parselib
+	url = https://github.com/RTHDX/parselib.git
