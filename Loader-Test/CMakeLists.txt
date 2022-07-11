@@ -20,5 +20,7 @@ create_test_executable(
 create_test_executable(
     TARGET "Loader-Test-mtl_parser"
     SOURCES mtl_parser_test.cpp
+            mtl_printer.cpp
+    HEADERS mtl_printer.hpp
     LIBS "OpenGL-Loader"
 )

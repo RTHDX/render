@@ -342,6 +342,4 @@ public:
     void visit(const loader::Wrapper_AST& ast) override;
 };
 
-parselib::Lexems mtl_lexems(const std::filesystem::path path);
-
 }

@@ -382,17 +382,12 @@ static parselib::Parser& entry() {
         illum_parser()   |
         map_kd_parser()
     );
-    return impl;
+    return impl.name("Entry_Parser");
 }
 
 parselib::Parser& mtl_parser() {
     static parselib::Parser impl(parselib::one_or_more(entry()));
     return parselib::bind<Mtl_AST>(impl);
-}
-
-
-parselib::Lexems mtl_lexems(const std::filesystem::path path) {
-    
 }
 
 }
