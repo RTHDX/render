@@ -6,6 +6,8 @@ namespace loader {
 parselib::Rules create_rules() {
     return parselib::Rules {
         parselib::Rule("\\s+", LexemType::SPACE, true),
+        parselib::Rule("#\.*\\n", LexemType::COMMENT, true),
+        parselib::Rule("\\n", LexemType::EOL, true),
 
         parselib::Rule{R"(-?(\d+)?\.\d+)", LexemType::FLOAT},
         parselib::Rule{R"(\d+)", LexemType::INTEGER},
@@ -214,22 +216,36 @@ void MapKd_AST::pop(parselib::AST* ast) { POP_AST(_value, ast); }
 void MapKd_AST::append(parselib::AST* ast) { APPEND_AST(_value, ast); }
 ACCEPT(MapKd_AST)
 
-void Mtl_AST::pop(parselib::AST* ast) {
-    auto iter = std::find_if(_components.begin(), _components.end(),
+static void common_remove(std::vector<parselib::uAST>& components,
+                           parselib::AST* ast) {
+    auto iter = std::find_if(components.begin(), components.end(),
         [ast](const parselib::uAST& item) {
             return item.get() == ast;
         }
     );
 
-    if (iter != _components.end()) {
-        _components.erase(_components.begin(), iter);
+    if (iter != components.end()) {
+        components.erase(components.begin(), iter);
     }
+}
+
+void Mtl_AST::pop(parselib::AST* ast) {
+    common_remove(_components, ast);
 }
 
 void Mtl_AST::append(parselib::AST* ast) {
     _components.push_back(std::move(parselib::uAST(ast)));
 }
 ACCEPT(Mtl_AST)
+
+void Wrapper_AST::pop(parselib::AST* ast) {
+    common_remove(_components, ast);
+}
+
+void Wrapper_AST::append(parselib::AST* ast) {
+    _components.push_back(std::move(parselib::uAST(ast)));
+}
+ACCEPT(Wrapper_AST)
 
 #undef ACCEPT
 
@@ -372,6 +388,11 @@ static parselib::Parser& entry() {
 parselib::Parser& mtl_parser() {
     static parselib::Parser impl(parselib::one_or_more(entry()));
     return parselib::bind<Mtl_AST>(impl);
+}
+
+
+parselib::Lexems mtl_lexems(const std::filesystem::path path) {
+    
 }
 
 }

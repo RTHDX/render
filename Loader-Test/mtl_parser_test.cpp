@@ -99,3 +99,27 @@ TEST(illum_pattern, test) {
     ASSERT_TRUE(grammar.accept(lexems, ast));
     delete ast;
 }
+
+TEST(mtl_document, test) {
+    auto lexems = create_lexer().tokenize(
+        "# Blender MTL File: 'None'\n"
+        "# Material Count : 1\n"
+        "newmtl Material\n"
+        "Ns 359.999993\n"
+        "Ka 1.000000 1.000000 1.000000\n"
+        "Kd 0.800000 0.800000 0.800000\n"
+        "Ks 0.500000 0.500000 0.500000\n"
+        "Ke 0.000000 0.000000 0.000000\n"
+        "Ni 1.450000\n"
+        "d 1.000000\n"
+        "illum 2\n"
+    );
+    ASSERT_EQ(lexems.size(), 26);
+    ASSERT_EQ(lexems[0].tag, loader::LexemType::NEW_MTL);
+    ASSERT_EQ(lexems[lexems.size() - 1].tag, loader::LexemType::INTEGER);
+
+    parselib::Driver grammar(loader::mtl_parser());
+    auto* ast = new loader::Wrapper_AST;
+    ASSERT_TRUE(grammar.accept(lexems, ast));
+    delete ast;
+}

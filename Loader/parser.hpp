@@ -4,6 +4,7 @@
 #include <string>
 #include <format>
 #include <sstream>
+#include <filesystem>
 
 #include <glm/glm.hpp>
 #include <parselib/parselib.hpp>
@@ -30,7 +31,9 @@ struct LexemType {
         ILLUM,
         MAP_KD,
 
-        SPACE = 50
+        SPACE = 50,
+        COMMENT,
+        EOL
     };
 };
 
@@ -245,6 +248,20 @@ private:
     std::vector<parselib::uAST> _components;
 };
 
+class Wrapper_AST final : public parselib::AST {
+public:
+    Wrapper_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) const override;
+
+    const std::vector<parselib::uAST>& components() const { return _components; }
+
+private:
+    std::vector<parselib::uAST> _components;
+};
+
 parselib::Parser& integer_parser();
 parselib::Parser& float_parser();
 parselib::Parser& string_parser();
@@ -294,6 +311,8 @@ public:
     virtual void visit(const loader::Illm_AST& ast) = 0;
     virtual void visit(const loader::MapKd_AST& ast) = 0;
     virtual void visit(const loader::Mtl_AST& ast) = 0;
+
+    virtual void visit(const loader::Wrapper_AST& ast) = 0;
 };
 
 }
@@ -319,6 +338,10 @@ public:
     void visit(const loader::Illm_AST& ast) override;
     void visit(const loader::MapKd_AST& ast) override;
     void visit(const loader::Mtl_AST& ast) override;
+
+    void visit(const loader::Wrapper_AST& ast) override;
 };
+
+parselib::Lexems mtl_lexems(const std::filesystem::path path);
 
 }
