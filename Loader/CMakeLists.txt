@@ -11,7 +11,18 @@ create_library(
 
 create_library(
     TARGET "OpenGL-${PROJECT_NAME}"
-    SOURCES loader.cpp mesh.cpp opengl_converter.cpp material.cpp
-    HEADERS loader.hpp mesh.hpp opengl_converter.hpp material.hpp visitor.hpp
-    LIBS OpenGL
+    SOURCES
+        loader.cpp
+        mesh.cpp
+        opengl_converter.cpp
+        material.cpp
+        parser.cpp
+    HEADERS
+        loader.hpp
+        mesh.hpp
+        opengl_converter.hpp
+        material.hpp
+        visitor.hpp
+        parser.hpp
+    LIBS OpenGL parselib
 )

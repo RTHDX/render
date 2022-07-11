@@ -13,94 +13,9 @@
 
 namespace loader {
 
-const std::string& float_template() {
-    static std::string float_pattern(R"(\d+\.\d+)");
-    return float_pattern;
-}
-
-const std::string& vec3_template() {
-    static std::string pattern(std::format("{} {} {}", float_template(),
-                                                       float_template(),
-                                                       float_template()));
-    return pattern;
-}
-
-const std::regex& Ka_template() {
-    static std::regex pattern(std::format("Ka {}", vec3_template()));
-    return pattern;
-}
-
-const std::regex& Kd_template() {
-    static std::regex pattern(std::format("Kd {}", vec3_template()));
-    return pattern;
-}
-
-const std::regex& Ks_template() {
-    static std::regex pattern(std::format("Ks {}", vec3_template()));
-    return pattern;
-}
-
-const std::regex& Ni_template() {
-    static std::regex pattern(std::format("Ni {}", float_template()));
-    return pattern;
-}
-
-const std::regex& Ns_template() {
-    static std::regex pattern(std::format("Ns {}", float_template()));
-    return pattern;
-}
-
-const std::regex& d_template() {
-    static std::regex pattern(std::format("d {}", float_template()));
-    return pattern;
-}
-
-const std::regex& illum_pattern() {
-    static std::regex pattern("illum \d");
-    return pattern;
-}
-
-const std::regex& newmtl_pattern() {
-    static std::regex pattern("newmtl .+");
-    return pattern;
-}
-
-glm::vec3 vec3_converter(const std::string& in) {
-    glm::vec3 out;
-    std::stringstream ss(in);
-    std::string temp;
-    ss >> temp >> out.x >> out.y >> out.z;
-    return out;
-}
-
-float float_converter(const std::string& in) {
-    float out;
-    std::stringstream ss(in);
-    std::string temp;
-    ss >> temp >> out;
-    return out;
-}
-
-std::string string_converter(const std::string& in) {
-    std::string out;
-    std::stringstream ss(in);
-    std::string temp;
-    ss >> temp >> out;
-    return out;
-}
-
-IluminationModel illumination_converter(const std::string& in) {
-    uint32_t out;
-    std::stringstream ss(in);
-    std::string temp;
-    ss >> temp >> out;
-    return (IluminationModel)out;
-}
-
-
 struct LexemType {
     enum Tag {
-        INTEGER = 0,
+        INTEGER = 1,
         FLOAT,
         STRING,
 
@@ -108,11 +23,14 @@ struct LexemType {
         KA,
         KD,
         KS,
+        KE,
         NS,
         NI,
         D,
         ILLUM,
-        MAP_KD
+        MAP_KD,
+
+        SPACE = 50
     };
 };
 
@@ -146,10 +64,10 @@ private:
 
 class Vector3f_AST final : public parselib::AST {
 public:
-    Vector3f_AST();
+    Vector3f_AST() = default;
 
-    void pop(parselib::AST* ast) const override;
-    void append(parselib::AST* ast) const override;
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
     void accept(parselib::Visitor* v) const override;
 
     const parselib::uAST& x() const { return _x; }
@@ -193,7 +111,21 @@ public:
 
     void pop(parselib::AST* ast) override;
     void append(parselib::AST* ast) override;
-    void accept(parselib::AST* ast) override;
+    void accept(parselib::Visitor* ast) const override;
+
+    const parselib::uAST& vector() const { return _vector; }
+
+private:
+    parselib::uAST _vector;
+};
+
+class Ke_AST final : public parselib::AST {
+public:
+    Ke_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* ast) const override;
 
     const parselib::uAST& vector() const { return _vector; }
 
@@ -207,7 +139,7 @@ public:
 
     void pop(parselib::AST* ast) override;
     void append(parselib::AST* ast) override;
-    void accept(parselib::Visitor* v) override;
+    void accept(parselib::Visitor* v) const override;
 
     const parselib::uAST& vector() const { return _vector; }
 
@@ -221,7 +153,7 @@ public:
 
     void pop(parselib::AST* ast) override;
     void append(parselib::AST* ast) override;
-    void accept(parselib::Visitor* v) override;
+    void accept(parselib::Visitor* v) const override;
 
     const parselib::uAST& vector() const { return _vector; }
 
@@ -235,7 +167,7 @@ public:
 
     void pop(parselib::AST* ast) override;
     void append(parselib::AST* ast) override;
-    void accept(parselib::Visitor* v) override;
+    void accept(parselib::Visitor* v) const override;
 
     const parselib::uAST& value() const { return _value; }
 
@@ -249,7 +181,7 @@ public:
 
     void pop(parselib::AST* ast) override;
     void append(parselib::AST* ast) override;
-    void accept(parselib::Visitor* v) override;
+    void accept(parselib::Visitor* v) const override;
 
     const parselib::uAST& value() const { return _value; }
 
@@ -263,7 +195,7 @@ public:
 
     void pop(parselib::AST* ast) override;
     void append(parselib::AST* ast) override;
-    const accept(parselib::Visitor* v) override;
+    void accept(parselib::Visitor* v) const override;
 
     const parselib::uAST& value() const { return _value; }
 
@@ -277,7 +209,7 @@ public:
 
     void pop(parselib::AST* ast) override;
     void append(parselib::AST* ast) override;
-    void accept(parselib::Visitor* v) override;
+    void accept(parselib::Visitor* v) const override;
 
     const parselib::uAST& value() const { return _value; }
 
@@ -291,12 +223,26 @@ public:
 
     void pop(parselib::AST* ast) override;
     void append(parselib::AST* ast) override;
-    void accept(parselib::Visitor* v) override;
+    void accept(parselib::Visitor* v) const override;
 
     const parselib::uAST& value() const { return _value; }
 
 private:
     parselib::uAST _value;
+};
+
+class Mtl_AST final : public parselib::AST {
+public:
+    Mtl_AST() = default;
+
+    void pop(parselib::AST* ast) override;
+    void append(parselib::AST* ast) override;
+    void accept(parselib::Visitor* v) const override;
+
+    const std::vector<parselib::uAST>& components() const { return _components; }
+
+private:
+    std::vector<parselib::uAST> _components;
 };
 
 parselib::Parser& integer_parser();
@@ -310,6 +256,8 @@ parselib::Parser& ka_parser();
 parselib::Parser& kd_parser();
 // Ks = 'Ks' + float + float + float
 parselib::Parser& ks_parser();
+// Ke = 'Ke' + flaot + float + float
+parselib::Parser& ke_parser();
 // Ns = 'Ns' + float
 parselib::Parser& ns_parser();
 // Ni = 'Ni' + float
@@ -320,7 +268,8 @@ parselib::Parser& d_parser();
 parselib::Parser& illum_parser();
 // map_Kd = 'map_Kd' + string
 parselib::Parser& map_kd_parser();
-
+// mtl_doc = any+
+parselib::Parser& mtl_parser();
 }
 
 namespace parselib {
@@ -328,12 +277,48 @@ namespace parselib {
 class Visitor {
 public:
     Visitor() = default;
+    virtual ~Visitor() = default;
 
-    void take(loader::Material* material);
-    void release();
+    virtual void visit(const loader::Int_AST& ast) = 0;
+    virtual void visit(const loader::Float_AST& ast) = 0;
+    virtual void visit(const loader::Vector3f_AST& ast) = 0;
+    virtual void visit(const loader::String_AST& ast) = 0;
+    virtual void visit(const loader::NewMtl_AST& ast) = 0;
+    virtual void visit(const loader::Ka_AST& ast) = 0;
+    virtual void visit(const loader::Kd_AST& ast) = 0;
+    virtual void visit(const loader::Ks_AST& ast) = 0;
+    virtual void visit(const loader::Ke_AST& ast) = 0;
+    virtual void visit(const loader::Ns_AST& ast) = 0;
+    virtual void visit(const loader::Ni_AST& ast) = 0;
+    virtual void visit(const loader::D_AST& ast) = 0;
+    virtual void visit(const loader::Illm_AST& ast) = 0;
+    virtual void visit(const loader::MapKd_AST& ast) = 0;
+    virtual void visit(const loader::Mtl_AST& ast) = 0;
+};
 
-private:
-    loader::Material* _material;
+}
+
+namespace loader {
+
+class MtlBuilder final : public parselib::Visitor {
+public:
+    MtlBuilder();
+
+    void visit(const loader::Int_AST& ast) override;
+    void visit(const loader::Float_AST& ast) override;
+    void visit(const loader::Vector3f_AST& ast) override;
+    void visit(const loader::String_AST& ast) override;
+    void visit(const loader::NewMtl_AST& ast) override;
+    void visit(const loader::Ka_AST& ast) override;
+    void visit(const loader::Kd_AST& ast) override;
+    void visit(const loader::Ks_AST& ast) override;
+    void visit(const loader::Ke_AST& ast) override;
+    void visit(const loader::Ns_AST& ast) override;
+    void visit(const loader::Ni_AST& ast) override;
+    void visit(const loader::D_AST& ast) override;
+    void visit(const loader::Illm_AST& ast) override;
+    void visit(const loader::MapKd_AST& ast) override;
+    void visit(const loader::Mtl_AST& ast) override;
 };
 
 }

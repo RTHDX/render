@@ -26,7 +26,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/Nuklear/demo/glfw_open
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/backends")
 add_subdirectory(3rdParty/parselib)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/parselib")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty")
 
 add_library(ImGui STATIC
     "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/imgui.cpp"
