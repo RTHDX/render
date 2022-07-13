@@ -1,10 +1,7 @@
 #include <gtest/gtest.h>
 #include <glm/gtx/string_cast.hpp>
 
-#include <Loader/parser.hpp>
-
-#include "mtl_printer.hpp"
-
+#include <Loader/mtl_parser.hpp>
 
 
 class Test_MTL_Parsers : public testing::Test {
@@ -21,7 +18,7 @@ public:
 
 public:
     parselib::Lexer lexer;
-    MtlPrinter printer;
+    loader::MtlPrinter printer;
 };
 
 TEST_F(Test_MTL_Parsers, floats) {
@@ -72,6 +69,7 @@ TEST_F(Test_MTL_Parsers, ni_pattern) {
     ASSERT_EQ(lexems.size(), 2);
     auto* ast = new loader::Mtl_AST;
     ASSERT_TRUE(grammar.accept(lexems, ast));
+    print(ast);
     delete ast;
 }
 
@@ -81,6 +79,7 @@ TEST_F(Test_MTL_Parsers, ns_pattern) {
     ASSERT_EQ(lexems.size(), 2);
     auto* ast = new loader::Mtl_AST;
     ASSERT_TRUE(grammar.accept(lexems, ast));
+    print(ast);
     delete ast;
 }
 
@@ -90,6 +89,7 @@ TEST_F(Test_MTL_Parsers, d_pattern) {
     ASSERT_EQ(lexems.size(), 2);
     auto* ast = new loader::Mtl_AST;
     ASSERT_TRUE(grammar.accept(lexems, ast));
+    print(ast);
     delete ast;
 }
 
@@ -97,8 +97,11 @@ TEST_F(Test_MTL_Parsers, newmtl_pattern) {
     auto lexems = lexer.tokenize("newmtl lambert1.001");
     parselib::Driver grammar(loader::new_mtl_parser());
     ASSERT_EQ(lexems.size(), 2);
+    ASSERT_EQ(lexems[0].tag, loader::LexemType::NEW_MTL);
+    ASSERT_EQ(lexems[1].tag, loader::LexemType::STRING);
     auto* ast = new loader::Mtl_AST;
     ASSERT_TRUE(grammar.accept(lexems, ast));
+    print(ast);
     delete ast;
 }
 
@@ -108,31 +111,53 @@ TEST_F(Test_MTL_Parsers, illum_pattern) {
     ASSERT_EQ(lexems.size(), 2);
     auto* ast = new loader::Mtl_AST;
     ASSERT_TRUE(grammar.accept(lexems, ast));
+    print(ast);
     delete ast;
 }
 
-//TEST_F(Test_MTL_Parsers, mtl_document) {
-//    auto lexems = lexer.tokenize(
-//        "# Blender MTL File: 'None'\n"
-//        "# Material Count : 1\n"
-//        "newmtl Material\n"
-//        "Ns 359.999993\n"
-//        "Ka 1.000000 1.000000 1.000000\n"
-//        "Kd 0.800000 0.800000 0.800000\n"
-//        "Ks 0.500000 0.500000 0.500000\n"
-//        "Ke 0.000000 0.000000 0.000000\n"
-//        "Ni 1.450000\n"
-//        "d 1.000000\n"
-//        "illum 2\n"
-//    );
-//    ASSERT_EQ(lexems.size(), 26);
-//    ASSERT_EQ(lexems[0].tag, loader::LexemType::NEW_MTL);
-//    ASSERT_EQ(lexems[lexems.size() - 1].tag, loader::LexemType::INTEGER);
-//
-//    parselib::Driver grammar(loader::mtl_parser());
-//    auto* ast = new loader::Wrapper_AST;
-//    ASSERT_TRUE(grammar.accept(lexems, ast));
-//    MtlPrinter printer(std::cout);
-//    ast->accept(&printer);
-//    delete ast;
-//}
+TEST_F(Test_MTL_Parsers, mtl_document_1) {
+    auto lexems = lexer.tokenize("Ka 1.000000 1.000000 1.000000");
+    ASSERT_EQ(lexems.size(), 4);
+
+    parselib::Driver grammar(loader::mtl_parser());
+    auto* ast = new loader::Wrapper_AST;
+    ASSERT_TRUE(grammar.accept(lexems, ast));
+    print(ast);
+    delete ast;
+}
+
+TEST_F(Test_MTL_Parsers, mtl_document_2) {
+    auto lexems = lexer.tokenize(
+        "newmtl Material\n"
+        "Ns 359.999993\n"
+    );
+    //ASSERT_EQ(lexems.size(), 4);
+    parselib::Driver grammar(loader::mtl_parser());
+    auto* ast = new loader::Wrapper_AST;
+    ASSERT_TRUE(grammar.accept(lexems, ast));
+    print(ast);
+    delete ast;
+}
+
+TEST_F(Test_MTL_Parsers, mtl_document_3) {
+    auto lexems = lexer.tokenize(
+        "# Blender MTL File: 'None'\n"
+        "# Material Count : 1\n"
+        "newmtl Material\n"
+        "Ns 359.999993\n"
+        "Ka 1.000000 1.000000 1.000000\n"
+        "Kd 0.800000 0.800000 0.800000\n"
+        "Ks 0.500000 0.500000 0.500000\n"
+        "Ke 0.000000 0.000000 0.000000\n"
+        "Ni 1.450000\n"
+        "d 1.000000\n"
+        "illum 2\n"
+    );
+    ASSERT_EQ(lexems.size(), 26);
+
+    parselib::Driver grammar(loader::mtl_parser());
+    auto* ast = new loader::Wrapper_AST;
+    ASSERT_TRUE(grammar.accept(lexems, ast));
+    print(ast);
+    delete ast;
+}

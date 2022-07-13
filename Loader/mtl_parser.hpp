@@ -83,7 +83,7 @@ private:
 
 class String_AST final : public parselib::AST {
 public:
-    String_AST(const std::string& c);
+    String_AST(const std::string c);
     NO_POP
     NO_APPEND
     void accept(parselib::Visitor*) const override;
@@ -262,31 +262,31 @@ private:
     std::vector<parselib::uAST> _components;
 };
 
-parselib::Parser& integer_parser();
-parselib::Parser& float_parser();
-parselib::Parser& string_parser();
+parselib::Parser integer_parser();
+parselib::Parser float_parser();
+parselib::Parser string_parser();
 // newmtl = 'newmtl' + string
-parselib::Parser& new_mtl_parser();
+parselib::Parser new_mtl_parser();
 // Ka = 'Ka' + float + float + float
-parselib::Parser& ka_parser();
+parselib::Parser ka_parser();
 // Kd = 'Kd' + float + float + float
-parselib::Parser& kd_parser();
+parselib::Parser kd_parser();
 // Ks = 'Ks' + float + float + float
-parselib::Parser& ks_parser();
+parselib::Parser ks_parser();
 // Ke = 'Ke' + flaot + float + float
-parselib::Parser& ke_parser();
+parselib::Parser ke_parser();
 // Ns = 'Ns' + float
-parselib::Parser& ns_parser();
+parselib::Parser ns_parser();
 // Ni = 'Ni' + float
-parselib::Parser& ni_parser();
+parselib::Parser ni_parser();
 // d = 'd' + float
-parselib::Parser& d_parser();
+parselib::Parser d_parser();
 // illum = illum + integer
-parselib::Parser& illum_parser();
+parselib::Parser illum_parser();
 // map_Kd = 'map_Kd' + string
-parselib::Parser& map_kd_parser();
+parselib::Parser map_kd_parser();
 // mtl_doc = any+
-parselib::Parser& mtl_parser();
+parselib::Parser mtl_parser();
 }
 
 namespace parselib {
@@ -340,6 +340,42 @@ public:
     void visit(const loader::Mtl_AST& ast) override;
 
     void visit(const loader::Wrapper_AST& ast) override;
+};
+
+
+class MtlPrinter final : public parselib::Visitor {
+public:
+    MtlPrinter(std::ostream&);
+
+    void visit(const loader::Int_AST& ast) override;
+    void visit(const loader::Float_AST& ast) override;
+    void visit(const loader::Vector3f_AST& ast) override;
+    void visit(const loader::String_AST& ast) override;
+    void visit(const loader::NewMtl_AST& ast) override;
+    void visit(const loader::Ka_AST& ast) override;
+    void visit(const loader::Kd_AST& ast) override;
+    void visit(const loader::Ks_AST& ast) override;
+    void visit(const loader::Ke_AST& ast) override;
+    void visit(const loader::Ns_AST& ast) override;
+    void visit(const loader::Ni_AST& ast) override;
+    void visit(const loader::D_AST& ast) override;
+    void visit(const loader::Illm_AST& ast) override;
+    void visit(const loader::MapKd_AST& ast) override;
+    void visit(const loader::Mtl_AST& ast) override;
+
+    void visit(const loader::Wrapper_AST& ast) override;
+
+private:
+    void print_prefix() const;
+    std::string prefix() const;
+    void print(const std::string& content);
+    void header(const std::string& header);
+    void footer(bool s=false);
+
+private:
+    std::ostream& _out;
+    std::string _prefix;
+    size_t _lvl = 0;
 };
 
 }
