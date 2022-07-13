@@ -6,10 +6,19 @@
 
 namespace loader {
 
-void local_print(parselib::AST* ast) {
-    static MtlPrinter printer(std::cout);
-    ast->accept(&printer);
-}
+
+#if (DEBUG_OUT)
+    void ast_print(parselib::AST* ast) {
+        static MtlPrinter printer(std::cout);
+        ast->accept(&printer);
+    }
+#endif
+
+#if (DEBUG_OUT)
+    #define DEBUG_AST_PRINT ast_print(this)
+#else
+    #define DEBUG_AST_PRINT
+#endif
 
 parselib::Rules create_rules() {
     return parselib::Rules {
@@ -72,6 +81,7 @@ void Vector3f_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find id " << ast_id << std::endl;
     }
+    DEBUG_AST_PRINT;
 }
 
 void Vector3f_AST::append(parselib::AST* ast) {
@@ -84,7 +94,7 @@ void Vector3f_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append ast: " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(Vector3f_AST)
 
@@ -94,7 +104,7 @@ void NewMtl_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find id: " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 
 void NewMtl_AST::append(parselib::AST* ast) {
@@ -103,7 +113,7 @@ void NewMtl_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled tree" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(NewMtl_AST)
 
@@ -113,7 +123,7 @@ void Ka_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find: " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 
 void Ka_AST::append(parselib::AST* ast) {
@@ -122,7 +132,7 @@ void Ka_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled tree" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(Ka_AST)
 
@@ -132,7 +142,7 @@ void Kd_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find ast" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 
 void Kd_AST::append(parselib::AST* ast) {
@@ -141,7 +151,7 @@ void Kd_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled ast" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(Kd_AST)
 
@@ -151,7 +161,7 @@ void Ke_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 void Ke_AST::append(parselib::AST* ast) {
     if (!_vector) {
@@ -159,7 +169,7 @@ void Ke_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled ast" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(Ke_AST)
 
@@ -169,7 +179,7 @@ void Ks_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 
 void Ks_AST::append(parselib::AST* ast) {
@@ -178,7 +188,7 @@ void Ks_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled ast" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(Ks_AST)
 
@@ -188,7 +198,7 @@ void Ns_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 
 void Ns_AST::append(parselib::AST* ast) {
@@ -197,7 +207,7 @@ void Ns_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled ast" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(Ns_AST)
 
@@ -207,7 +217,7 @@ void Ni_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 
 void Ni_AST::append(parselib::AST* ast) {
@@ -216,7 +226,7 @@ void Ni_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled ast" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(Ni_AST)
 
@@ -226,7 +236,7 @@ void D_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 
 void D_AST::append(parselib::AST* ast) {
@@ -235,7 +245,7 @@ void D_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled ast" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(D_AST)
 
@@ -245,7 +255,7 @@ void Illm_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 
 void Illm_AST::append(parselib::AST* ast) {
@@ -254,7 +264,7 @@ void Illm_AST::append(parselib::AST* ast) {
     } else {
         std::cerr << "Could not append to filled ast" << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 ACCEPT(Illm_AST)
 
@@ -264,7 +274,7 @@ void MapKd_AST::pop(parselib::AST* ast) {
     } else {
         std::cerr << "Could not find " << ast->id() << std::endl;
     }
-    local_print(this);
+    DEBUG_AST_PRINT;
 }
 void MapKd_AST::append(parselib::AST* ast) {
     if (!_value) {

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(Loader)
 
+option(RENDER_LOADER_OPENGL_ENABLE_DEBUGOUT OFF)
 
 create_library(
     TARGET "RTX-${PROJECT_NAME}"
@@ -26,3 +27,7 @@ create_library(
         mtl_parser.hpp
     LIBS OpenGL parselib
 )
+
+if (${RENDER_LOADER_OPENGL_ENABLE_DEBUGOUT})
+    target_compile_definitions("OpenGL-${PROJECT_NAME}" PRIVATE "DEBUG_OUT")
+endif ()
