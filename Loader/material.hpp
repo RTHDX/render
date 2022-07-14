@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <glm/glm.hpp>
 
 
@@ -13,13 +15,16 @@ enum class IluminationModel {
 
 struct Material {
     std::string name;
-    glm::vec3 ambient_color;
-    glm::vec3 diffuse_color;
-    glm::vec3 specular_color;
-    float specular_highlights; // 0 - 1000
-    float optical_density;     // 0.001 - 10 (index of refraction)
-    float dissolve;            // alpha component 0.0 - 1.0
+    glm::vec3 ambient_color;   // Ka
+    glm::vec3 diffuse_color;   // Kd
+    glm::vec3 specular_color;  // Ks
+    float specular_highlights; // 0 - 1000 (Ns)
+    float optical_density;     // 0.001 - 10 (Ni)
+    float dissolve;            // alpha component 0.0 - 1.0 (d)
     IluminationModel ilum;
 };
+
+bool operator == (const Material& lha, const Material& rhs);
+bool operator != (const Material& lhs, const Material& rhs);
 
 }

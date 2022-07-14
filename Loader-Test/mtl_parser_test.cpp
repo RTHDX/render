@@ -9,16 +9,23 @@ public:
     Test_MTL_Parsers()
         : testing::Test()
         , lexer(loader::create_rules())
+#if(DEBUG_OUT)
         , printer(std::cout)
+#endif
     {}
 
     void print(auto* ast) {
+#if(DEBUG_OUT)
         ast->accept(&printer);
+#endif
+        (void*)ast;
     }
 
 public:
     parselib::Lexer lexer;
+#if(DEBUG_OUT)
     loader::MtlPrinter printer;
+#endif
 };
 
 TEST_F(Test_MTL_Parsers, floats) {
@@ -160,4 +167,8 @@ TEST_F(Test_MTL_Parsers, mtl_document_3) {
     ASSERT_TRUE(grammar.accept(lexems, ast));
     print(ast);
     delete ast;
+}
+
+TEST_F(Test_MTL_Parsers, build_material) {
+    loader::Material actual = loader::read_material("./mesh-examples/stone_1.mtl");
 }
