@@ -448,8 +448,10 @@ Material read_material(const std::filesystem::path& path) {
     Material out;
 
     std::ifstream file(path.c_str());
-    std::string content{std::istream_iterator<char>(file),
-                        std::istream_iterator<char>()};
+    std::string content;
+    for (std::string line; std::getline(file, line);) {
+        content += (line + "\n");
+    }
     parselib::Lexer lexer(create_rules());
     auto lexems = lexer.tokenize(content);
     parselib::Driver grammar(mtl_parser());
@@ -521,7 +523,7 @@ void MtlBuilder::visit(const loader::Ks_AST& ast) {
 }
 
 void MtlBuilder::visit(const loader::Ke_AST& ast) {
-    std::cerr << "IMPLMENT ME" << std::endl;
+    std::cerr << "IMPLMENT ME " << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void MtlBuilder::visit(const loader::Ns_AST& ast) {
@@ -553,7 +555,7 @@ void MtlBuilder::visit(const loader::Illm_AST& ast) {
 }
 
 void MtlBuilder::visit(const loader::MapKd_AST& ast) {
-    std::cerr << "IMPLEMNT ME " << std::endl;
+    std::cerr << "IMPLEMNT ME " << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void MtlBuilder::visit(const loader::Mtl_AST& ast) {

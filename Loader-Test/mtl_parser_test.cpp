@@ -170,5 +170,17 @@ TEST_F(Test_MTL_Parsers, mtl_document_3) {
 }
 
 TEST_F(Test_MTL_Parsers, build_material) {
-    loader::Material actual = loader::read_material("./mesh-examples/stone_1.mtl");
+    loader::Material actual = loader::read_material("./stone_1.mtl");
+    loader::Material expected {
+        .name="lambert1",
+        .ambient_color = {1.0, 1.0, 1.0},
+        .diffuse_color = {0.756863, 0.756863, 0.756863},
+        .specular_color = {0.5, 0.5, 0.5},
+        .specular_highlights = 200.0,
+        .optical_density = 1.45,
+        .dissolve = 1.0,
+        .ilum=loader::IluminationModel::DIFFUSE_AND_SPECULAR,
+    };
+
+    EXPECT_EQ(actual, expected);
 }
