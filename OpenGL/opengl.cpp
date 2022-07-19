@@ -15,7 +15,7 @@ Context& Context::instance() {
     return self;
 }
 
-void Context::initialize() {
+void Context::initialize(bool to_dump) {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         std::terminate();
@@ -24,6 +24,8 @@ void Context::initialize() {
     glEnable(GL_MULTISAMPLE);
     glEnable(GL_STENCIL_TEST);
     glEnable(GL_DEPTH_TEST);
+
+    if (to_dump) { dump(); }
 }
 
 void Context::dump() const {
@@ -306,6 +308,33 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height) {
 }
 
 
+bool check_shader(GLuint id) {
+    GLint success = 0;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        static constexpr size_t BUFF_SIZE = 256;
+        char msg[BUFF_SIZE];
+        glGetShaderInfoLog(id, BUFF_SIZE, nullptr, msg);
+        std::cerr << "Shader compiled with error: " << msg << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool check_program(GLuint id) {
+    GLint success;
+    glGetProgramiv(id, GL_LINK_STATUS, &success);
+    if (!success) {
+        constexpr size_t BUFF_SIZE = 512;
+        char msg[BUFF_SIZE];
+        glGetProgramInfoLog(id, BUFF_SIZE, nullptr, msg);
+        std::cerr << "Program linking failed with: " << msg << std::endl;
+        return false;
+    }
+    return true;
+}
+
+
 GLuint create_program(const std::string& vertex_shader_src,
                       const std::string& fragment_shader_src) {
     GLuint program         = glCreateProgram(),
@@ -315,14 +344,23 @@ GLuint create_program(const std::string& vertex_shader_src,
     const auto* src = vertex_shader_src.data();
     glShaderSource(vertex_shader, 1, &src, nullptr);
     glCompileShader(vertex_shader);
+    if (!check_shader(vertex_shader)) {
+        glDeleteShader(vertex_shader);
+    }
 
     src = fragment_shader_src.data();
     glShaderSource(fragment_shader, 1, &src, nullptr);
     glCompileShader(fragment_shader);
+    if (!check_shader(fragment_shader)) {
+        glDeleteShader(fragment_shader);
+    }
 
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
+    if (!check_program(program)) {
+        glDeleteProgram(program);
+    }
     return program;
 }
 

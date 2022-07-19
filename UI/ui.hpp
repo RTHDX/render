@@ -5,7 +5,7 @@ namespace ui {
 
 bool init_glfw(int major, int minor);
 bool init_glfw_lite();
-GLFWwindow* create_window(int width, int height, const char* title);
+GLFWwindow* create_window(int width, int height, const char* title, bool=false);
 bool init_opengl();
 
 }

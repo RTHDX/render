@@ -98,9 +98,9 @@ void show_window(Scene& scene) {
     ImGui::End();
 }
 
-GLFWwindow* init(const auto& background) {
+GLFWwindow* init(const auto& background, bool fullscreen) {
     ui::init_glfw(4, 6);
-    auto* window = ui::create_window(WIDTH, HEIGHT, "mesh");
+    auto* window = ui::create_window(WIDTH, HEIGHT, "mesh", fullscreen);
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
     opengl::Context::instance().background(background);
@@ -119,7 +119,7 @@ auto create_scene() {
 
 
 int main() {
-    auto* window = init(background);
+    auto* window = init(background, false);
 
     auto scene = create_scene();
     auto program = opengl::create_program(vertex_path, fragment_path);

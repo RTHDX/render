@@ -15,8 +15,8 @@
 #include <UI/application.hpp>
 #include <UI/io.hpp>
 
-const unsigned int WIDTH = 800;
-const unsigned int HEIGHT = 600;
+const unsigned int WIDTH = 1280;
+const unsigned int HEIGHT = 960;
 
 
 auto read_cube() {

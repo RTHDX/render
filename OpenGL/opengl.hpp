@@ -36,11 +36,11 @@ private:
 };
 
 
-class Context final : public Object {
+class Context {
 public:
     static Context& instance();
 
-    void initialize() override;
+    void initialize(bool=false);
     void dump() const;
 
     void viewport(int width, int height) const;
@@ -51,11 +51,6 @@ public:
 
 private:
     Context() = default;
-
-    Context(const Context&) = delete;
-    Context& operator = (const Context&) = delete;
-    Context(Context&&) = delete;
-    Context& operator = (Context&&) = delete;
 
 private:
     glm::vec4 _background;
@@ -194,5 +189,8 @@ GLuint create_vbo(GLuint vao, VertexBufferAttrib attribs);
 bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);
 bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val);
+
+bool check_shader(GLuint id);
+bool check_program(GLuint id);
 
 }

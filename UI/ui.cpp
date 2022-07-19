@@ -25,10 +25,20 @@ bool init_glfw_lite() {
 }
 
 
-GLFWwindow* create_window(int width, int height, const char* title) {
-    GLFWwindow* window = glfwCreateWindow(width, height, title, nullptr,
-                                          nullptr);
-    if (window == nullptr) {
+GLFWwindow* create_window(int width, int height, const char* title,
+                          bool fullstreen) {
+    GLFWwindow* window = nullptr;
+    if (fullstreen) {
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+        window = glfwCreateWindow(mode->width, mode->height, "",
+                                  monitor, nullptr);
+    } else {
+        window = glfwCreateWindow(width, height, title, nullptr,
+                                  nullptr);
+    }
+
+    if (!window) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         std::terminate();
