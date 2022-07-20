@@ -79,10 +79,12 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         opengl::Context::instance().draw_background();
 
-        orange_item.draw(program_orange);
+        program_orange.use();
+        orange_item.draw();
         //glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        yellow_item.draw(program_yellow);
+        program_yellow.use();
+        yellow_item.draw();
         //glDrawArrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);

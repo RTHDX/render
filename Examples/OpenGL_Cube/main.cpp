@@ -99,7 +99,7 @@ void show_window(Scene& scene) {
 }
 
 GLFWwindow* init(const auto& background, bool fullscreen) {
-    ui::init_glfw(4, 6);
+    ui::init_glfw(3, 3);
     auto* window = ui::create_window(WIDTH, HEIGHT, "mesh", fullscreen);
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();

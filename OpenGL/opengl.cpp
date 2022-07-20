@@ -311,11 +311,11 @@ void framebuffer_size_callback(GLFWwindow*, int width, int height) {
 bool check_shader(GLuint id) {
     GLint success = 0;
     glGetShaderiv(id, GL_COMPILE_STATUS, &success);
-    if (!success) {
+    if (success == GL_FALSE) {
         static constexpr size_t BUFF_SIZE = 256;
         char msg[BUFF_SIZE];
         glGetShaderInfoLog(id, BUFF_SIZE, nullptr, msg);
-        std::cerr << "Shader compiled with error: " << msg << std::endl;
+        std::cout << "Shader compiled with error: " << msg << std::endl;
         return false;
     }
     return true;
@@ -324,7 +324,7 @@ bool check_shader(GLuint id) {
 bool check_program(GLuint id) {
     GLint success;
     glGetProgramiv(id, GL_LINK_STATUS, &success);
-    if (!success) {
+    if (success == GL_FALSE) {
         constexpr size_t BUFF_SIZE = 512;
         char msg[BUFF_SIZE];
         glGetProgramInfoLog(id, BUFF_SIZE, nullptr, msg);
@@ -342,25 +342,27 @@ GLuint create_program(const std::string& vertex_shader_src,
            fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 
     const auto* src = vertex_shader_src.data();
-    glShaderSource(vertex_shader, 1, &src, nullptr);
-    glCompileShader(vertex_shader);
+    SAFE_CALL(glShaderSource(vertex_shader, 1, &src, nullptr));
+    SAFE_CALL(glCompileShader(vertex_shader));
     if (!check_shader(vertex_shader)) {
-        glDeleteShader(vertex_shader);
+        SAFE_CALL(glDeleteShader(vertex_shader));
     }
 
     src = fragment_shader_src.data();
-    glShaderSource(fragment_shader, 1, &src, nullptr);
-    glCompileShader(fragment_shader);
+    SAFE_CALL(glShaderSource(fragment_shader, 1, &src, nullptr));
+    SAFE_CALL(glCompileShader(fragment_shader));
     if (!check_shader(fragment_shader)) {
-        glDeleteShader(fragment_shader);
+        SAFE_CALL(glDeleteShader(fragment_shader));
     }
 
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
+    SAFE_CALL(glAttachShader(program, vertex_shader));
+    SAFE_CALL(glAttachShader(program, fragment_shader));
+    SAFE_CALL(glLinkProgram(program));
     if (!check_program(program)) {
-        glDeleteProgram(program);
+        SAFE_CALL(glDeleteProgram(program));
     }
+    SAFE_CALL(glDetachShader(program, vertex_shader));
+    SAFE_CALL(glDetachShader(program, fragment_shader));
     return program;
 }
 
@@ -425,6 +427,37 @@ GLuint create_vbo(GLuint vao, VertexBufferAttrib attribs) {
                           attribs.width, attribs.offset);
     bind_vao(0);
     return id;
+}
+
+void on_gl_error(GLenum error_code, const char* call, const char* file,
+                 int line) {
+    if (error_code == GL_NO_ERROR) return;
+
+    std::cerr << call << " -> ";
+    switch (error_code) {
+    case GL_INVALID_ENUM:
+        std::cerr << "INVALID_ENUM";
+        break;
+    case GL_INVALID_VALUE:
+        std::cerr << "INVALID_VALUE";
+        break;
+    case GL_INVALID_OPERATION:
+        std::cerr << "INVALID_OPERATION";
+        break;
+    case GL_INVALID_FRAMEBUFFER_OPERATION:
+        std::cerr << "INVALID_FRAMEBUFFER_OPERATION";
+        break;
+    case GL_OUT_OF_MEMORY:
+        std::cerr << "OUT_OF_MEMORY";
+        break;
+    case GL_STACK_UNDERFLOW:
+        std::cerr << "STACK_UNDERFLOW";
+        break;
+    case GL_STACK_OVERFLOW:
+        std::cerr << "STACK_OVERFLOW";
+        break;
+    }
+    std::cerr << "[" << file << ":" << line << "]" << std::endl;
 }
 
 }

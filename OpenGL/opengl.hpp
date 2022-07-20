@@ -177,6 +177,13 @@ struct VertexBufferAttrib {
     void* offset;
 };
 
+void on_gl_error(GLenum error_code, const char* call, const char* file,
+                 int line);
+#define SAFE_CALL(gl_call)\
+    gl_call;\
+    opengl::on_gl_error(glGetError(), #gl_call, __FILE__, __LINE__);
+//#define SAFE_CALL(call) call
+
 
 GLuint create_program(const std::filesystem::path& vertex_path,
                       const std::filesystem::path& fragment_path);

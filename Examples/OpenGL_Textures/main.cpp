@@ -9,6 +9,7 @@
 #include <OpenGL/opengl.hpp>
 #include <OpenGL/camera.hpp>
 #include <OpenGL/opengl_utils.hpp>
+#include <OpenGL/item.hpp>
 
 int WIDTH = 1280;
 int HEIGHT = 860;
@@ -19,7 +20,7 @@ std::vector<glm::vec3> gen_frame(size_t width, size_t height) {
     for (size_t h_pos = 0; h_pos < height; ++h_pos) {
         for (size_t w_pos = 0; w_pos < width; ++w_pos) {
             const size_t i = h_pos * width + w_pos;
-            out[i] = {1.0, 1.0, 1.0};
+            out[i] = {.5, .5, .5};
         }
     }
     return out;
@@ -53,29 +54,18 @@ int main() {
         std::filesystem::path("./fragment_shader.frag")
     );
 
-    std::vector<TexVertexData> vertices{
-        {.pos={-1.0,  1.0, 0.0}, .tex_pos={0.0, 1.0}},
-        {.pos={ 1.0,  1.0, 0.0}, .tex_pos={1.0, 1.0}},
-        {.pos={ 1.0, -1.0, 0.0}, .tex_pos={1.0, 0.0}},
-        {.pos={-1.0, -1.0, 0.0}, .tex_pos={0.0, 0.0}}
+    glm::vec3 normal {0.0, 0.0, 1.0};
+    std::vector<opengl::VertexTexData> vertices {
+        {.position{-1.0,  1.0, 0.0}, .normal=normal, .tex_pos={0, 1}},
+        {.position{ 1.0,  1.0, 0.0}, .normal=normal, .tex_pos={1, 1}},
+        {.position{ 1.0, -1.0, 0.0}, .normal=normal, .tex_pos={1, 0}},
+
+        {.position{-1.0,  1.0, 0.0}, .normal=normal, .tex_pos={0, 1}},
+        {.position{-1.0, -1.0, 0.0}, .normal=normal, .tex_pos={0, 0}},
+        {.position{1.0,  -1.0, 0.0}, .normal=normal, .tex_pos={1, 0}}
     };
-    GLuint vbo, vao;
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 vertices.size() * sizeof (TexVertexData),
-                 vertices.data(),
-                 GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          (void*)offsetof(TexVertexData, pos));
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          (void*)offsetof(TexVertexData, tex_pos));
-    glEnableVertexAttribArray(1);
+    opengl::TItem triangle(std::move(vertices));
+    triangle.initialize();
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -85,30 +75,20 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
                     GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     auto frame = gen_frame(WIDTH, HEIGHT);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_FLOAT,
                  glm::value_ptr(*frame.data()));
-    glGenerateMipmap(GL_TEXTURE_2D);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-
-        glClearColor(0.2, 0.2, 0.2, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT);
+        opengl::Context::instance().draw_background();
 
         glBindTexture(GL_TEXTURE_2D, tex);
-
         glUseProgram(program);
-        glBindVertexArray(vao);
-
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        triangle.draw();
 
         glfwSwapBuffers(window);
     }
-
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
 
     glfwTerminate();
     return EXIT_SUCCESS;
