@@ -25,10 +25,10 @@ void Context::initialize(bool to_dump) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         std::terminate();
     }
-    glDebugMessageCallback(utils::gl_debug_output, nullptr);
-    glEnable(GL_MULTISAMPLE);
-    glEnable(GL_STENCIL_TEST);
-    glEnable(GL_DEPTH_TEST);
+    SAFE_CALL(glDebugMessageCallback(utils::gl_debug_output, nullptr));
+    SAFE_CALL(glEnable(GL_MULTISAMPLE));
+    SAFE_CALL(glEnable(GL_STENCIL_TEST));
+    SAFE_CALL(glEnable(GL_DEPTH_TEST));
 
     if (to_dump) { dump(); }
 }
@@ -56,7 +56,7 @@ void Context::dump() const {
 }
 
 void Context::viewport(int width, int height) const {
-    glViewport(0, 0, width, height);
+    SAFE_CALL(glViewport(0, 0, width, height));
 }
 
 void Context::background(const glm::vec4& color) {
@@ -64,8 +64,13 @@ void Context::background(const glm::vec4& color) {
 }
 
 void Context::draw_background() const {
-    glClearColor(_background.r, _background.g, _background.b, _background.a);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    SAFE_CALL(glClearColor(_background.r,
+                           _background.g,
+                           _background.b,
+                           _background.a));
+    SAFE_CALL(glClear(GL_COLOR_BUFFER_BIT |
+                      GL_DEPTH_BUFFER_BIT |
+                      GL_STENCIL_BUFFER_BIT));
 }
 
 GLint Context::active_program() const { return get(GL_CURRENT_PROGRAM); }
