@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <glad/glad.h>
+
 #include "opengl_utils.hpp"
 
 

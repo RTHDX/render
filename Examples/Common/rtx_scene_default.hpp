@@ -3,7 +3,7 @@
 #include <vector>
 
 #include <RTX/rtx.hpp>
-#include <OpenGL/opengl.hpp>
+//#include <OpenGL/opengl.hpp>
 #include <RTX/utils.hpp>
 #include <RTX/rtx_internal.hpp>
 

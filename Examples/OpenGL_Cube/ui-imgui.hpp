@@ -6,8 +6,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include <OpenGL/opengl.hpp>
-
 
 auto& init_imgui(GLFWwindow* window, const char* glsl_version) {
     IMGUI_CHECKVERSION();

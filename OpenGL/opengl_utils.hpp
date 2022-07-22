@@ -4,7 +4,6 @@
 
 #include <glad/glad.h>
 
-
 namespace opengl::utils {
 
 void APIENTRY gl_debug_output(GLenum source, GLenum type, unsigned int id,

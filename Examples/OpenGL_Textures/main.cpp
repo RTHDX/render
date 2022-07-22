@@ -6,10 +6,14 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <UI/ui.hpp>
+
 #include <OpenGL/opengl.hpp>
-#include <OpenGL/camera.hpp>
 #include <OpenGL/opengl_utils.hpp>
-#include <OpenGL/item.hpp>
+#include <OpenGL/opengl_proc.hpp>
+#include <OpenGL/opengl_vertex_input.hpp>
+
+using VertexData = opengl::vec3pos_vec2tex_t;
+using VertexAttrib = opengl::VertexAttribCommand<VertexData>;
 
 int WIDTH = 1280;
 int HEIGHT = 860;
@@ -32,11 +36,19 @@ struct TexVertexData {
 };
 
 
-auto create_camera() {
-    return opengl::Camera {(float)WIDTH, (float)HEIGHT,
-        glm::radians(45.0),
-        {10, 10, 10}
-    };
+GLuint create_texture() {
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                    GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    auto frame = gen_frame(WIDTH, HEIGHT);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_FLOAT,
+                 glm::value_ptr(*frame.data()));
+    return tex;
 }
 
 
@@ -54,41 +66,47 @@ int main() {
         std::filesystem::path("./fragment_shader.frag")
     );
 
-    glm::vec3 normal {0.0, 0.0, 1.0};
-    std::vector<opengl::VertexTexData> vertices {
-        {.position{-1.0,  1.0, 0.0}, .normal=normal, .tex_pos={0, 1}},
-        {.position{ 1.0,  1.0, 0.0}, .normal=normal, .tex_pos={1, 1}},
-        {.position{ 1.0, -1.0, 0.0}, .normal=normal, .tex_pos={1, 0}},
+    std::vector<VertexData> vertices {
+        {.pos{-1.0,  1.0, 0.0}, .tex_pos={0, 1}},
+        {.pos{ 1.0,  1.0, 0.0}, .tex_pos={1, 1}},
+        {.pos{ 1.0, -1.0, 0.0}, .tex_pos={1, 0}},
 
-        {.position{-1.0,  1.0, 0.0}, .normal=normal, .tex_pos={0, 1}},
-        {.position{-1.0, -1.0, 0.0}, .normal=normal, .tex_pos={0, 0}},
-        {.position{1.0,  -1.0, 0.0}, .normal=normal, .tex_pos={1, 0}}
+        {.pos{-1.0,  1.0, 0.0}, .tex_pos={0, 1}},
+        {.pos{-1.0, -1.0, 0.0}, .tex_pos={0, 0}},
+        {.pos{1.0,  -1.0, 0.0}, .tex_pos={1, 0}}
     };
-    opengl::TItem triangle(std::move(vertices));
-    triangle.initialize();
+    auto vao = opengl::gen_vertex_array();
+    auto pos_vbo = opengl::gen_vertex_buffers();
+    auto tex_vbo = opengl::gen_vertex_buffers();
+    opengl::bind_vao(vao);
+    opengl::bind_vbo<VertexData>(pos_vbo, vertices);
+    opengl::bind_vbo<VertexData>(tex_vbo, vertices);
+    opengl::do_vertex_attrib_cmds<VertexData>(vao, {
+        {.index=0, .stride=3, .offset=(void*)offsetof(VertexData, pos)},
+        {.index=1, .stride=2, .offset=(void*)offsetof(VertexData, tex_pos)}
+    });
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    auto frame = gen_frame(WIDTH, HEIGHT);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB, GL_FLOAT,
-                 glm::value_ptr(*frame.data()));
+    GLuint tex = create_texture();
 
+    opengl::DrawArrayCommand draw_cmd{
+        .vao = vao,
+        .count = vertices.size()
+    };
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
 
         glBindTexture(GL_TEXTURE_2D, tex);
         glUseProgram(program);
-        triangle.draw();
+
+        opengl::draw(draw_cmd);
 
         glfwSwapBuffers(window);
     }
+
+    opengl::free_vertex_array(vao);
+    opengl::free_vertex_buffer(pos_vbo);
+    opengl::free_vertex_buffer(tex_vbo);
 
     glfwTerminate();
     return EXIT_SUCCESS;

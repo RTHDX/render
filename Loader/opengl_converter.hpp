@@ -1,25 +1,22 @@
 #pragma once
 
-#include <OpenGL/item.hpp>
+#include <OpenGL/opengl_vertex_input.hpp>
 
 #include "visitor.hpp"
 #include "loader.hpp"
 
 namespace loader {
+using Vertices = std::vector<opengl::vec3pos_vec3norm_t>;
 
 class Converter {
 public:
     Converter() = default;
     ~Converter() = default;
 
-    std::vector<opengl::Item> read(const std::string path);
+    std::vector<Vertices> read(const std::string path);
 
     void visit(const Face& face);
-    opengl::Item convert(const Mesh& mesh);
-
-private:
-    opengl::Coordinates convert_vertices(const Mesh& mesh) const;
-    opengl::Coordinates convert_normals(const Mesh& mesh) const;
+    Vertices convert(const Mesh& mesh);
 
 private:
     Loader loader;

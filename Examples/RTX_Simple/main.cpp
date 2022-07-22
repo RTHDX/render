@@ -11,7 +11,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <UI/ui.hpp>
-#include <OpenGL/opengl.hpp>
+#include <OpenGL/opengl_proc.hpp>
 
 #include "rtx.hpp"
 
@@ -73,7 +73,7 @@ rtx::Sphere make_ground(const rtx::Material& material, float radius) {
 int main() {
     if (!ui::init_glfw_lite()) { return EXIT_FAILURE; }
     auto* window = ui::create_window(rtx::WIDTH, rtx::HEIGHT, "RTX Simple");
-    glfwSetFramebufferSizeCallback(window, opengl::framebuffer_size_callback);
+    //glfwSetFramebufferSizeCallback(window, opengl::framebuffer_size_callback);
 
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();

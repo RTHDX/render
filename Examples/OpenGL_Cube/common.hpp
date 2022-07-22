@@ -3,12 +3,9 @@
 #include <iostream>
 #include <filesystem>
 
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <UI/ui.hpp>
-#include <OpenGL/opengl.hpp>
-#include <OpenGL/item.hpp>
 #include <OpenGL/camera.hpp>
 #include <OpenGL/opengl_utils.hpp>
 #include <Loader/opengl_converter.hpp>
@@ -21,7 +18,6 @@ const unsigned int HEIGHT = 960;
 
 auto read_cube() {
     auto items = loader::Converter().read("./cube.obj");
-    for (auto& item : items) { item.initialize(); }
     return items;
 }
 
@@ -56,17 +52,4 @@ void init_io(GLFWwindow* window) {
     glfwSetMouseButtonCallback(window, on_mouse_pressed);
     glfwSetScrollCallback(window, on_scrolled);
     glfwSetDropCallback(window, on_dropped);
-}
-
-auto create_program() {
-    const std::filesystem::path vertex_path(R"(.\vertex_shader.vert)");
-    const std::filesystem::path fragment_path(R"(.\fragment_shader.frag)");
-    opengl::Program program("cube");
-    auto vertex_shader_src = opengl::utils::read_shader(vertex_path);
-    auto fragment_shader_src = opengl::utils::read_shader(fragment_path);
-    program.attach_shader(GL_VERTEX_SHADER, vertex_shader_src);
-    program.attach_shader(GL_FRAGMENT_SHADER, fragment_shader_src);
-    program.link_program();
-
-    return program;
 }

@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <OpenGL/opengl.hpp>
+//#include <OpenGL/opengl.hpp>
 #include <UI/ui.hpp>
 #include <UI/property.hpp>
 #include <RTX/rtx.hpp>

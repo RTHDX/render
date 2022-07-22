@@ -5,18 +5,13 @@ project(OpenGL)
 create_library(
     TARGET ${PROJECT_NAME}
     SOURCES
-        opengl.cpp
         opengl_utils.cpp
-        item.cpp
         camera.hpp
-        model.cpp
-        operators.cpp
+        opengl_proc.cpp
+        opengl_context.cpp
     HEADERS
-        opengl.hpp
         opengl_utils.hpp
-        item.hpp
         camera.cpp
-        model.hpp
-        operators.hpp
+        opengl_proc.hpp
     LIBS UI
 )

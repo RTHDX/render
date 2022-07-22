@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <UI/ui.hpp>
-#include <OpenGL/opengl.hpp>
+#include <OpenGL/opengl_proc.hpp>
 #include <UI/io.hpp>
 
 #include <glad/glad.h>

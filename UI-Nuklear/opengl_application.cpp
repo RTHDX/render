@@ -1,5 +1,6 @@
 #include <UI/ui.hpp>
-#include <OpenGL/opengl.hpp>
+#include <OpenGL/opengl_proc.hpp>
+#include <GLFW/glfw3.h>
 
 #include "opengl_application.hpp"
 

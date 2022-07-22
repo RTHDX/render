@@ -523,7 +523,8 @@ void MtlBuilder::visit(const loader::Ks_AST& ast) {
 }
 
 void MtlBuilder::visit(const loader::Ke_AST& ast) {
-    std::cerr << "IMPLMENT ME " << __PRETTY_FUNCTION__ << std::endl;
+    std::cerr << "IMPLMENT ME " <<
+                 "MtlBuilder::visit(const loader::Ke_AST& ast)" << std::endl;
 }
 
 void MtlBuilder::visit(const loader::Ns_AST& ast) {
@@ -555,7 +556,8 @@ void MtlBuilder::visit(const loader::Illm_AST& ast) {
 }
 
 void MtlBuilder::visit(const loader::MapKd_AST& ast) {
-    std::cerr << "IMPLEMNT ME " << __PRETTY_FUNCTION__ << std::endl;
+    std::cerr << "IMPLEMNT ME " <<
+                 "MtlBuilder::visit(const loader::MapKd_AST& ast)" << std::endl;
 }
 
 void MtlBuilder::visit(const loader::Mtl_AST& ast) {

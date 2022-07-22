@@ -7,7 +7,7 @@
 #include <nuklear_glfw_gl4.h>
 
 #include <UI/ui.hpp>
-#include <OpenGL/opengl.hpp>
+#include <OpenGL/opengl_proc.hpp>
 #include <UI/io.hpp>
 
 #include "nuklear_widgets.hpp"

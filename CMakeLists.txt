@@ -45,7 +45,7 @@ add_library(ImGui STATIC
 add_subdirectory(UI)
 add_subdirectory(OpenGL)
 add_subdirectory(3rdParty/Nuklear/demo/glfw_opengl4)
-add_subdirectory(UI-Nuklear)
+#add_subdirectory(UI-Nuklear)
 add_subdirectory(RTX)
 add_subdirectory(Loader)
 add_subdirectory(Examples)
