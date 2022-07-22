@@ -47,6 +47,7 @@ GLuint create_program(const std::filesystem::path& vertex_path,
                       const std::filesystem::path& fragment_path);
 GLuint create_program(const std::string& vertex_shader,
                       const std::string& fragment_shader);
+void free_program(GLuint id);
 
 bool check_shader(GLuint id);
 bool check_program(GLuint id);

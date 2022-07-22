@@ -7,7 +7,6 @@
 
 #include <UI/ui.hpp>
 
-#include <OpenGL/opengl.hpp>
 #include <OpenGL/opengl_utils.hpp>
 #include <OpenGL/opengl_proc.hpp>
 #include <OpenGL/opengl_vertex_input.hpp>
@@ -81,25 +80,21 @@ int main() {
     opengl::bind_vao(vao);
     opengl::bind_vbo<VertexData>(pos_vbo, vertices);
     opengl::bind_vbo<VertexData>(tex_vbo, vertices);
-    opengl::do_vertex_attrib_cmds<VertexData>(vao, {
+    opengl::do_vertex_attrib_cmds<VertexData>(
+    {
         {.index=0, .stride=3, .offset=(void*)offsetof(VertexData, pos)},
         {.index=1, .stride=2, .offset=(void*)offsetof(VertexData, tex_pos)}
     });
 
     GLuint tex = create_texture();
 
-    opengl::DrawArrayCommand draw_cmd{
-        .vao = vao,
-        .count = vertices.size()
-    };
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
 
         glBindTexture(GL_TEXTURE_2D, tex);
-        glUseProgram(program);
-
-        opengl::draw(draw_cmd);
+        opengl::use(program);
+        opengl::draw({.vao = vao, .count = vertices.size()});
 
         glfwSwapBuffers(window);
     }
@@ -107,6 +102,7 @@ int main() {
     opengl::free_vertex_array(vao);
     opengl::free_vertex_buffer(pos_vbo);
     opengl::free_vertex_buffer(tex_vbo);
+    opengl::free_program(program);
 
     glfwTerminate();
     return EXIT_SUCCESS;
