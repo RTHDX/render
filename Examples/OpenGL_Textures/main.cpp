@@ -35,10 +35,11 @@ std::vector<glm::vec3> gen_frame(size_t width, size_t height,
 }
 
 glm::vec3 make_color(float radians) {
+    constexpr float shift = 0.01;
     return {
-        sin(radians),
-        cos(radians),
-        sin(radians)
+        std::fabs(sin(radians + shift)),
+        std::fabs(sin(radians + 2 * shift)),
+        std::fabs(sin(radians + 3 * shift))
     };
 }
 
