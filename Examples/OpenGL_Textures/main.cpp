@@ -18,41 +18,28 @@ int WIDTH = 1280;
 int HEIGHT = 860;
 
 
-std::vector<glm::vec3> gen_frame(size_t width, size_t height) {
+std::vector<glm::vec3> gen_frame(size_t width, size_t height,
+                                 const glm::vec3& color={}) {
     std::vector<glm::vec3> out(width * height);
     for (size_t h_pos = 0; h_pos < height; ++h_pos) {
         for (size_t w_pos = 0; w_pos < width; ++w_pos) {
             const size_t i = h_pos * width + w_pos;
             if (i % 2 == 0) {
-                out[i] = {.5, .9, .5};
+                out[i] = color == glm::vec3{} ? glm::vec3{.5, .9, .5} : color;
             } else {
-                out[i] = {.9, .5, .5};
+                out[i] = color == glm::vec3{} ? glm::vec3{.9, .5, .5} : color;
             }
         }
     }
     return out;
 }
 
-struct TexVertexData {
-    glm::vec3 pos;
-    glm::vec2 tex_pos;
-};
-
-
-GLuint create_texture() {
-    GLuint tex;
-    SAFE_CALL(glGenTextures(1, &tex));
-    SAFE_CALL(glBindTexture(GL_TEXTURE_2D, tex));
-    SAFE_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-    SAFE_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-    SAFE_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                              GL_LINEAR_MIPMAP_LINEAR));
-    SAFE_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-    auto frame = gen_frame(WIDTH, HEIGHT);
-    SAFE_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH, HEIGHT, 0, GL_RGB,
-                           GL_FLOAT, glm::value_ptr(*frame.data())));
-    SAFE_CALL(glGenerateMipmap(GL_TEXTURE_2D));
-    return tex;
+glm::vec3 make_color(float radians) {
+    return {
+        sin(radians),
+        cos(radians),
+        sin(radians)
+    };
 }
 
 
@@ -92,13 +79,19 @@ int main() {
         {.index=1, .stride=2, .offset=(void*)offsetof(VertexData, tex_pos)}
     });
 
-    GLuint tex = create_texture();
+    auto tex = opengl::gen_texture();
 
+    float radians = 0.0;
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
 
-        glBindTexture(GL_TEXTURE_2D, tex);
+        opengl::bind_texture(
+            {WIDTH, HEIGHT},
+            std::move(gen_frame(WIDTH, HEIGHT, make_color(radians)))
+        );
+        radians += 0.01;
+        opengl::activate_texture(tex);
         opengl::use(program);
         opengl::draw({.vao = vao, .count = vertices.size()});
 

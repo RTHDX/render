@@ -26,6 +26,7 @@ public:
 
     GLint active_program() const;
     GLint bound_vao() const;
+    GLint bound_texture_2d() const;
 
 private:
     Context() = default;
@@ -97,6 +98,12 @@ inline void do_vertex_attrib_cmds(std::vector<VertexAttribCommand<T>>&& cmds) {
         set_vertex_attrib<T>(command);
     }
 }
+
+GLuint gen_texture();
+void bind_texture(const glm::ivec2& dims,
+                  std::vector<glm::vec3>&& texture);
+void activate_texture(GLuint id);
+void free_texture(GLuint id);
 
 void use(GLuint id);
 
