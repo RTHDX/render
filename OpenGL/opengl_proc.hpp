@@ -83,7 +83,7 @@ inline void bind_pbo(GLuint id, const std::vector<T>& in) {
     const T* data = in.data();
     const size_t width = in.size() * sizeof (T);
     SAFE_CALL(glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, id));
-    SAFE_CALL(glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, size, data,
+    SAFE_CALL(glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, width, data,
                            GL_DYNAMIC_DRAW));
 }
 
