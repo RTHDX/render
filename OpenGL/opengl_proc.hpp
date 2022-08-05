@@ -64,6 +64,11 @@ GLuint gen_vertex_buffers();
 void free_vertex_buffers(const std::vector<GLuint>& in);
 void free_vertex_buffer(GLuint id);
 
+std::vector<GLuint> gen_pixel_buffers(size_t count);
+GLuint gen_pixel_buffers();
+void free_pixel_buffers(const std::vector<GLuint>& id);
+void free_pixel_buffer(GLuint id);
+
 template <typename T>
 inline void bind_vbo(GLuint id, const std::vector<T>& in) {
     assert(Context::instance().bound_vao() > 0);
@@ -71,6 +76,15 @@ inline void bind_vbo(GLuint id, const std::vector<T>& in) {
     const size_t width = in.size() * sizeof (T);
     SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, id));
     SAFE_CALL(glBufferData(GL_ARRAY_BUFFER, width, data, GL_STATIC_DRAW));
+}
+
+template <typename T>
+inline void bind_pbo(GLuint id, const std::vector<T>& in) {
+    const T* data = in.data();
+    const size_t width = in.size() * sizeof (T);
+    SAFE_CALL(glBindBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, id));
+    SAFE_CALL(glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB, size, data,
+                           GL_DYNAMIC_DRAW));
 }
 
 template <typename T> struct VertexAttribCommand {

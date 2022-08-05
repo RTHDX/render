@@ -152,6 +152,27 @@ void free_vertex_buffer(GLuint id) {
 }
 
 
+std::vector<GLuint> gen_pixel_buffers(size_t count) {
+    std::vector<GLuint> out(count);
+    SAFE_CALL(glGenBuffers(count, out.data()));
+    return out;
+}
+
+GLuint gen_pixel_buffers() {
+    GLuint id;
+    SAFE_CALL(glGenBuffers(1, &id));
+    return id;
+}
+
+void free_pixel_buffers(const std::vector<GLuint>& in) {
+    SAFE_CALL(glDeleteVertexArrays(in.size(), in.data()));
+}
+
+void free_pixel_buffer(GLuint id) {
+    SAFE_CALL(glDeleteVertexArrays(1, &id));
+}
+
+
 void bind_vao(GLuint id) {
     SAFE_CALL(glBindVertexArray(id));
 }

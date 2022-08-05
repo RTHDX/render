@@ -7,6 +7,8 @@ add_subdirectory(OpenGL_SingleTriangle)
 add_subdirectory(OpenGL_MultipleTriangle)
 add_subdirectory(OpenGL_Cube)
 add_subdirectory(OpenGL_Textures)
+add_subdirectory(OpenGL_Life)
+add_subdirectory(OpenGL_SpriteAnimation)
 
 #add_subdirectory(RTX_Simple)
 #add_subdirectory(RTX_Simple_2)

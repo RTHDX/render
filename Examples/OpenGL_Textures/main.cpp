@@ -6,7 +6,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <UI/ui.hpp>
-
 #include <OpenGL/opengl_utils.hpp>
 #include <OpenGL/opengl_proc.hpp>
 #include <OpenGL/opengl_vertex_input.hpp>

@@ -19,3 +19,6 @@
 [submodule "3rdParty/parselib"]
 	path = 3rdParty/parselib
 	url = https://github.com/RTHDX/parselib.git
+[submodule "3rdParty/stb"]
+	path = 3rdParty/stb
+	url = https://github.com/nothings/stb.git
