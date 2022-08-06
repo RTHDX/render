@@ -17,9 +17,9 @@ create_test_executable(
     LIBS "OpenGL-Loader"
 )
 
-create_test_executable(
-    TARGET "Loader-Test-mtl_parser"
-    SOURCES mtl_parser_test.cpp
-    HEADERS
-    LIBS "OpenGL-Loader"
-)
+#create_test_executable(
+#    TARGET "Loader-Test-mtl_parser"
+#    SOURCES mtl_parser_test.cpp
+#    HEADERS
+#    LIBS "OpenGL-Loader"
+#)

@@ -24,6 +24,9 @@ bool init_glfw_lite() {
     return result == GLFW_TRUE;
 }
 
+void unload_glfw() {
+    glfwTerminate();
+}
 
 GLFWwindow* create_window(int width, int height, const char* title,
                           bool fullstreen) {

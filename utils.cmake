@@ -26,7 +26,6 @@ function (create_executable)
     add_executable(${THIS_TARGET} ${THIS_HEADERS} ${THIS_SOURCES})
     target_include_directories(${THIS_TARGET} PRIVATE
                                ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
-    message("----------------------> ${OPENGL_LIBRARIES}")
     target_link_libraries(${THIS_TARGET} PRIVATE
                           ${OPENGL_LIBRARIES}
                           glfw

@@ -17,14 +17,14 @@ create_library(
         mesh.cpp
         opengl_converter.cpp
         material.cpp
-        mtl_parser.cpp
+        #mtl_parser.cpp
     HEADERS
         loader.hpp
         mesh.hpp
         opengl_converter.hpp
         material.hpp
         visitor.hpp
-        mtl_parser.hpp
+        #mtl_parser.hpp
     LIBS OpenGL parselib
 )
 

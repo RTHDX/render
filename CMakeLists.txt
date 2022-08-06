@@ -44,7 +44,10 @@ add_subdirectory(UI)
 add_subdirectory(OpenGL)
 add_subdirectory(RTX)
 add_subdirectory(Loader)
-add_subdirectory(Examples)
+option(RENDER_ENABLE_EXAMPLES OFF)
+if (${RENDER_ENAMBLE_EXAMPLES})
+    add_subdirectory(Examples)
+endif()
 
 
 if (${RENDER_ENABLE_TESTING})
