@@ -24,15 +24,14 @@ using byte_t = unsigned char;
 using VertexData = opengl::vec3pos_vec3norm_vec2tex_t;
 
 std::vector<VertexData> create_square() {
-    glm::vec3 norm(0.0, 0.0, 1.0);
     return {
-        {.pos{-1.0, 1.0,  0.0}, .norm=norm, .tex_pos{0, 1}},
-        {.pos{ 1.0, 1.0,  0.0}, .norm=norm, .tex_pos{1, 1}},
-        {.pos{ 1.0, -1.0, 0.0}, .norm=norm, .tex_pos{1, 0}},
+        {{-1.0, 1.0,  0.0}, {0.0, 0.0, 1.0}, {0, 1}},
+        {{ 1.0, 1.0,  0.0}, {0.0, 0.0, 1.0}, {1, 1}},
+        {{ 1.0, -1.0, 0.0}, {0.0, 0.0, 1.0}, {1, 0}},
 
-        {.pos{-1.0,  1.0, 0.0}, .norm=norm, .tex_pos{0, 1}},
-        {.pos{-1.0, -1.0, 0.0}, .norm=norm, .tex_pos{0, 0}},
-        {.pos{1.0,  -1.0, 0.0}, .norm=norm, .tex_pos{1, 0}}
+        {{-1.0,  1.0, 0.0}, {0.0, 0.0, 1.0}, {0, 1}},
+        {{-1.0, -1.0, 0.0}, {0.0, 0.0, 1.0}, {0, 0}},
+        {{1.0,  -1.0, 0.0}, {0.0, 0.0, 1.0}, {1, 0}}
     };
 }
 
@@ -60,11 +59,7 @@ int main() {
     opengl::bind_vbo<VertexData>(pos_vbo, vertices);
     opengl::bind_vbo<VertexData>(norm_vbo, vertices);
     opengl::bind_vbo<VertexData>(tex_vbo, vertices);
-    opengl::do_vertex_attrib_cmds<VertexData>({
-        {.index=0, .stride=3, .offset=(void*)offsetof(VertexData, pos)},
-        {.index=1, .stride=3, .offset=(void*)offsetof(VertexData, norm)},
-        {.index=2, .stride=2, .offset=(void*)offsetof(VertexData, tex_pos)}
-    });
+    opengl::do_vertex_attrib_cmds(std::move(VertexData::commands()));
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

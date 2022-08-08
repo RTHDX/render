@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 
+#include "comands.hpp"
 
 namespace opengl {
 
@@ -87,14 +88,6 @@ inline void bind_pbo(GLuint id, const std::vector<T>& in) {
                            GL_DYNAMIC_DRAW));
 }
 
-template <typename T> struct VertexAttribCommand {
-    GLuint index;
-    GLuint stride;
-    void* offset;
-
-    size_t width = sizeof(T);
-};
-
 void bind_vao(GLuint id);
 
 template<typename T>
@@ -104,12 +97,15 @@ inline void set_vertex_attrib(const VertexAttribCommand<T>& cmd) {
                                     cmd.width, cmd.offset));
 }
 
-template<typename T>
-inline void do_vertex_attrib_cmds(std::vector<VertexAttribCommand<T>>&& cmds) {
+
+template <typename Iterable>
+inline void do_vertex_attrib_cmds(Iterable&& comands) {
     assert(Context::instance().bound_vao() > 0);
 
-    for (const auto& command : cmds) {
-        set_vertex_attrib<T>(command);
+    for (const auto& cmd : comands) {
+        SAFE_CALL(glEnableVertexAttribArray(cmd.index));
+        SAFE_CALL(glVertexAttribPointer(cmd.index, cmd.stride, GL_FLOAT,
+                                        GL_FALSE, cmd.width, cmd.offset));
     }
 }
 
@@ -121,16 +117,7 @@ void free_texture(GLuint id);
 
 void use(GLuint id);
 
-struct DrawArrayCommand {
-    GLuint vao;
-    size_t count;
-    size_t first = 0;
-    GLenum mode = GL_TRIANGLES;
-};
-
-
 void draw(DrawArrayCommand&& cmd);
-
 
 bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);

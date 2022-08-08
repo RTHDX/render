@@ -112,10 +112,7 @@ int main() {
         opengl::bind_vao(vaos[i]);
         opengl::bind_vbo<VertexData>(pos_vbo[i], scene.objects[i]);
         opengl::bind_vbo<VertexData>(norm_vbo[i], scene.objects[i]);
-        opengl::do_vertex_attrib_cmds<VertexData>(
-            {{.index=0, .stride=3, .offset=(void*)offsetof(VertexData, pos)},
-             {.index=1, .stride=3, .offset=(void*)offsetof(VertexData, normal)}}
-        );
+        opengl::do_vertex_attrib_cmds(std::move(VertexData::commands()));
         opengl::bind_vao(0);
     }
 

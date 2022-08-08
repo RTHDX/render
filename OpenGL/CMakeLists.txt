@@ -9,9 +9,11 @@ create_library(
         camera.hpp
         opengl_proc.cpp
         opengl_context.cpp
+        opengl_vertex_input.cpp
     HEADERS
         opengl_utils.hpp
         camera.cpp
         opengl_proc.hpp
+        opengl_vertex_input.hpp
     LIBS UI
 )

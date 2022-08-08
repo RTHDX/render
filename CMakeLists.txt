@@ -45,7 +45,7 @@ add_subdirectory(OpenGL)
 add_subdirectory(RTX)
 add_subdirectory(Loader)
 option(RENDER_ENABLE_EXAMPLES OFF)
-if (${RENDER_ENAMBLE_EXAMPLES})
+if (${RENDER_ENABLE_EXAMPLES})
     add_subdirectory(Examples)
 endif()
 

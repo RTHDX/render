@@ -59,13 +59,13 @@ int main() {
     );
 
     std::vector<VertexData> vertices {
-        {.pos{-1.0,  1.0, 0.0}, .tex_pos={0, 1}},
-        {.pos{ 1.0,  1.0, 0.0}, .tex_pos={1, 1}},
-        {.pos{ 1.0, -1.0, 0.0}, .tex_pos={1, 0}},
+        {glm::vec3{-1.0,  1.0, 0.0}, glm::vec2{0, 1}},
+        {glm::vec3{ 1.0,  1.0, 0.0}, glm::vec2{1, 1}},
+        {glm::vec3{ 1.0, -1.0, 0.0}, glm::vec2{1, 0}},
 
-        {.pos{-1.0,  1.0, 0.0}, .tex_pos={0, 1}},
-        {.pos{-1.0, -1.0, 0.0}, .tex_pos={0, 0}},
-        {.pos{1.0,  -1.0, 0.0}, .tex_pos={1, 0}}
+        {glm::vec3{-1.0,  1.0, 0.0}, glm::vec2{0, 1}},
+        {glm::vec3{-1.0, -1.0, 0.0}, glm::vec2{0, 0}},
+        {glm::vec3{1.0,  -1.0, 0.0}, glm::vec2{1, 0}}
     };
     auto vao = opengl::gen_vertex_array();
     auto pos_vbo = opengl::gen_vertex_buffers();
@@ -73,11 +73,7 @@ int main() {
     opengl::bind_vao(vao);
     opengl::bind_vbo<VertexData>(pos_vbo, vertices);
     opengl::bind_vbo<VertexData>(tex_vbo, vertices);
-    opengl::do_vertex_attrib_cmds<VertexData>(
-    {
-        {.index=0, .stride=3, .offset=(void*)offsetof(VertexData, pos)},
-        {.index=1, .stride=2, .offset=(void*)offsetof(VertexData, tex_pos)}
-    });
+    opengl::do_vertex_attrib_cmds(std::move(VertexData::commands()));
 
     auto tex = opengl::gen_texture();
 
