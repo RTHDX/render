@@ -7,6 +7,21 @@
 
 namespace opengl {
 
+struct vec3pos {
+    using vertex_attrib_t = VertexAttribCommand<vec3pos>;
+    using commands_t = std::vector<vertex_attrib_t>;
+    using this_t = vec3pos;
+
+    glm::vec3 pos;
+
+public:
+    vec3pos() = default;
+    vec3pos(glm::vec3&& p);
+
+    static commands_t commands();
+    static void bind(const std::vector<vec3pos>& buffer);
+};
+
 struct vec3pos_vec3norm_t {
     using vertex_attrib_t = VertexAttribCommand<vec3pos_vec3norm_t>;
     using commands_t = std::vector<vertex_attrib_t>;

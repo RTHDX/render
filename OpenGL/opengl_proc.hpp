@@ -11,6 +11,7 @@
 #include "comands.hpp"
 
 namespace opengl {
+using byte_t = unsigned char;
 
 class Context {
 public:
@@ -112,6 +113,8 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
 GLuint gen_texture();
 void bind_texture(const glm::ivec2& dims,
                   std::vector<glm::vec3>&& texture);
+void bind_texture(const glm::ivec2& dims,
+                  byte_t* texture);
 void activate_texture(GLuint id);
 void free_texture(GLuint id);
 

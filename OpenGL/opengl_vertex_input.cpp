@@ -3,6 +3,16 @@
 
 namespace opengl {
 
+vec3pos::vec3pos(glm::vec3&& p)
+    : pos(std::move(p))
+{}
+
+vec3pos::commands_t vec3pos::commands() {
+    return {
+        {.index=0, .stride=3, .offset=(void*)offsetof(this_t, pos)}
+    };
+}
+
 vec3pos_vec3norm_t::vec3pos_vec3norm_t(glm::vec3&& p, glm::vec3&& n)
     : pos(std::move(p))
     , normal(std::move(n))

@@ -12,6 +12,12 @@ template <typename T> struct VertexAttribCommand {
     size_t width = sizeof(T);
 };
 
+struct TextureBindCommand {
+    GLenum target;
+    GLenum feature;
+    GLenum value;
+};
+
 struct DrawArrayCommand {
     GLuint vao;
     size_t count;
