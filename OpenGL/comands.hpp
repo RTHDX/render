@@ -25,4 +25,12 @@ struct DrawArrayCommand {
     GLenum mode = GL_TRIANGLES;
 };
 
+struct DrawElementsCommand {
+    GLuint vao;
+    size_t count;
+    size_t* indices = nullptr;
+    GLenum type = GL_UNSIGNED_INT;
+    GLenum mode = GL_TRIANGLES;
+};
+
 }

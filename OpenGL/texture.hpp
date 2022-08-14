@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include <glad/glad.h>
 
 namespace opengl {
@@ -10,6 +12,7 @@ struct Texture {
     int height = 0;
     int depth = 0;
     byte_t* buffer = nullptr;
+    std::string path;
 
     GLuint id = 0;
 
@@ -17,6 +20,7 @@ public:
     Texture(const char* filepath);
     ~Texture();
 
+    bool read();
     size_t size() const { return width * height * depth; }
 };
 

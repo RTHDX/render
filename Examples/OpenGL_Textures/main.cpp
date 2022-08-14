@@ -89,7 +89,9 @@ int main() {
         radians += 0.01;
         opengl::activate_texture(tex);
         opengl::use(program);
-        opengl::draw({.vao = vao, .count = vertices.size()});
+        opengl::draw(
+            opengl::DrawArrayCommand{.vao = vao, .count = vertices.size()}
+        );
 
         glfwSwapBuffers(window);
     }

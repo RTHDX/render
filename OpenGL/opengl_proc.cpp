@@ -131,6 +131,28 @@ void free_vertex_array(GLuint id) {
 }
 
 
+std::vector<GLuint> gen_element_buffers(size_t count) {
+    std::vector<GLuint> out(count);
+    SAFE_CALL(glGenBuffers(count, out.data()));
+    return out;
+}
+
+GLuint gen_element_buffer() {
+    GLuint out;
+    SAFE_CALL(glGenBuffers(1, &out));
+    return out;
+}
+
+void free_element_buffers(std::vector<GLuint>& in) {
+    SAFE_CALL(glDeleteBuffers(in.size(), in.data()));
+    in.clear();
+}
+
+void free_element_buffer(GLuint id) {
+    SAFE_CALL(glDeleteBuffers(1, &id));
+}
+
+
 std::vector<GLuint> gen_vertex_buffers(size_t count) {
     std::vector<GLuint> out(count);
     SAFE_CALL(glGenBuffers(count, out.data()));
@@ -224,6 +246,15 @@ void draw(DrawArrayCommand&& cmd) {
     assert(opengl::Context::instance().active_program() != 0);
     bind_vao(cmd.vao);
     SAFE_CALL(glDrawArrays(cmd.mode, cmd.first, cmd.count));
+    bind_vao(0);
+}
+
+void draw(DrawElementsCommand&& cmd) {
+    assert(cmd.vao != 0);
+    assert(opengl::Context::instance().active_program() != 0);
+
+    bind_vao(cmd.vao);
+    SAFE_CALL(glDrawElements(cmd.mode, cmd.count, cmd.type, cmd.indices));
     bind_vao(0);
 }
 

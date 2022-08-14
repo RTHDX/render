@@ -19,9 +19,10 @@ const std::filesystem::path fragment_path(R"(.\fragment_shader.frag)");
 const std::filesystem::path image_path(R"(.\hr-level1_running.png)");
 glm::vec4 background = { 0.5, 0.8, 0.8, 1.0 };
 
-using VertexData = opengl::vec3pos;
+void frame_preprocess(GLuint id);
+void frame_postprocess(auto* w);
 
-std::vector<VertexData> create_square_vec3() {
+std::vector<opengl::vec3pos> create_square_vec3() {
     return {
         {glm::vec3{-1.0,  1.0, 0.0}},
         {glm::vec3{ 1.0,  1.0, 0.0}},
@@ -30,6 +31,18 @@ std::vector<VertexData> create_square_vec3() {
         {glm::vec3{-1.0,  1.0, 0.0}},
         {glm::vec3{-1.0, -1.0, 0.0}},
         {glm::vec3{1.0,  -1.0, 0.0}}
+    };
+}
+
+std::vector<opengl::vec3pos_vec2tex_t> create_square_v3p_v2t() {
+    return {
+        {glm::vec3{-1.0,  1.0, 0.0}, glm::vec2{0, 1}},
+        {glm::vec3{ 1.0,  1.0, 0.0}, glm::vec2{1, 1}},
+        {glm::vec3{ 1.0, -1.0, 0.0}, glm::vec2{1, 0}},
+
+        {glm::vec3{-1.0,  1.0, 0.0}, glm::vec2{0, 1}},
+        {glm::vec3{-1.0, -1.0, 0.0}, glm::vec2{0, 0}},
+        {glm::vec3{1.0,  -1.0, 0.0}, glm::vec2{1, 0}}
     };
 }
 
@@ -44,33 +57,45 @@ int main() {
     opengl::Context::instance().background(background);
 
     auto program = opengl::create_program(vertex_path, fragment_path);
+    opengl::Texture texture("hr-level1_running.png");
+    if (texture.read()) {
+        texture.id = opengl::gen_texture();
+        opengl::bind_texture({WIDTH, HEIGHT}, texture.buffer);
+    }
 
-    GLuint vao = opengl::gen_vertex_array(),
-           pos_vbo = opengl::gen_vertex_buffers();
-           //norm_vbo = opengl::gen_vertex_buffers(),
-           //tex_vbo = opengl::gen_vertex_buffers();
-
-    auto vertices = create_square();
-
-    opengl::bind_vao(vao);
-    opengl::bind_vbo<VertexData>(pos_vbo, vertices);
-    opengl::do_vertex_attrib_cmds(std::move(VertexData::commands()));
+    GLuint vao = opengl::gen_vertex_array();
+    auto vertices = create_square_vec3();
+    auto buffers = decltype(vertices)::value_type::gen_buffers(vao, vertices);
 
     glm::mat4 projection(1.0);
     glm::mat4 view(1.0);
     glm::mat4 model(1.0);
     while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+        frame_preprocess(vao);
+
         opengl::Context::instance().draw_background();
         opengl::use(program);
+        opengl::activate_texture(texture.id);
         opengl::set_mat4(program, "projection", projection);
         opengl::set_mat4(program, "view", view);
         opengl::set_mat4(program, "model", model);
-        opengl::draw({.vao=vao, .count=vertices.size()});
+        opengl::draw(opengl::DrawArrayCommand{.vao=vao, .count=vertices.size()});
 
-        glfwSwapBuffers(window);
+        frame_postprocess(window);
     }
 
+    opengl::free_vertex_buffers(buffers);
+    opengl::free_vertex_array(vao);
     glfwTerminate();
     return 0;
+}
+
+void frame_preprocess(GLuint id) {
+    opengl::bind_vao(id);
+    glfwPollEvents();
+}
+
+void frame_postprocess(auto* w) {
+    glfwSwapBuffers(w);
+    opengl::bind_vao(0);
 }

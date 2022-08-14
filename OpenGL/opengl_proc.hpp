@@ -61,6 +61,11 @@ GLuint gen_vertex_array();
 void free_vertex_array(const std::vector<GLuint>& in);
 void free_vertex_array(GLuint id);
 
+std::vector<GLuint> gen_element_buffers(size_t count);
+GLuint gen_element_buffer();
+void free_element_buffers(std::vector<GLuint>& in);
+void free_element_buffer(GLuint id);
+
 std::vector<GLuint> gen_vertex_buffers(size_t count);
 GLuint gen_vertex_buffers();
 void free_vertex_buffers(const std::vector<GLuint>& in);
@@ -78,6 +83,15 @@ inline void bind_vbo(GLuint id, const std::vector<T>& in) {
     const size_t width = in.size() * sizeof (T);
     SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, id));
     SAFE_CALL(glBufferData(GL_ARRAY_BUFFER, width, data, GL_STATIC_DRAW));
+}
+
+template <typename T>
+inline void bind_ebo(GLuint id, const std::vector<T>& in) {
+    assert(Context::instance().bound_vao() > 0);
+    const T* data = in.data();
+    const size_t width = in.size() * sizeof(T);
+    SAFE_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id));
+    SAFE_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, width, data, GL_STATIC_DRAW));
 }
 
 template <typename T>
@@ -121,6 +135,7 @@ void free_texture(GLuint id);
 void use(GLuint id);
 
 void draw(DrawArrayCommand&& cmd);
+void draw(DrawElementsCommand&& cmd);
 
 bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);

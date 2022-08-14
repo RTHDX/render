@@ -130,7 +130,7 @@ int main() {
         opengl::set_mat4(program, "projection", scene.camera.projection());
         for (size_t i = 0; i < scene.objects.size(); ++i) {
             opengl::set_mat4(program, "model", model);
-            opengl::draw({
+            opengl::draw(opengl::DrawArrayCommand{
                 .vao=vaos[i],
                 .count=scene.objects[i].size()
             });
