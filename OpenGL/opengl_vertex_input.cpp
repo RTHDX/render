@@ -60,7 +60,7 @@ vec3pos_vec3norm_vec2tex_t::vec3pos_vec3norm_vec2tex_t(glm::vec3&& p,
 
 buffers_t vec3pos_vec3norm_vec2tex_t::gen_buffers(GLuint vao,
                                                   const this_in_t& in) {
-    auto buffers = gen_vertex_buffers(3);
+    auto buffers = gen_vertex_buffers(1);
     bind_vao(vao);
     for (GLuint id : buffers) {
         bind_vbo<this_t>(id, in);
@@ -87,11 +87,12 @@ vec3pos_vec2tex_t::vec3pos_vec2tex_t(glm::vec3&& p, glm::vec2&& t)
 
 buffers_t vec3pos_vec2tex_t::gen_buffers(GLuint vao,
                                          const std::vector<this_t>& in) {
-    auto buffers = gen_vertex_buffers(2);
+    auto buffers = gen_vertex_buffers(1);
     bind_vao(vao);
     for (GLuint id : buffers) {
         bind_vbo<this_t>(id, in);
     }
+    do_vertex_attrib_cmds(std::move(this_t::commands()));
     bind_vao(0);
     return buffers;
 }

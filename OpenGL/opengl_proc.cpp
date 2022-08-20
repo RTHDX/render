@@ -200,15 +200,10 @@ void bind_vao(GLuint id) {
 }
 
 
-GLuint gen_texture() {
+GLuint gen_texture(GLenum target) {
     GLuint tex;
     SAFE_CALL(glGenTextures(1, &tex));
-    SAFE_CALL(glBindTexture(GL_TEXTURE_2D, tex));
-    //SAFE_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-    //SAFE_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-    //SAFE_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    //                          GL_LINEAR_MIPMAP_LINEAR));
-    //SAFE_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    SAFE_CALL(glBindTexture(target, tex));
     return tex;
 }
 
@@ -222,9 +217,13 @@ void bind_texture(const glm::ivec2& dims, // x - width, y - height
 
 void bind_texture(const glm::ivec2& dims, byte_t* texture) {
     assert(Context::instance().bound_texture_2d() > 0);
-    SAFE_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, dims.x, dims.y, 0, GL_RGB,
+    SAFE_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dims.x, dims.y, 0, GL_RGBA,
                            GL_UNSIGNED_BYTE, texture));
     SAFE_CALL(glGenerateMipmap(GL_TEXTURE_2D));
+}
+
+void bind_texture(GLenum target, GLuint id) {
+    SAFE_CALL(glBindTexture(target, id));
 }
 
 void activate_texture(GLuint id) {

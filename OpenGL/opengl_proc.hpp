@@ -85,11 +85,10 @@ inline void bind_vbo(GLuint id, const std::vector<T>& in) {
     SAFE_CALL(glBufferData(GL_ARRAY_BUFFER, width, data, GL_STATIC_DRAW));
 }
 
-template <typename T>
-inline void bind_ebo(GLuint id, const std::vector<T>& in) {
+inline void bind_ebo(GLuint id, const std::vector<uint32_t>& in) {
     assert(Context::instance().bound_vao() > 0);
-    const T* data = in.data();
-    const size_t width = in.size() * sizeof(T);
+    const uint32_t* data = in.data();
+    const size_t width = in.size() * sizeof(uint32_t);
     SAFE_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id));
     SAFE_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, width, data, GL_STATIC_DRAW));
 }
@@ -124,11 +123,12 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
     }
 }
 
-GLuint gen_texture();
+GLuint gen_texture(GLenum target = GL_TEXTURE_2D);
 void bind_texture(const glm::ivec2& dims,
                   std::vector<glm::vec3>&& texture);
 void bind_texture(const glm::ivec2& dims,
                   byte_t* texture);
+void bind_texture(GLenum target, GLuint id);
 void activate_texture(GLuint id);
 void free_texture(GLuint id);
 

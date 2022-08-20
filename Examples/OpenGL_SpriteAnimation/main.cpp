@@ -22,27 +22,19 @@ glm::vec4 background = { 0.5, 0.8, 0.8, 1.0 };
 void frame_preprocess(GLuint id);
 void frame_postprocess(auto* w);
 
-std::vector<opengl::vec3pos> create_square_vec3() {
+std::vector<opengl::vec3pos_vec2tex_t> create_vertices() {
     return {
-        {glm::vec3{-1.0,  1.0, 0.0}},
-        {glm::vec3{ 1.0,  1.0, 0.0}},
-        {glm::vec3{ 1.0, -1.0, 0.0}},
-
-        {glm::vec3{-1.0,  1.0, 0.0}},
-        {glm::vec3{-1.0, -1.0, 0.0}},
-        {glm::vec3{1.0,  -1.0, 0.0}}
+        {{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}},
+        {{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
+        {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
+        {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}
     };
 }
 
-std::vector<opengl::vec3pos_vec2tex_t> create_square_v3p_v2t() {
+std::vector<uint32_t> create_indices() {
     return {
-        {glm::vec3{-1.0,  1.0, 0.0}, glm::vec2{0, 1}},
-        {glm::vec3{ 1.0,  1.0, 0.0}, glm::vec2{1, 1}},
-        {glm::vec3{ 1.0, -1.0, 0.0}, glm::vec2{1, 0}},
-
-        {glm::vec3{-1.0,  1.0, 0.0}, glm::vec2{0, 1}},
-        {glm::vec3{-1.0, -1.0, 0.0}, glm::vec2{0, 0}},
-        {glm::vec3{1.0,  -1.0, 0.0}, glm::vec2{1, 0}}
+        0, 1, 3,
+        1, 2, 3
     };
 }
 
@@ -57,15 +49,18 @@ int main() {
     opengl::Context::instance().background(background);
 
     auto program = opengl::create_program(vertex_path, fragment_path);
-    opengl::Texture texture("hr-level1_running.png");
-    if (texture.read()) {
-        texture.id = opengl::gen_texture();
-        opengl::bind_texture({WIDTH, HEIGHT}, texture.buffer);
-    }
+    auto vao = opengl::gen_vertex_array();
+    auto ebo = opengl::gen_element_buffer();
 
-    GLuint vao = opengl::gen_vertex_array();
-    auto vertices = create_square_vec3();
+    auto vertices = create_vertices();
+    auto indices = create_indices();
+
     auto buffers = decltype(vertices)::value_type::gen_buffers(vao, vertices);
+    opengl::bind_vao(vao);
+    opengl::bind_ebo(ebo, indices);
+
+    opengl::Texture texture("hr-level1_running.png");
+    if (texture.read()) { texture.bind(); }
 
     glm::mat4 projection(1.0);
     glm::mat4 view(1.0);
@@ -74,12 +69,15 @@ int main() {
         frame_preprocess(vao);
 
         opengl::Context::instance().draw_background();
+        texture.activate();
         opengl::use(program);
-        opengl::activate_texture(texture.id);
         opengl::set_mat4(program, "projection", projection);
         opengl::set_mat4(program, "view", view);
         opengl::set_mat4(program, "model", model);
-        opengl::draw(opengl::DrawArrayCommand{.vao=vao, .count=vertices.size()});
+        opengl::draw(opengl::DrawElementsCommand{
+            .vao=vao,
+            .count=indices.size()
+        });
 
         frame_postprocess(window);
     }

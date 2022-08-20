@@ -27,8 +27,11 @@ void Context::initialize(bool to_dump) {
     }
     SAFE_CALL(glDebugMessageCallback(utils::gl_debug_output, nullptr));
     SAFE_CALL(glEnable(GL_MULTISAMPLE));
-    //SAFE_CALL(glEnable(GL_STENCIL_TEST));
-    //SAFE_CALL(glEnable(GL_DEPTH_TEST));
+    SAFE_CALL(glEnable(GL_STENCIL_TEST));
+    SAFE_CALL(glEnable(GL_DEPTH_TEST));
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (to_dump) { dump(); }
 }

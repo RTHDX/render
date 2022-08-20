@@ -8,4 +8,5 @@ create_executable(
     LIBS OpenGL UI
 )
 
-copy_files(FILES "vertex_shader.vert" "fragment_shader.frag" "container.jpg")
+copy_files(FILES "vertex_shader.vert" "fragment_shader.frag" "container.jpg"
+           "hr-level1_running.png")
