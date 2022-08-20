@@ -22,3 +22,6 @@
 [submodule "3rdParty/stb"]
 	path = 3rdParty/stb
 	url = https://github.com/nothings/stb.git
+[submodule "3rdParty/gmock-global"]
+	path = 3rdParty/gmock-global
+	url = https://github.com/apriorit/gmock-global.git
