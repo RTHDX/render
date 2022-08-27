@@ -11,11 +11,13 @@ create_library(
         opengl_context.cpp
         opengl_vertex_input.cpp
         texture.cpp
+        opengl_functions.cpp
     HEADERS
         opengl_utils.hpp
         camera.cpp
         opengl_proc.hpp
         opengl_vertex_input.hpp
         texture.hpp
+        opengl_functions.hpp
     LIBS UI
 )

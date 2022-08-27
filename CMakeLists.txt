@@ -62,6 +62,7 @@ if (${RENDER_ENABLE_TESTING})
     enable_testing()
     add_subdirectory("RTX-Test")
     add_subdirectory("Loader-Test")
+    add_subdirectory("OpenGL-Test")
 endif ()
 
 if (${RENDER_ENABLE_BENCHMARK})

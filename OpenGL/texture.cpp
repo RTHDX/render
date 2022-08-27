@@ -5,6 +5,7 @@
 
 #include "opengl_proc.hpp"
 #include "texture.hpp"
+#include "opengl_functions.hpp"
 
 namespace opengl {
 
@@ -24,10 +25,12 @@ bool Texture::read() {
         return false;
     }
     id = gen_texture(TARGET);
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_MIN_FILTER, min_filter));
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_MAG_FILTER, mag_filter));
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_WRAP_S, wrap_s));
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_WRAP_T, wrap_t));
+    Provider::instance().tex_parameter_i(TARGET, GL_TEXTURE_MIN_FILTER,
+                                         min_filter);
+    Provider::instance().tex_parameter_i(TARGET, GL_TEXTURE_MAG_FILTER,
+                                         mag_filter);
+    Provider::instance().tex_parameter_i(TARGET, GL_TEXTURE_WRAP_S, wrap_s);
+    Provider::instance().tex_parameter_i(TARGET, GL_TEXTURE_WRAP_T, wrap_t);
     return true;
 }
 
@@ -38,13 +41,12 @@ void Texture::bind() {
 }
 
 void Texture::activate() {
-    //SAFE_CALL(glBindTexture(GL_TEXTURE_2D, id));
     SAFE_CALL(glActiveTexture(GL_TEXTURE0));
 }
 
 Texture::~Texture() {
     stbi_image_free(buffer);
-    free_texture(id);
+    Provider::instance().delete_textures(1, &id);
 }
 
 

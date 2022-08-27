@@ -5,6 +5,7 @@
 
 #include "opengl_utils.hpp"
 #include "opengl_proc.hpp"
+#include "opengl_functions.hpp"
 
 
 namespace opengl {
@@ -202,8 +203,8 @@ void bind_vao(GLuint id) {
 
 GLuint gen_texture(GLenum target) {
     GLuint tex;
-    SAFE_CALL(glGenTextures(1, &tex));
-    SAFE_CALL(glBindTexture(target, tex));
+    opengl::function().gen_textures(1, &tex);
+    opengl::function().bind_texture(target, tex);
     return tex;
 }
 
