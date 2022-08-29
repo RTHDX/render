@@ -35,7 +35,6 @@ TEST(Texture, test) {
 
     opengl::Texture texture("hr-level1_running.png");
     ASSERT_TRUE(texture.read());
-
 }
 
 

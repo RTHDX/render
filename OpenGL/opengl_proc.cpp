@@ -294,4 +294,12 @@ bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val) {
     return true;
 }
 
+bool set_int(GLuint id, const std::string_view name, GLint value) {
+    assert(Context::instance().active_program() > 0);
+    auto loc = find_location(id, name);
+    if (loc < 0) return false;
+    SAFE_CALL(glUniform1i(loc, value));
+    return true;
+}
+
 }

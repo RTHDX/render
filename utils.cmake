@@ -51,7 +51,8 @@ function (create_library)
     cmake_parse_arguments(THIS "" "TARGET" "HEADERS;SOURCES;LIBS" ${ARGV})
     message("Preparing library: ${THIS_TARGET}")
     add_library(${THIS_TARGET} STATIC ${THIS_HEADERS} ${THIS_SOURCES})
-    target_link_directories(${THIS_TARGET} PRIVATE ${RENDER_BOOST_LINK_DIR})
+    target_include_directories(${THIS_TARGET} PRIVATE
+                               ${RENDER_BOOST_INCLUDE_DIR})
     target_link_libraries(${THIS_TARGET} PRIVATE
                           ${OPENGL_LIBRARIES}
                           glfw

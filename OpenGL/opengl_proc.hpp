@@ -29,6 +29,7 @@ public:
     GLint active_program() const;
     GLint bound_vao() const;
     GLint bound_texture_2d() const;
+    GLint bound_texture_2d_array() const;
 
 private:
     Context() = default;
@@ -140,5 +141,6 @@ void draw(DrawElementsCommand&& cmd);
 bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);
 bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val);
+bool set_int(GLuint id, const std::string_view name, GLint value);
 
 }

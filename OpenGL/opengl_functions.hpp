@@ -16,7 +16,18 @@ public:
     virtual void generate_mipmap(GLenum target) = 0;
     virtual void gen_textures(GLsizei n, GLuint* textures) = 0;
     virtual void bind_texture(GLenum target, GLuint tex) = 0;
+    virtual void activate_texture(GLenum target) = 0;
     virtual void delete_textures(GLsizei n, GLuint* textures) = 0;
+    virtual void tex_storage_3d(GLenum target, GLsizei levels, GLenum iformat,
+                                GLsizei w, GLsizei h, GLsizei depth) = 0;
+    virtual void tex_subimage_3d(GLenum target, GLint level, GLint xoffset,
+                                 GLint yoffset, GLint zoffset, GLsizei width,
+                                 GLsizei height, GLsizei depth, GLenum format,
+                                 GLenum type, const void* pixels) = 0;
+    virtual void tex_image_3d(GLenum target, GLint level, GLint internalformat,
+                              GLsizei width, GLsizei height, GLsizei depth,
+                              GLint border, GLenum format, GLenum type,
+                              const void* data) = 0;
 };
 
 class Invoker final : public IInvoker {
@@ -31,7 +42,18 @@ public:
     void generate_mipmap(GLenum target) override;
     void gen_textures(GLsizei n, GLuint* textures) override;
     void bind_texture(GLenum target, GLuint tex) override;
+    void activate_texture(GLenum target) override;
     void delete_textures(GLsizei n, GLuint* textures) override;
+    void tex_storage_3d(GLenum target, GLsizei levels, GLenum iformat,
+                        GLsizei w, GLsizei h, GLsizei depth) override;
+    void tex_image_3d(GLenum target, GLint level, GLint internalformat,
+                      GLsizei width, GLsizei height, GLsizei depth,
+                      GLint border, GLenum format, GLenum type,
+                      const void* data) override;
+    void tex_subimage_3d(GLenum target, GLint level, GLint xoffset,
+                         GLint yoffset, GLint zoffset, GLsizei width,
+                         GLsizei height, GLsizei depth, GLenum format,
+                         GLenum type, const void* pixels) override;
 };
 
 class Provider final : public IInvoker {
@@ -45,7 +67,18 @@ public:
     void generate_mipmap(GLenum target) override;
     void gen_textures(GLsizei n, GLuint* textures) override;
     void bind_texture(GLenum target, GLuint tex) override;
+    void activate_texture(GLenum target) override;
     void delete_textures(GLsizei n, GLuint* textures) override;
+    void tex_storage_3d(GLenum target, GLsizei levels, GLenum iformat,
+                        GLsizei w, GLsizei h, GLsizei depth) override;
+    void tex_image_3d(GLenum target, GLint level, GLint internalformat,
+                      GLsizei width, GLsizei height, GLsizei depth,
+                      GLint border, GLenum format, GLenum type,
+                      const void* data) override;
+    void tex_subimage_3d(GLenum target, GLint level, GLint xoffset,
+                         GLint yoffset, GLint zoffset, GLsizei width,
+                         GLsizei height, GLsizei depth, GLenum format,
+                         GLenum type, const void* pixels) override;
 
     const IInvoker& impl() const { return *_impl; }
     IInvoker& impl() { return *_impl; }
@@ -57,8 +90,6 @@ private:
     std::unique_ptr<IInvoker> _impl;
 };
 
-inline Provider& function() {
-    return Provider::instance();
-}
+inline Provider& function() { return Provider::instance(); }
 
 }

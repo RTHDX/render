@@ -9,4 +9,4 @@ create_executable(
 )
 
 copy_files(FILES "vertex_shader.vert" "fragment_shader.frag"
-                 "hr-level1_running.png")
+                 "hr-level1_running.png" "fire.jpg")

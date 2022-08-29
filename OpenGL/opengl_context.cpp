@@ -80,4 +80,8 @@ GLint Context::active_program() const { return get(GL_CURRENT_PROGRAM); }
 GLint Context::bound_vao() const { return get(GL_VERTEX_ARRAY_BINDING); }
 GLint Context::bound_texture_2d() const { return get(GL_TEXTURE_BINDING_2D); }
 
+GLint Context::bound_texture_2d_array() const {
+    return get(GL_TEXTURE_BINDING_2D_ARRAY);
+}
+
 }

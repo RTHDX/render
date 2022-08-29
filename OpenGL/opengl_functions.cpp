@@ -1,4 +1,5 @@
 #include <iostream>
+#include <boost/stacktrace.hpp>
 
 #include "opengl_functions.hpp"
 
@@ -32,7 +33,7 @@ static void on_gl_error(GLenum error_code, const char* call, const char* file,
         std::cerr << "STACK_OVERFLOW";
         break;
     }
-    std::cerr << "[" << file << ":" << line << "]" << std::endl;
+    std::cerr << std::endl << call << std::endl;
 }
 #define SAFE_CALL(gl_call)\
     gl_call;\
@@ -62,10 +63,34 @@ void Invoker::bind_texture(GLenum target, GLuint tex) {
     SAFE_CALL(glBindTexture(target, tex));
 }
 
+void Invoker::activate_texture(GLenum target) {
+    SAFE_CALL(glActiveTexture(target));
+}
+
 void Invoker::delete_textures(GLsizei n, GLuint* textures) {
     SAFE_CALL(glDeleteTextures(n, textures));
 }
 
+void Invoker::tex_storage_3d(GLenum target, GLsizei levels, GLenum iformat,
+                             GLsizei w, GLsizei h, GLsizei depth) {
+    SAFE_CALL(glTexStorage3D(target, levels, iformat, w, h, depth));
+}
+
+void Invoker::tex_subimage_3d(GLenum target, GLint level, GLint xoffset,
+                              GLint yoffset, GLint zoffset, GLsizei width,
+                              GLsizei height, GLsizei depth, GLenum format,
+                              GLenum type, const void* pixels) {
+    SAFE_CALL(glTexSubImage3D(target, level, xoffset, yoffset, zoffset,
+                              width, height, depth, format, type, pixels));
+}
+
+void Invoker::tex_image_3d(GLenum target, GLint level, GLint internalformat,
+                           GLsizei width, GLsizei height, GLsizei depth,
+                           GLint border, GLenum format, GLenum type,
+                           const void* data) {
+    SAFE_CALL(glTexImage3D(target, level, internalformat, width, height,
+                           depth, border, format, type, data));
+}
 
 Provider& Provider::instance(IInvoker* impl) {
     static Provider self(impl == nullptr ? new Invoker : impl);
@@ -100,8 +125,33 @@ void Provider::bind_texture(GLenum t, GLuint tex) {
     _impl->bind_texture(t, tex);
 }
 
+void Provider::activate_texture(GLenum target) {
+    _impl->activate_texture(target);
+}
+
 void Provider::delete_textures(GLsizei n, GLuint* textures) {
     _impl->delete_textures(n, textures);
+}
+
+void Provider::tex_storage_3d(GLenum target, GLsizei levels, GLenum iformat,
+                             GLsizei w, GLsizei h, GLsizei depth) {
+    _impl->tex_storage_3d(target, levels, iformat, w, h, depth);
+}
+
+void Provider::tex_subimage_3d(GLenum target, GLint level, GLint xoffset,
+                               GLint yoffset, GLint zoffset, GLsizei width,
+                               GLsizei height, GLsizei depth, GLenum format,
+                               GLenum type, const void* pixels) {
+    _impl->tex_subimage_3d(target, level, xoffset, yoffset, zoffset,
+                           width, height, depth, format, type, pixels);
+}
+
+void Provider::tex_image_3d(GLenum target, GLint level, GLint internalformat,
+                            GLsizei width, GLsizei height, GLsizei depth,
+                            GLint border, GLenum format, GLenum type,
+                            const void* data) {
+    _impl->tex_image_3d(target, level, internalformat,
+                        width, height, depth, border, format, type, data);
 }
 
 }
