@@ -67,7 +67,7 @@ int main() {
     opengl::bind_ebo(ebo, indices);
 
     int width, height, depth;
-    stbi_set_flip_vertically_on_load(true);
+    //stbi_set_flip_vertically_on_load(true);
     opengl::byte_t* buffer = stbi_load(R"(.\fire.jpg)",
                                        &width, &height, &depth, STBI_rgb_alpha);
     if (buffer == nullptr) {
@@ -84,7 +84,7 @@ int main() {
     SAFE_CALL(glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
     SAFE_CALL(glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     SAFE_CALL(glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    
+
     const GLsizei tile_w_count = 6, tile_h_count = 6;
     const GLsizei total_tiles = tile_w_count * tile_h_count;
     const GLsizei tile_w = width / tile_w_count,
@@ -97,16 +97,19 @@ int main() {
     SAFE_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, width));
     SAFE_CALL(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, height));
     for (GLsizei i = 0; i < total_tiles; ++i) {
-        opengl::function().tex_subimage_3d(
+        int ix = i % tile_h_count;
+        int iy = i / tile_w_count;
+        int x = ix * tile_w;
+        int y = iy * tile_h;
+        SAFE_CALL(glTexSubImage3D(
             GL_TEXTURE_2D_ARRAY,
             0,
             0, 0, i,
             tile_w, tile_h, 1,
             GL_RGBA,
             GL_UNSIGNED_BYTE,
-            buffer
-            //buffer
-        );
+            buffer + ((y * width + x) * STBI_rgb_alpha)
+        ));
     }
 
     opengl::function().generate_mipmap(GL_TEXTURE_2D_ARRAY);
@@ -136,7 +139,7 @@ int main() {
             0 : count + 1;
 
         //using namespace std::chrono_literals;
-        //std::this_thread::sleep_for(1s);
+        //std::this_thread::sleep_for(50ms);
     }
 
     opengl::free_vertex_buffers(buffers);

@@ -13,7 +13,17 @@ float actual_layer() {
                       floor(current_frame + 0.5)));
 }
 
+vec3 eval_coords() {
+    return vec3(
+        tex_coords.x,
+        1.0 - tex_coords.y,
+        actual_layer()
+    );
+}
+
 void main() {
-    //frag_color = vec4(0.1, 0.4, 0.1, 1.0);
-    frag_color = texture(texture_0, vec3(tex_coords, actual_layer()));
+    vec2 t_coords = vec2(tex_coords.x, 1.0 - tex_coords.y);
+    //frag_color = texture(texture_0, vec3(vec2(tex_coords.x, 1.0 - tex_coords.y),
+    //                                     actual_layer()));
+    frag_color = texture(texture_0, eval_coords());
 }
