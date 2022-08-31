@@ -22,8 +22,5 @@ vec3 eval_coords() {
 }
 
 void main() {
-    vec2 t_coords = vec2(tex_coords.x, 1.0 - tex_coords.y);
-    //frag_color = texture(texture_0, vec3(vec2(tex_coords.x, 1.0 - tex_coords.y),
-    //                                     actual_layer()));
     frag_color = texture(texture_0, eval_coords());
 }

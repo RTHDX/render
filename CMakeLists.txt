@@ -49,6 +49,13 @@ if (${RENDER_ENABLE_EXAMPLES})
     add_subdirectory(Examples)
 endif()
 
+create_library(
+    TARGET Render
+    SOURCES Animation.cpp
+    HEADERS Animation.hpp
+    LIBS UI OpenGL
+)
+
 
 if (${RENDER_ENABLE_TESTING})
     message("!!! ---Testing enabled--- !!!")
