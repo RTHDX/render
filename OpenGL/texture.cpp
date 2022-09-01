@@ -46,7 +46,7 @@ void Texture::activate() {
 
 Texture::~Texture() {
     stbi_image_free(buffer);
-    Provider::instance().delete_textures(1, &id);
+    SAFE_CALL(glDeleteTextures(1, &id));
 }
 
 
@@ -68,6 +68,7 @@ bool TextureArray::read() {
     buffer = stbi_load(path.c_str(), &width, &height, &depth, read_mode());
     if (buffer == nullptr) {
         std::cerr << "Unalble to load texture " << path << std::endl;
+        is_read = false;
         return false;
     }
     const GLsizei tile_w = width / tiles_count_w,
@@ -106,6 +107,7 @@ bool TextureArray::read() {
         ));
     }
     SAFE_CALL(glGenerateMipmap(TARGET));
+    is_read = true;
     return true;
 }
 

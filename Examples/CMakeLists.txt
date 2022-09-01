@@ -10,6 +10,7 @@ add_subdirectory(OpenGL_Textures)
 add_subdirectory(OpenGL_Texture_2)
 #add_subdirectory(OpenGL_Life)
 add_subdirectory(OpenGL_SpriteAnimation)
+add_subdirectory(OpenGL_ItemAnimation)
 
 #add_subdirectory(RTX_Simple)
 #add_subdirectory(RTX_Simple_2)

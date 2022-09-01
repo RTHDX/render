@@ -120,15 +120,21 @@ GLenum convert_to_shader_type(const std::filesystem::path& path) {
 }
 
 std::string read_shader(const std::filesystem::path& path) {
+    if (!std::filesystem::exists(path)) {
+        std::wcerr << "No path found" << path.c_str() << std::endl;
+        return {};
+    }
+
     std::ifstream file(path.c_str());
     if (!file) {
         std::cerr << "Could not open" << std::endl;
         return std::string();
     }
-    return std::string(
+    std::string content(
         (std::istreambuf_iterator<char>(file)),
          std::istreambuf_iterator<char>()
     );
+    return content;
 }
 
 }

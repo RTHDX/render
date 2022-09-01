@@ -43,6 +43,7 @@ struct TextureArray {
     uint32_t tiles_count_w;
     uint32_t tiles_count_h;
     byte_t* buffer = nullptr;
+    bool is_read = false;
 
     GLuint id = 0;
     GLenum wrap_s = GL_CLAMP_TO_EDGE;
