@@ -6,6 +6,7 @@ create_library(
     SOURCES ui.cpp
             application.cpp
             observer.cpp
+            io.cpp
     HEADERS ui.hpp
             application.hpp
             observer.hpp

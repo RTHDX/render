@@ -44,17 +44,11 @@ add_subdirectory(UI)
 add_subdirectory(OpenGL)
 add_subdirectory(RTX)
 add_subdirectory(Loader)
+add_subdirectory(Render)
 option(RENDER_ENABLE_EXAMPLES OFF)
 if (${RENDER_ENABLE_EXAMPLES})
     add_subdirectory(Examples)
 endif()
-
-create_library(
-    TARGET Render
-    SOURCES Animation.cpp
-    HEADERS Animation.hpp
-    LIBS UI OpenGL
-)
 
 
 if (${RENDER_ENABLE_TESTING})
@@ -70,6 +64,7 @@ if (${RENDER_ENABLE_TESTING})
     add_subdirectory("RTX-Test")
     add_subdirectory("Loader-Test")
     add_subdirectory("OpenGL-Test")
+    add_subdirectory("Render-Test")
 endif ()
 
 if (${RENDER_ENABLE_BENCHMARK})

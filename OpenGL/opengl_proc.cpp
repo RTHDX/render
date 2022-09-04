@@ -249,7 +249,7 @@ void draw(DrawArrayCommand&& cmd) {
     bind_vao(0);
 }
 
-void draw(DrawElementsCommand&& cmd) {
+void draw(DrawElementsCommand cmd) {
     assert(cmd.vao != 0);
     assert(opengl::Context::instance().active_program() != 0);
 

@@ -1,4 +1,4 @@
-#include <map>
+#include <iostream>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -10,8 +10,9 @@
 #include <OpenGL/opengl_vertex_input.hpp>
 #include <OpenGL/texture.hpp>
 #include <OpenGL/opengl_functions.hpp>
+#include <Render/Animation.hpp>
 
-#include "Animation.hpp"
+#include "Item.hpp"
 
 int WIDTH = 1280;
 int HEIGHT = 860;
@@ -45,25 +46,44 @@ std::vector<uint32_t> create_indices() {
     };
 }
 
-enum class Direction {
-    NORTH,
-    EAST_NORTH,
-    EAST,
-    EAST_SOUTH,
-    SOUTH,
-    SOUTH_WEST,
-    WEST,
-    WEST_NORTH
-};
+glm::mat4 create_item_model() {
+    return {
+        0.1, 0.0, 0.0, 0.0,
+        0.0, 0.2, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    };
+}
 
-struct Item_2D {
-    std::map<Direction, render::Animation> animations;
-    glm::mat4 model;
+opengl::TextureArray sprite_atlas() {
+    opengl::TextureArray texture(R"(.\hr-level1_running.png)", 22, 8);
+    texture.read();
+    return texture;
+}
 
-public:
-    Item_2D() {}
-};
+std::map<Direction, render::Animation> create_animations() {
+    return {
+        {Direction::NORTH, {0, 22}},
+        {Direction::EAST_NORTH, {23, 45}},
+        {Direction::EAST, {45, 67}},
+        {Direction::EAST_SOUTH, {67, 89}},
+        {Direction::SOUTH, {89, 111}},
+        {Direction::SOUTH_WEST, {111, 133}},
+        {Direction::WEST, {123, 155}},
+        {Direction::WEST_NORTH, {155, 177}}
+    };
+}
 
+Item_2D create_item() {
+    Item_2D out{
+        .input = create_vertices(),
+        .indices = create_indices(),
+        .model = create_item_model(),
+        .atlas = sprite_atlas(),
+        .animations = create_animations()
+    };
+    return out;
+}
 
 int main() {
     if (!ui::init_glfw(4, 6)) { return EXIT_FAILURE; }
@@ -86,16 +106,19 @@ int main() {
     glm::mat4 projection(1.0);
     glm::mat4 view(1.0);
     glm::mat4 model{
-        0.2, 0.0, 0.0, 0.0,
-        0.0, 0.4, 0.0, 0.0,
-        0.0, 0.0, 0.2, 0.0,
+        0.1, 0.0, 0.0, 0.0,
+        0.0, 0.2, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
         0.0, 0.0, 0.0, 1.0
     };
-    render::Animation animation_1({
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-        11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
-    });
+    auto animations = create_animations();
+    uint64_t count = 0;
     while (!glfwWindowShouldClose(window)) {
+        auto& animation = animations[Direction::NORTH];
+        if (count == 5) {
+            animation.update();
+            count = 0;
+        }
         frame_preprocess(vao);
         opengl::Context::instance().draw_background();
         texture.bind();
@@ -103,14 +126,17 @@ int main() {
         opengl::set_mat4(program, "projection", projection);
         opengl::set_mat4(program, "view", view);
         opengl::set_mat4(program, "model", model);
-        opengl::set_int(program, "total_frames", texture.total_tiles());
-        opengl::set_int(program, "current_frame", animation_1.current_index());
+        opengl::set_int(program, "total_frames", animation.total_frames());
+        render::index_t current_frame = animation.current_index();
+        opengl::set_int(program, "current_frame",
+                        current_frame);
         opengl::draw(opengl::DrawElementsCommand{
             .vao = vao,
             .count = indices.size()
         });
-        animation_1.update();
         frame_postprocess(window);
+
+        count++;
     }
 
     opengl::free_vertex_buffers(vbo);
