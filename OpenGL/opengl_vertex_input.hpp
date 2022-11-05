@@ -80,4 +80,10 @@ public:
     static commands_t commands();
 };
 
+template <typename T> concept vertex_input_c =
+    requires (T t) {
+        t.gen_buffers();
+        t.commands();
+    };
+
 }

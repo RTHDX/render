@@ -25,6 +25,9 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/backends")
 add_subdirectory(3rdParty/parselib)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty")
+add_subdirectory(3rdParty/tinygltf)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/tinygltf")
+
 
 add_library(ImGui STATIC
     "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/imgui.cpp"
@@ -66,6 +69,7 @@ if (${RENDER_ENABLE_TESTING})
     add_subdirectory("OpenGL-Test")
     add_subdirectory("Render-Test")
 endif ()
+
 
 if (${RENDER_ENABLE_BENCHMARK})
     message("!!! ---Benchmark enabled--- !!!")

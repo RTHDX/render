@@ -23,3 +23,10 @@ create_test_executable(
 #    HEADERS
 #    LIBS "OpenGL-Loader"
 #)
+
+create_test_executable(
+    TARGET tloader_test
+    SOURCES tloader_test.cpp
+    LIBS "OpenGL-Loader"
+    MESHES "mesh-examples/cube.gltf"
+)

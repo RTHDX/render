@@ -25,3 +25,6 @@
 [submodule "3rdParty/gmock-global"]
 	path = 3rdParty/gmock-global
 	url = https://github.com/apriorit/gmock-global.git
+[submodule "3rdParty/tinygltf"]
+	path = 3rdParty/tinygltf
+	url = https://github.com/syoyo/tinygltf.git

@@ -25,9 +25,7 @@ function (include_deps)
 endfunction ()
 
 function (create_executable)
-    #set(CMAKE_CUDA_ARCHITECTURES CMAKE_CUDA_ARCHITECTURES_DEFAULT)
-
-    cmake_parse_arguments(THIS "" "TARGET" "HEADERS;SOURCES;LIBS" ${ARGV})
+    cmake_parse_arguments(THIS "" "TARGET" "HEADERS;SOURCES;LIBS;SHADERS;MESHES" ${ARGV})
     message("Preparing executable: ${THIS_TARGET}")
     add_executable(${THIS_TARGET} ${THIS_HEADERS} ${THIS_SOURCES})
     target_include_directories(${THIS_TARGET} PRIVATE ${RENDER_BOOST_INCLUDE_DIR})
@@ -42,13 +40,19 @@ function (create_executable)
     set_property(TARGET ${THIS_TARGET} PROPERTY CXX_STANDARD 20)
     target_compile_definitions(${THIS_TARGET} PRIVATE
                                "DEBUG=$<IF:$<CONFIG:Debug>,1,0>")
+    if (THIS_SHADERS)
+        message("Copying shaders: ${THIS_SHADERS}")
+        copy_files(FILES ${THIS_SHADERS})
+    endif ()
+    if (THIS_MESHES)
+        message("Copying meshes: ${THIS_MESHES}")
+        copy_files(FILES ${THIS_MESHES})
+    endif ()
 endfunction (create_executable)
 
 
 function (create_library)
-    #set(CMAKE_CUDA_ARCHITECTURES CMAKE_CUDA_ARCHITECTURES_DEFAULT)
-
-    cmake_parse_arguments(THIS "" "TARGET" "HEADERS;SOURCES;LIBS" ${ARGV})
+    cmake_parse_arguments(THIS "" "TARGET" "HEADERS;SOURCES;LIBS;SHADERS;MESHES" ${ARGV})
     message("Preparing library: ${THIS_TARGET}")
     add_library(${THIS_TARGET} STATIC ${THIS_HEADERS} ${THIS_SOURCES})
     target_include_directories(${THIS_TARGET} PRIVATE
@@ -63,15 +67,26 @@ function (create_library)
     set_property(TARGET ${THIS_TARGET} PROPERTY CXX_STANDARD 20)
     target_compile_definitions(${THIS_TARGET} PRIVATE
                                "DEBUG=$<IF:$<CONFIG:Debug>,1,0>")
+    if (THIS_SHADERS)
+        message("Copying shaders: ${THIS_SHADERS}")
+        copy_files(FILES ${THIS_SHADERS})
+    endif ()
+    if (THIS_MESHES)
+        message("Copying meshes: ${THIS_MESHES}")
+        copy_files(FILES ${THIS_MESHES})
+    endif ()
 endfunction (create_library)
 
 
 function (create_test_executable)
-    cmake_parse_arguments(THIS "" "TARGET" "HEADERS;SOURCES;LIBS" ${ARGV})
+    cmake_parse_arguments(THIS "" "TARGET" "HEADERS;SOURCES;LIBS;SHADERS;MESHES" ${ARGV})
     create_executable(
         TARGET  ${THIS_TARGET}
         SOURCES ${THIS_SOURCES}
         HEADERS ${THIS_HEADERS}
         LIBS ${THIS_LIBS} GTest::gtest GTest::gtest_main GTest::gmock
-                          GTest::gmock_main)
+                          GTest::gmock_main
+        SHADERS ${THIS_SHADERS}
+        MESHES ${THIS_MESHES}
+    )
 endfunction(create_test_executable)
