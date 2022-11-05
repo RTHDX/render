@@ -58,14 +58,17 @@ void TLoader::process_node(const gltf::Node& node, const gltf::Model& model) {
 }
 
 void TLoader::process_mesh(const gltf::Mesh& mesh, const gltf::Model& model) {
-    ;
+    for (const auto& primitive : mesh.primitives) {
+        process_primitive(primitive, model);
+    }
 }
 
 void TLoader::process_primitive(const gltf::Primitive& prim,
                                 const gltf::Model& model) {
     const auto& attributes = prim.attributes;
     for (auto it = attributes.begin(); it != attributes.end(); ++it) {
-        ;
+        std::cout << "Key: " << it->first << ", value: " << it->second
+                  << std::endl;
     }
 }
 
