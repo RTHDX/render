@@ -5,6 +5,7 @@
 #include <UI/ui.hpp>
 #include <OpenGL/opengl_proc.hpp>
 #include <OpenGL/camera.hpp>
+#include <Loader/opengl_converter.hpp>
 
 constexpr int WIDTH = 800;
 constexpr int HEIGHT = 600;
@@ -12,7 +13,18 @@ constexpr int HEIGHT = 600;
 
 struct Item {
     glm::mat4 model;
-    
+    GLuint vao;
+    std::vector<opengl::buffers_t> vertex_input;
+
+    bool open() {
+        auto vertices = loader::Converter().read("./cube.obj");
+        vao = opengl::gen_vertex_array();
+        for (const auto& vertex_data: vertices) {
+            vertex_input.push_back(std::move(
+                loader::Vertices::value_type::gen_buffers(vao, vertex_data)
+            ));
+        }
+    }
 };
 
 

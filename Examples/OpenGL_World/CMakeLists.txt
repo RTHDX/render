@@ -7,6 +7,6 @@ create_executable(
     TARGET ${PROJECT_NAME}
     SOURCES main.cpp
     LIBS OpenGL UI
+    MESHES cube.obj cube.mtl
+    SHADERS fragment_shader.frag vertex_shader.vert
 )
-
-#copy_files(FILES "vertex_shader.vert" "fragment_shader.frag")
