@@ -29,9 +29,9 @@ void Context::initialize(bool to_dump) {
     SAFE_CALL(glEnable(GL_MULTISAMPLE));
     SAFE_CALL(glEnable(GL_STENCIL_TEST));
     SAFE_CALL(glEnable(GL_DEPTH_TEST));
+    SAFE_CALL(glEnable(GL_BLEND));
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if (to_dump) { dump(); }
 }
@@ -67,13 +67,15 @@ void Context::background(const glm::vec4& color) {
 }
 
 void Context::draw_background() const {
+    static constexpr GLbitfield CLEAR_MODE = GL_COLOR_BUFFER_BIT
+                                             | GL_DEPTH_BUFFER_BIT
+                                             | GL_STENCIL_BUFFER_BIT;
+
     SAFE_CALL(glClearColor(_background.r,
                            _background.g,
                            _background.b,
                            _background.a));
-    SAFE_CALL(glClear(GL_COLOR_BUFFER_BIT |
-                      GL_DEPTH_BUFFER_BIT |
-                      GL_STENCIL_BUFFER_BIT));
+    SAFE_CALL(glClear(CLEAR_MODE));
 }
 
 GLint Context::active_program() const { return get(GL_CURRENT_PROGRAM); }

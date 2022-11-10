@@ -13,7 +13,7 @@ public:
     Converter() = default;
     ~Converter() = default;
 
-    std::vector<Vertices> read(const std::string path);
+    std::vector<Vertices> read(const std::string& path);
 
     void visit(const Face& face);
     Vertices convert(const Mesh& mesh);

@@ -2,7 +2,7 @@
 
 namespace loader {
 
-std::vector<Vertices> Converter::read(const std::string path) {
+std::vector<Vertices> Converter::read(const std::string& path) {
     auto meshes = loader.read(path);
     std::vector<Vertices> out(meshes.size());
     for (size_t i = 0; i < out.size(); ++i) {
