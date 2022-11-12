@@ -2,6 +2,14 @@
 
 #include "item.hpp"
 
+namespace fs = std::filesystem;
+
+Item3D::Item3D(const fs::path& vertex,
+               const fs::path& fragment,
+               const glm::vec4& color)
+    : _program(opengl::create_program(vertex, fragment))
+    , _color(color)
+{}
 
 Item3D::~Item3D() {
     for (opengl::buffers_t& v_data : _vertex_input) {
@@ -23,14 +31,14 @@ void Item3D::open(const std::string& path) {
 void Item3D::draw() const {
     for (size_t i = 0; i < _vertices.size(); ++i) {
         opengl::draw(opengl::DrawArrayCommand{
-            .vao = _vao,
+            .vao   = _vao,
             .count = _vertices[i].size()
         });
     }
 }
 
 void Item3D::modify(glm::mat4&& modificator) {
-    _model = _model * modificator;
+    _model = modificator;
 }
 
 

@@ -1,10 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <ostream>
 
 
 namespace ui {
-
 
 struct KeyEvent {
     int key;
@@ -15,6 +15,7 @@ struct KeyEvent {
 public:
     KeyEvent(int k, int s, int a, int m);
 };
+std::ostream& operator << (std::ostream& os, const KeyEvent& event);
 
 
 struct MouseEvent {
@@ -24,6 +25,7 @@ struct MouseEvent {
 public:
     MouseEvent(double x, double y);
 };
+std::ostream& operator << (std::ostream& os, const MouseEvent& event);
 
 
 struct MouseButtonEvent {
@@ -34,6 +36,7 @@ struct MouseButtonEvent {
 public:
     MouseButtonEvent(int b, int a, int m);
 };
+std::ostream& operator << (std::ostream& os, const MouseButtonEvent& event);
 
 
 struct ScrollEvent {
@@ -43,6 +46,7 @@ struct ScrollEvent {
 public:
     ScrollEvent(double x, double y);
 };
+std::ostream& operator << (std::ostream& os, const ScrollEvent& event);
 
 
 struct DropEvent {
@@ -52,6 +56,7 @@ struct DropEvent {
 public:
     DropEvent(int c, const char** p);
 };
+std::ostream& operator << (std::ostream& os, const DropEvent& event);
 
 
 class Listener;

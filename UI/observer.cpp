@@ -10,10 +10,22 @@ KeyEvent::KeyEvent(int k, int s, int a, int m)
     , mode(m)
 {}
 
+std::ostream& operator << (std::ostream& os, const KeyEvent& event) {
+    os << "<KeyEvent. key: " << event.key << ", scancode: " << event.scancode
+       << ", action: " << event.action << ", mode: " << event.mode << ">";
+    return os;
+}
+
 MouseEvent::MouseEvent(double x, double y)
     : xpos(x)
     , ypos(y)
 {}
+
+std::ostream& operator << (std::ostream& os, const MouseEvent& event) {
+    os << "<MouseEvent. xpos: " << event.xpos << ", ypos: " << event.ypos
+       << ">";
+    return os;
+}
 
 MouseButtonEvent::MouseButtonEvent(int b, int a, int m)
     : button(b)
@@ -21,15 +33,35 @@ MouseButtonEvent::MouseButtonEvent(int b, int a, int m)
     , mode(m)
 {}
 
+std::ostream& operator << (std::ostream& os, const MouseButtonEvent& e) {
+    os << "<MouseButtonEvent. button: " << e.button << ", action: " << e.action
+       << ", mode: " << e.mode << ">";
+    return os;
+}
+
 ScrollEvent::ScrollEvent(double x, double y)
     : xoffset(x)
     , yoffset(y)
 {}
 
+std::ostream& operator << (std::ostream& os, const ScrollEvent& e) {
+    os << "<ScrollEvent. dx: " << e.xoffset << ", dy: " << e.yoffset << ">";
+    return os;
+}
+
 DropEvent::DropEvent(int c, const char** p)
     : count(c)
     , paths(p)
 {}
+
+std::ostream& operator << (std::ostream& os, const DropEvent& e) {
+    os << "<DropEvent. count: " << e.count;
+    for (int i = 0; i < e.count; ++i) {
+        os << e.paths[i] << "; ";
+    }
+    os << ">";
+    return os;
+}
 
 
 Publisher::Publisher()
@@ -73,7 +105,8 @@ void Publisher::emit(const DropEvent& event) const {
     templated_emit<DropEvent>(event);
 }
 
-template <typename Event> inline void Publisher::templated_emit(const Event& e) const {
+template <typename Event>
+inline void Publisher::templated_emit(const Event& e) const {
     for (Listener* l : _listeners) {
         l->consume(e);
     }

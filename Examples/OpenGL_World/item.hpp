@@ -7,39 +7,29 @@
 #include <Loader/opengl_converter.hpp>
 
 
-inline glm::mat4 scale_matrix(const glm::vec3& scale) {
-    return {
-        scale.x, 0.0, 0.0, 0.0,
-        0.0, scale.y, 0.0, 0.0,
-        0.0, 0.0, scale.z, 0.0,
-        0.0, 0.0, 0.0,     1.0
-    };
-}
-
-inline glm::mat4 move_matrix(const glm::vec3& move) {
-    return {
-        1.0, 0.0, 0.0, move.x,
-        0.0, 1.0, 0.0, move.y,
-        0.0, 1.0, 1.0, move.z,
-        0.0, 0.0, 0.0, 1.0
-    };
-}
-
-
 class Item3D {
 public:
     Item3D() = default;
+    Item3D(const std::filesystem::path& vertex,
+           const std::filesystem::path& fragment,
+           const glm::vec4& color);
     ~Item3D();
 
     void open(const std::string& path);
     void draw() const;
     void modify(glm::mat4&& modificator);
 
-    const glm::mat4& model() const { return model; }
+    const glm::mat4& model() const { return _model; }
+    GLuint program() const { return _program; }
+    void color(const glm::vec4& color) { _color = color; }
+    const glm::vec4& color() { return _color; }
 
 private:
     glm::mat4 _model {1.0};
     GLuint _vao {0};
+    GLuint _program{ 0 };
+    glm::vec4 _color{0.0, 0.0, 0.0, 1.0};
+
     std::vector<opengl::buffers_t> _vertex_input;
     std::vector<loader::Vertices> _vertices;
 };
@@ -55,3 +45,11 @@ struct ShaderUniformData {
 
 void pass_shader_uniforms(GLuint program, ShaderUniformData&& data,
                           const Item3D& item);
+
+class Scene {
+public:
+    Scene() = default;
+
+private:
+    std::vector<Item3D> _items;
+};
