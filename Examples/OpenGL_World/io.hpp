@@ -38,7 +38,7 @@ private:
 
 class GlobalListener : public ui::Listener {
 public:
-    GlobalListener(Item3D& item, ui::Publisher* publisher);
+    GlobalListener(Scene& scene, ui::Publisher* publisher);
 
     void consume(const ui::KeyEvent& event) override;
     void consume(const ui::MouseEvent& event) override;
@@ -53,5 +53,6 @@ private:
     ItemListener _item_listener;
 
     bool _wire_mode = false;
+    Scene& _scene;
     ui::MouseEvent _last_mouse_event;
 };

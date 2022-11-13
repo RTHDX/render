@@ -60,6 +60,9 @@ public:
 
     std::vector<Item3D>& items() { return _items; }
 
+    int width() const  { return _camera.width(); }
+    int height() const { return _camera.height(); }
+
 private:
     std::vector<Item3D> _items;
     opengl::Light _light;

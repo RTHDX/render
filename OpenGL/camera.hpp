@@ -38,7 +38,9 @@ public:
     void move(Direction direction);
 
     void width(float width) { _width = width; }
+    int width() const { return _width; }
     void height(float val) { _height = val; }
+    int height() const { return _height; }
 
 private:
     glm::vec3 up() const;

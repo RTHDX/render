@@ -74,7 +74,9 @@ Scene::~Scene() {
 
 
 void Scene::draw() {
+    int stencil_ref = 1;
     for (const auto& item : _items) {
+        SAFE_CALL(glStencilFunc(GL_ALWAYS, stencil_ref, 0xFF));
         pass_shader_uniforms(item.program(), {
             .color = item.color(),
             .light_position = _light.position(),
@@ -83,5 +85,6 @@ void Scene::draw() {
             .projection = _camera.projection(),
             .model = item.model()
         }, item);
+        ++stencil_ref;
     }
 }
