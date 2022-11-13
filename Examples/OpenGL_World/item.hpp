@@ -58,6 +58,8 @@ public:
 
     void draw();
 
+    std::vector<Item3D>& items() { return _items; }
+
 private:
     std::vector<Item3D> _items;
     opengl::Light _light;

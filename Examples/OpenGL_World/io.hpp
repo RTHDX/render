@@ -47,7 +47,11 @@ public:
     void consume(const ui::DropEvent& event) override;
 
 private:
+    void pick_pixel();
+
+private:
     ItemListener _item_listener;
 
     bool _wire_mode = false;
+    ui::MouseEvent _last_mouse_event;
 };

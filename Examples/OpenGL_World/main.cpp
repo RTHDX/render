@@ -57,7 +57,7 @@ int main() {
         opengl::Camera(WIDTH, HEIGHT, glm::radians(45.0), {10, 10, 10})
     );
 
-    //GlobalListener g_listener(cube, &ui::io::IO::instance());
+    GlobalListener g_listener(scene.items()[0], &ui::io::IO::instance());
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

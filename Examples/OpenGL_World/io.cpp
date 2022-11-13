@@ -1,6 +1,9 @@
+#include <format>
 #include <iostream>
 
+#include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "io.hpp"
 
@@ -21,10 +24,14 @@ void GlobalListener::consume(const ui::KeyEvent& event) {
 }
 void GlobalListener::consume(const ui::MouseEvent& event) {
     std::cout << event << std::endl;
+    _last_mouse_event = event;
     _item_listener.consume(event);
 }
 void GlobalListener::consume(const ui::MouseButtonEvent& event) {
     std::cout << event << std::endl;
+    if (event.button == GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW_PRESS) {
+        return pick_pixel();
+    }
     _item_listener.consume(event);
 }
 void GlobalListener::consume(const ui::ScrollEvent& event) {
@@ -34,6 +41,24 @@ void GlobalListener::consume(const ui::ScrollEvent& event) {
 void GlobalListener::consume(const ui::DropEvent& event) {
     std::cout << event << std::endl;
     _item_listener.consume(event);
+}
+
+void GlobalListener::pick_pixel() {
+    GLbyte pixel_color[4];
+    glReadPixels(
+        (int)_last_mouse_event.xpos,
+        (int)_last_mouse_event.ypos,
+        1,
+        1,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        pixel_color
+    );
+    std::cout << std::format("r {} g {} b {} a {}", pixel_color[0],
+                                                    pixel_color[1],
+                                                    pixel_color[2],
+                                                    pixel_color[3]
+    ) << std::endl;
 }
 
 

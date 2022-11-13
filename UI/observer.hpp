@@ -23,6 +23,7 @@ struct MouseEvent {
     double ypos;
 
 public:
+    MouseEvent() = default;
     MouseEvent(double x, double y);
 };
 std::ostream& operator << (std::ostream& os, const MouseEvent& event);
