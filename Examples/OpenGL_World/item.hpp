@@ -5,6 +5,8 @@
 #include <GLFW/glfw3.h>
 
 #include <Loader/opengl_converter.hpp>
+#include <OpenGL/camera.hpp>
+#include <OpenGL/light.hpp>
 
 
 class Item3D {
@@ -18,11 +20,12 @@ public:
     void open(const std::string& path);
     void draw() const;
     void modify(glm::mat4&& modificator);
+    void finalyze();
 
     const glm::mat4& model() const { return _model; }
     GLuint program() const { return _program; }
     void color(const glm::vec4& color) { _color = color; }
-    const glm::vec4& color() { return _color; }
+    const glm::vec4& color() const { return _color; }
 
 private:
     glm::mat4 _model {1.0};
@@ -49,7 +52,14 @@ void pass_shader_uniforms(GLuint program, ShaderUniformData&& data,
 class Scene {
 public:
     Scene() = default;
+    Scene(std::vector<Item3D>&& items, opengl::Light&& light,
+          opengl::Camera&& camera);
+    ~Scene();
+
+    void draw();
 
 private:
     std::vector<Item3D> _items;
+    opengl::Light _light;
+    opengl::Camera _camera;
 };

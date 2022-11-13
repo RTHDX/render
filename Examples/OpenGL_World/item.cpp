@@ -12,9 +12,13 @@ Item3D::Item3D(const fs::path& vertex,
 {}
 
 Item3D::~Item3D() {
-    for (opengl::buffers_t& v_data : _vertex_input) {
-        opengl::free_vertex_buffers(v_data);
-    }
+    //for (opengl::buffers_t& v_data : _vertex_input) {
+    //    opengl::free_vertex_buffers(v_data);
+    //}
+    //opengl::free_vertex_array(_vao);
+}
+
+void Item3D::finalyze() {
     opengl::free_vertex_array(_vao);
 }
 
@@ -52,4 +56,32 @@ void pass_shader_uniforms(GLuint program, ShaderUniformData&& data,
     opengl::set_mat4(program, "projection", data.projection);
     opengl::set_mat4(program, "model", data.model);
     item.draw();
+}
+
+
+Scene::Scene(std::vector<Item3D>&& items, opengl::Light&& light,
+             opengl::Camera&& camera)
+    : _items(std::move(items))
+    , _light(std::move(light))
+    , _camera(std::move(camera))
+{}
+
+Scene::~Scene() {
+    for (auto& item : _items) {
+        item.finalyze();
+    }
+}
+
+
+void Scene::draw() {
+    for (const auto& item : _items) {
+        pass_shader_uniforms(item.program(), {
+            .color = item.color(),
+            .light_position = _light.position(),
+            .light_color = _light.color(),
+            .view = _camera.view(),
+            .projection = _camera.projection(),
+            .model = item.model()
+        }, item);
+    }
 }

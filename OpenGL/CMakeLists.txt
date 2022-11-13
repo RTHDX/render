@@ -12,6 +12,7 @@ create_library(
         opengl_vertex_input.cpp
         texture.cpp
         opengl_functions.cpp
+        light.cpp
     HEADERS
         opengl_utils.hpp
         camera.cpp
@@ -19,5 +20,6 @@ create_library(
         opengl_vertex_input.hpp
         texture.hpp
         opengl_functions.hpp
+        light.hpp
     LIBS UI
 )
