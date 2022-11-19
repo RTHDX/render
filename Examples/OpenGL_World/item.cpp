@@ -1,3 +1,5 @@
+#include <glm/gtx/transform.hpp>
+
 #include <OpenGL/opengl_proc.hpp>
 
 #include "item.hpp"
@@ -9,6 +11,13 @@ Item3D::Item3D(const fs::path& vertex,
                const glm::vec4& color)
     : _program(opengl::create_program(vertex, fragment))
     , _color(color)
+{}
+
+Item3D::Item3D(ItemInputData&& data)
+    : _program(opengl::create_program(data.vertex, data.fragment))
+    , _color(data.color)
+    , _selection_program(opengl::create_program(data.vertex, data.fragment))
+    , _selection_color(data.selection_color)
 {}
 
 Item3D::~Item3D() {
@@ -45,6 +54,23 @@ void Item3D::modify(glm::mat4&& modificator) {
     _model = modificator;
 }
 
+bool Item3D::activate(int id) {
+    if (id == _id) {
+        _is_active = true;
+    } else {
+        _is_active = false;
+    }
+    return _is_active;
+}
+
+void Item3D::activate() {
+    _is_active = true;
+}
+
+void Item3D::deactivate() {
+    _is_active = false;
+}
+
 
 void pass_shader_uniforms(GLuint program, ShaderUniformData&& data,
                           const Item3D& item) {
@@ -55,6 +81,16 @@ void pass_shader_uniforms(GLuint program, ShaderUniformData&& data,
     opengl::set_mat4(program, "view", data.view);
     opengl::set_mat4(program, "projection", data.projection);
     opengl::set_mat4(program, "model", data.model);
+    item.draw();
+}
+
+void pass_selection_shader_uniforms(GLuint program,
+                                    SelectionShaderUniformData&& data,
+                                    const Item3D& item) {
+    opengl::use(program);
+    opengl::set_mat4(program, "model", data.model);
+    opengl::set_mat4(program, "view", data.view);
+    opengl::set_mat4(program, "projection", data.projection);
     item.draw();
 }
 
@@ -75,8 +111,12 @@ Scene::~Scene() {
 
 void Scene::draw() {
     int stencil_ref = 1;
-    for (const auto& item : _items) {
+    for (auto& item : _items) {
+        SAFE_CALL(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
         SAFE_CALL(glStencilFunc(GL_ALWAYS, stencil_ref, 0xFF));
+        SAFE_CALL(glStencilMask(0xFF));
+        item.id(stencil_ref);
+        ++stencil_ref;
         pass_shader_uniforms(item.program(), {
             .color = item.color(),
             .light_position = _light.position(),
@@ -85,6 +125,19 @@ void Scene::draw() {
             .projection = _camera.projection(),
             .model = item.model()
         }, item);
-        ++stencil_ref;
     }
+}
+
+
+bool Scene::activate_index(GLuint index) {
+    bool is_activated = false;
+    for (auto& item : _items) {
+        if (item.id() == index) {
+            item.activate();
+            is_activated = true;
+        } else {
+            item.deactivate();
+        }
+    }
+    return is_activated;
 }

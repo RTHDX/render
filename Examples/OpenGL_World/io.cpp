@@ -7,11 +7,14 @@
 
 #include "io.hpp"
 
+static bool is_key_press_or_hold(const ui::KeyEvent& event, int key);
+
 
 GlobalListener::GlobalListener(Scene& scene, ui::Publisher* publisher)
     : ui::Listener(publisher)
     , _scene(scene)
     , _item_listener(scene.items()[0])
+    , _camera_listener(scene.camera())
 {}
 
 void GlobalListener::consume(const ui::KeyEvent& event) {
@@ -21,25 +24,37 @@ void GlobalListener::consume(const ui::KeyEvent& event) {
         return;
     }
 
-    _item_listener.consume(event);
+    return is_item_active() ?
+        _item_listener.consume(event) :
+        _camera_listener.consume(event);
 }
 void GlobalListener::consume(const ui::MouseEvent& event) {
     _last_mouse_event = event;
-    _item_listener.consume(event);
+
+    return is_item_active() ?
+        _item_listener.consume(event) :
+        _camera_listener.consume(event);
 }
 void GlobalListener::consume(const ui::MouseButtonEvent& event) {
     if (event.button == GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW_PRESS) {
         return pick_pixel();
     }
-    _item_listener.consume(event);
+
+    return is_item_active() ?
+        _item_listener.consume(event) :
+        _camera_listener.consume(event);
 }
 
 void GlobalListener::consume(const ui::ScrollEvent& event) {
-    _item_listener.consume(event);
+    return is_item_active() ?
+        _item_listener.consume(event) :
+        _camera_listener.consume(event);
 }
 
 void GlobalListener::consume(const ui::DropEvent& event) {
-    _item_listener.consume(event);
+    return is_item_active() ?
+        _item_listener.consume(event) :
+        _camera_listener.consume(event);
 }
 
 void GlobalListener::pick_pixel() {
@@ -53,7 +68,11 @@ void GlobalListener::pick_pixel() {
         GL_UNSIGNED_INT,
         &index
     ));
-    std::cout << index << std::endl;
+    _scene.activate_index(index);
+}
+
+bool GlobalListener::is_item_active() {
+    return _item_listener.item().is_active();
 }
 
 
@@ -83,7 +102,6 @@ void ItemListener::consume(const ui::KeyEvent& event) {
     if (event.key == GLFW_KEY_E && press_or_hold) {
         return rotate_right();
     }
-    std::cout << event << std::endl;
 }
 
 void ItemListener::consume(const ui::MouseEvent& event) {
@@ -136,4 +154,47 @@ void ItemListener::rotate_right() {
     _item.modify(std::move(
         glm::rotate(_item.model(), -glm::radians(ROTATE_SPEED), ROTATE_AXE)
     ));
+}
+
+
+CameraListener::CameraListener(opengl::Camera& camera)
+    : ui::Listener()
+    , _camera(camera)
+{}
+
+void CameraListener::consume(const ui::KeyEvent& event) {
+    if (is_key_press_or_hold(event, GLFW_KEY_W)) {
+        return _camera.move(opengl::Direction::FORWARD);
+    }
+    if (is_key_press_or_hold(event, GLFW_KEY_S)) {
+        return _camera.move(opengl::Direction::BACKWARD);
+    }
+    if (is_key_press_or_hold(event, GLFW_KEY_A)) {
+        return _camera.move(opengl::Direction::LEFT);
+    }
+    if (is_key_press_or_hold(event, GLFW_KEY_D)) {
+        return _camera.move(opengl::Direction::RIGHT);
+    }
+}
+
+void CameraListener::consume(const ui::MouseEvent& event) {
+    ;
+}
+
+void CameraListener::consume(const ui::MouseButtonEvent& event) {
+    ;
+}
+
+void CameraListener::consume(const ui::ScrollEvent& event) {
+    ;
+}
+
+void CameraListener::consume(const ui::DropEvent& event) {
+    ;
+}
+
+
+static bool is_key_press_or_hold(const ui::KeyEvent& event, int key) {
+    return event.key == key &&
+           (event.action == GLFW_PRESS || event.action == GLFW_REPEAT);
 }

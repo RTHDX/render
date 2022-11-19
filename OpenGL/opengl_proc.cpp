@@ -273,7 +273,6 @@ bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val) {
     if (loc < 0) return false;
     glUniform3f(loc, val.x, val.y, val.z);
     return true;
-
 }
 
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val) {

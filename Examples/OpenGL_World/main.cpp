@@ -21,17 +21,30 @@ glm::vec4 background   = {0.5, 0.8, 0.8, 1.0};
 glm::vec4 ground_color = {0.5, 0.5, 0.5, 1.0};
 glm::vec4 light_color  = {0.8, 0.8, 1.0, 1.0};
 glm::vec3 light_pos    = {20.0, 20.0, 20.0};
-std::filesystem::path vertex_path("./vertex_shader.vert");
-std::filesystem::path fragment_path("./fragment_shader.frag");
+namespace fs = std::filesystem;
 
 auto create_cube() {
-    Item3D cube(vertex_path, fragment_path, {1.0, 0.5, 0.31, 1.0});
+    Item3D cube(ItemInputData {
+        .vertex             = fs::path("./vertex_shader.vert"),
+        .fragment           = fs::path("./fragment_shader.frag"),
+        .vertex_selection   = fs::path("./selection.vert"),
+        .fragment_selection = fs::path("./selection.frag"),
+        .color              = {1.0, 0.5, 0.31, 1.0},
+        .selection_color    = {1.0, 0.0, 0.0, 1.0}
+    });
     cube.open("./cube.obj");
     return cube;
 }
 
 auto create_ground() {
-    Item3D ground(vertex_path, fragment_path, {0.2, 0.2, 0.2, 1.0});
+    Item3D ground(ItemInputData {
+        .vertex             = fs::path("./vertex_shader.vert"),
+        .fragment           = fs::path("./fragment_shader.frag"),
+        .vertex_selection   = fs::path("./selection.vert"),
+        .fragment_selection = fs::path("./selection.frag"),
+        .color              = {0.2, 0.2, 0.2, 1.0},
+        .selection_color    = {1.0, 0.0, 0.0, 1.0}
+    });
     ground.open("./cube.obj");
     auto scale = glm::scale(ground.model(), {10.0, 1.0, 10.0});
     auto move = glm::translate(scale, {0.0, -5.0, 0.0});
@@ -47,9 +60,6 @@ int main() {
     opengl::Context::instance().initialize(true);
     opengl::Context::instance().background(background);
     opengl::Camera camera(WIDTH, HEIGHT, glm::radians(45.0), {10, 10, 10});
-
-    Item3D cube(vertex_path, fragment_path, {1.0, 0.5, 0.31, 1.0});
-    cube.open("./cube.obj");
 
     Scene scene(
         {create_cube(), create_ground()},

@@ -24,6 +24,8 @@ public:
     void consume(const ui::ScrollEvent& event) override;
     void consume(const ui::DropEvent& event) override;
 
+    const Item3D& item() const { return _item; }
+
 private:
     void move_forward();
     void move_backward();
@@ -34,6 +36,22 @@ private:
 
 private:
     Item3D& _item;
+};
+
+class CameraListener : public ui::Listener {
+public:
+    CameraListener(opengl::Camera& camera);
+
+    void consume(const ui::KeyEvent& event) override;
+    void consume(const ui::MouseEvent& event) override;
+    void consume(const ui::MouseButtonEvent& event) override;
+    void consume(const ui::ScrollEvent& event) override;
+    void consume(const ui::DropEvent& event) override;
+
+    const opengl::Camera& camera() const { return _camera; }
+
+private:
+    opengl::Camera& _camera;
 };
 
 class GlobalListener : public ui::Listener {
@@ -48,9 +66,11 @@ public:
 
 private:
     void pick_pixel();
+    bool is_item_active();
 
 private:
     ItemListener _item_listener;
+    CameraListener _camera_listener;
 
     bool _wire_mode = false;
     Scene& _scene;

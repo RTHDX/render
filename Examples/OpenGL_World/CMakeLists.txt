@@ -9,5 +9,6 @@ create_executable(
     HEADERS item.hpp io.hpp
     LIBS OpenGL UI OpenGL-Loader
     MESHES cube.obj cube.mtl
-    SHADERS fragment_shader.frag vertex_shader.vert
+    SHADERS fragment_shader.frag vertex_shader.vert selection.vert
+            selection.frag
 )
