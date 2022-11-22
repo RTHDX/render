@@ -45,7 +45,7 @@ void Item3D::draw() const {
     for (size_t i = 0; i < _vertices.size(); ++i) {
         opengl::draw(opengl::DrawArrayCommand{
             .vao   = _vao,
-            .count = _vertices[i].size()
+            .count = _vertices[i].size(),
         });
     }
 }
