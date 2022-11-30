@@ -56,12 +56,16 @@ void GlobalListener::consume(const ui::DropEvent& event) {
     std::cout << event << std::endl;
     if (event.paths.size() == 0) { return; }
 
-    map::reader::Reader reader(event.paths[0]);
+    auto path = event.paths[0];
+    map::reader::Reader reader(path);
     if (!reader.verify()) {
         std::wcerr << "Dropped file has incorrect extenstion" << std::endl;
+        std::wcerr << "Given: " << path.wstring() << std::endl;
+        std::wcerr << "Expected: .wrld" << std::endl;
+        return;
     }
 
-    reader.read();
+    if (!reader.read()) { return; }
 }
 
 void GlobalListener::pick_pixel() {
@@ -89,24 +93,22 @@ ItemListener::ItemListener(Item3D& item)
 {}
 
 void ItemListener::consume(const ui::KeyEvent& event) {
-    const bool press_or_hold = event.action == GLFW_PRESS ||
-                               event.action == GLFW_REPEAT;
-    if (event.key == GLFW_KEY_W && press_or_hold) {
+    if (is_key_press_or_hold(event, GLFW_KEY_W)) {
         return move_forward();
     }
-    if (event.key == GLFW_KEY_S && press_or_hold) {
+    if (is_key_press_or_hold(event, GLFW_KEY_S)) {
         return move_backward();
     }
-    if (event.key == GLFW_KEY_A && press_or_hold) {
+    if (is_key_press_or_hold(event, GLFW_KEY_A)) {
         return move_left();
     }
-    if (event.key == GLFW_KEY_D && press_or_hold) {
+    if (is_key_press_or_hold(event, GLFW_KEY_D)) {
         return move_right();
     }
-    if (event.key == GLFW_KEY_Q && press_or_hold) {
+    if (is_key_press_or_hold(event, GLFW_KEY_Q)) {
         return rotate_left();
     }
-    if (event.key == GLFW_KEY_E && press_or_hold) {
+    if (is_key_press_or_hold(event, GLFW_KEY_E)) {
         return rotate_right();
     }
 }

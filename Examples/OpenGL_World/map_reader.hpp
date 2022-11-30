@@ -19,11 +19,14 @@ public:
     bool verify() const;
 
     const map_t& map() const { return _map; }
+    uint32_t width() const { return _width; }
+    uint32_t height() const { return _height; }
 
 private:
     void convert(std::string&& content);
 
 public:
+    uint32_t _width = {0}, _height = {0};
     map_t _map;
     std::filesystem::path _path;
 };
