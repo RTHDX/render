@@ -50,17 +50,23 @@ std::ostream& operator << (std::ostream& os, const ScrollEvent& e) {
 }
 
 DropEvent::DropEvent(int c, const char** p)
-    : count(c)
-    , paths(p)
+    : paths(c) {
+    for (ptrdiff_t i = 0; i < c; ++i) {
+        paths[i] = std::filesystem::path(p[i]);
+    }
+}
+
+DropEvent::DropEvent(std::vector<std::filesystem::path>&& p)
+    : paths(std::move(p))
 {}
 
+
 std::ostream& operator << (std::ostream& os, const DropEvent& e) {
-    os << "<DropEvent. count: " << e.count;
-    for (int i = 0; i < e.count; ++i) {
-        os << e.paths[i] << "; ";
+    os << "<DropEvent ";
+    for (const auto& path : e.paths) {
+        os << path.string() << "; ";
     }
-    os << ">";
-    return os;
+    return os << ">";
 }
 
 

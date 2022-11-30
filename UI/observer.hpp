@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <ostream>
+#include <filesystem>
 
 
 namespace ui {
@@ -51,11 +52,13 @@ std::ostream& operator << (std::ostream& os, const ScrollEvent& event);
 
 
 struct DropEvent {
-    int count;
-    const char** paths;
+    //int count;
+    //const char** paths;
+    std::vector<std::filesystem::path> paths;
 
 public:
     DropEvent(int c, const char** p);
+    DropEvent(std::vector<std::filesystem::path>&& p);
 };
 std::ostream& operator << (std::ostream& os, const DropEvent& event);
 

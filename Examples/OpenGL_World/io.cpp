@@ -6,6 +6,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "io.hpp"
+#include "map_reader.hpp"
 
 static bool is_key_press_or_hold(const ui::KeyEvent& event, int key);
 
@@ -52,9 +53,15 @@ void GlobalListener::consume(const ui::ScrollEvent& event) {
 }
 
 void GlobalListener::consume(const ui::DropEvent& event) {
-    return is_item_active() ?
-        _item_listener.consume(event) :
-        _camera_listener.consume(event);
+    std::cout << event << std::endl;
+    if (event.paths.size() == 0) { return; }
+
+    map::reader::Reader reader(event.paths[0]);
+    if (!reader.verify()) {
+        std::wcerr << "Dropped file has incorrect extenstion" << std::endl;
+    }
+
+    reader.read();
 }
 
 void GlobalListener::pick_pixel() {

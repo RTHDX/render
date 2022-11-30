@@ -51,7 +51,8 @@ void Item3D::draw() const {
 }
 
 void Item3D::modify(glm::mat4&& modificator) {
-    _model = modificator;
+    //_model = modificator;
+    std::swap(_model, modificator);
 }
 
 bool Item3D::activate(int id) {
