@@ -9,9 +9,11 @@ create_executable(
             item.cpp
             io.cpp
             map_reader.cpp
+            ground_builder.cpp
     HEADERS item.hpp
             io.hpp
             map_reader.hpp
+            ground_builder.hpp
     LIBS OpenGL UI OpenGL-Loader
     MESHES cube.obj cube.mtl
     SHADERS fragment_shader.frag vertex_shader.vert selection.vert

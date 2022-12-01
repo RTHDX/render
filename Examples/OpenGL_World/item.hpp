@@ -102,6 +102,7 @@ public:
     Scene() = default;
     Scene(std::vector<Item3D>&& items, opengl::Light&& light,
           opengl::Camera&& camera);
+    Scene(opengl::Light&& light, opengl::Camera&& camera);
     ~Scene();
 
     void draw();
@@ -109,7 +110,8 @@ public:
     std::vector<Item3D>& items() { return _items; }
     opengl::Camera& camera() { return _camera; }
     bool activate_index(GLuint index);
-    Item3D& active_item() const;
+
+    void append(Item3D&& item);
 
     int width() const  { return _camera.width(); }
     int height() const { return _camera.height(); }

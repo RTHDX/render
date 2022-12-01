@@ -103,6 +103,11 @@ Scene::Scene(std::vector<Item3D>&& items, opengl::Light&& light,
     , _camera(std::move(camera))
 {}
 
+Scene::Scene(opengl::Light&& light, opengl::Camera&& camera)
+    : _light(std::move(light))
+    , _camera(std::move(camera))
+{}
+
 Scene::~Scene() {
     for (auto& item : _items) {
         item.finalyze();
@@ -141,4 +146,9 @@ bool Scene::activate_index(GLuint index) {
         }
     }
     return is_activated;
+}
+
+
+void Scene::append(Item3D&& item) {
+    _items.push_back(std::move(item));
 }
