@@ -7,15 +7,21 @@
 
 #include "io.hpp"
 #include "map_reader.hpp"
+#include "ground_builder.hpp"
 
 static bool is_key_press_or_hold(const ui::KeyEvent& event, int key);
 
 
-GlobalListener::GlobalListener(Scene& scene, ui::Publisher* publisher)
+GlobalListener::GlobalListener(Scene&& scene, ui::Publisher* publisher)
+    : ui::Listener(publisher)
+    , _scene(std::move(scene))
+    , _camera_listener(_scene.camera())
+{}
+
+GlobalListener::GlobalListener(const Scene& scene, ui::Publisher* publisher)
     : ui::Listener(publisher)
     , _scene(scene)
-    , _item_listener(scene.items()[0])
-    , _camera_listener(scene.camera())
+    , _camera_listener(_scene.camera())
 {}
 
 void GlobalListener::consume(const ui::KeyEvent& event) {
@@ -66,6 +72,13 @@ void GlobalListener::consume(const ui::DropEvent& event) {
     }
 
     if (!reader.read()) { return; }
+
+    const auto& map = reader.map();
+    const auto w = reader.width();
+    const auto h = reader.height();
+    for (auto&& item : create_ground(map, w, h)) {
+        _scene.append(std::move(item));
+    }
 }
 
 void GlobalListener::pick_pixel() {
@@ -83,14 +96,12 @@ void GlobalListener::pick_pixel() {
 }
 
 bool GlobalListener::is_item_active() {
-    return _item_listener.item().is_active();
+    //return _item_listener.item().is_active();
+    return std::any_of(_scene.items().cbegin(), _scene.items().cend(),
+        [](const Item3D& item) { return item.is_active(); }
+    );
 }
 
-
-ItemListener::ItemListener(Item3D& item)
-    : ui::Listener()
-    , _item(item)
-{}
 
 void ItemListener::consume(const ui::KeyEvent& event) {
     if (is_key_press_or_hold(event, GLFW_KEY_W)) {
@@ -130,38 +141,50 @@ void ItemListener::consume(const ui::DropEvent& event) {
 }
 
 void ItemListener::move_forward() {
-    _item.modify(std::move(
-        glm::translate(_item.model(), FORWARD_DIR)
+    if (!_item) return;
+
+    _item->modify(std::move(
+        glm::translate(_item->model(), FORWARD_DIR)
     ));
 }
 
 void ItemListener::move_backward() {
-    _item.modify(std::move(
-        glm::translate(_item.model(), BACKWARD_DIR)
+    if (!_item) return;
+
+    _item->modify(std::move(
+        glm::translate(_item->model(), BACKWARD_DIR)
     ));
 }
 
 void ItemListener::move_left() {
-    _item.modify(std::move(
-        glm::translate(_item.model(), LEFT_DIR)
+    if (!_item) return;
+
+    _item->modify(std::move(
+        glm::translate(_item->model(), LEFT_DIR)
     ));
 }
 
 void ItemListener::move_right() {
-    _item.modify(std::move(
-        glm::translate(_item.model(), RIGHT_DIR)
+    if (!_item) return;
+
+    _item->modify(std::move(
+        glm::translate(_item->model(), RIGHT_DIR)
     ));
 }
 
 void ItemListener::rotate_left() {
-    _item.modify(std::move(
-        glm::rotate(_item.model(), glm::radians(ROTATE_SPEED), ROTATE_AXE)
+    if (!_item) return;
+
+    _item->modify(std::move(
+        glm::rotate(_item->model(), glm::radians(ROTATE_SPEED), ROTATE_AXE)
     ));
 }
 
 void ItemListener::rotate_right() {
-    _item.modify(std::move(
-        glm::rotate(_item.model(), -glm::radians(ROTATE_SPEED), ROTATE_AXE)
+    if (!_item) return;
+
+    _item->modify(std::move(
+        glm::rotate(_item->model(), -glm::radians(ROTATE_SPEED), ROTATE_AXE)
     ));
 }
 

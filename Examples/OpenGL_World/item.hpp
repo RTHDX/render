@@ -17,6 +17,8 @@ struct ItemInputData {
 
     glm::vec4 color;
     glm::vec4 selection_color;
+
+    bool is_selectable = true;
 };
 
 
@@ -27,8 +29,9 @@ public:
     Item3D() = default;
     Item3D(const std::filesystem::path& vertex,
            const std::filesystem::path& fragment,
-           const glm::vec4& color);
-    Item3D(ItemInputData&& data);
+           const glm::vec4& color,
+           bool is_selectable = true);
+    explicit Item3D(ItemInputData&& data);
     ~Item3D();
 
     void open(const std::string& path);
@@ -41,7 +44,7 @@ public:
 
     void color(const glm::vec4& color) { _color = color; }
     const glm::vec4& color() const {
-        return _is_active ? _selection_color : _color;
+        return is_active() ? _selection_color : _color;
     }
 
     GLuint selection_program() const { return _selection_program; }
@@ -54,7 +57,7 @@ public:
     bool is_active() const { return _is_active; }
 
     bool activate(int);
-    void activate();
+    bool activate();
     void deactivate();
 
 private:
@@ -68,6 +71,7 @@ private:
 
     int _id {-1};
     bool _is_active {false};
+    bool _is_selectable;
 
     std::vector<opengl::buffers_t> _vertex_input;
     std::vector<loader::Vertices> _vertices;

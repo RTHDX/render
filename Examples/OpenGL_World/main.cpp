@@ -52,6 +52,13 @@ auto create_ground() {
     return ground;
 }
 
+auto create_empty_scene() {
+    return Scene {
+        opengl::Light({20.0, 20.0, 20.0}, {0.8, 0.8, 1.0, 1.0}),
+        opengl::Camera(WIDTH, HEIGHT, glm::radians(45.0), {10, 10, 10})
+    };
+}
+
 int main() {
     if (!ui::init_glfw(4, 6)) { return EXIT_FAILURE; }
 
@@ -61,19 +68,14 @@ int main() {
     opengl::Context::instance().background(background);
     opengl::Camera camera(WIDTH, HEIGHT, glm::radians(45.0), {10, 10, 10});
 
-    Scene scene(
-        {create_cube(), create_ground()},
-        opengl::Light({20.0, 20.0, 20.0}, {0.8, 0.8, 1.0, 1.0}),
-        opengl::Camera(WIDTH, HEIGHT, glm::radians(45.0), {10, 10, 10})
-    );
-
-    GlobalListener g_listener(scene, &ui::io::IO::instance());
+    GlobalListener g_listener(std::move(create_empty_scene()),
+                              &ui::io::IO::instance());
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
 
-        scene.draw();
+        g_listener.scene().draw();
 
         glfwSwapBuffers(window);
     }

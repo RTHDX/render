@@ -16,7 +16,7 @@ class ItemListener : public ui::Listener {
     static constexpr glm::vec3 ROTATE_AXE   {0.0,    1.0,    0.0};
 
 public:
-    ItemListener(Item3D& item);
+    ItemListener() = default;
 
     void consume(const ui::KeyEvent& event) override;
     void consume(const ui::MouseEvent& event) override;
@@ -24,7 +24,8 @@ public:
     void consume(const ui::ScrollEvent& event) override;
     void consume(const ui::DropEvent& event) override;
 
-    const Item3D& item() const { return _item; }
+    void item(Item3D* item) { _item = item; }
+    const Item3D* const item() const { return _item; }
 
 private:
     void move_forward();
@@ -35,7 +36,7 @@ private:
     void rotate_right();
 
 private:
-    Item3D& _item;
+    Item3D* _item = nullptr;
 };
 
 class CameraListener : public ui::Listener {
@@ -56,13 +57,16 @@ private:
 
 class GlobalListener : public ui::Listener {
 public:
-    GlobalListener(Scene& scene, ui::Publisher* publisher);
+    explicit GlobalListener(Scene&& scene, ui::Publisher* publisher);
+    explicit GlobalListener(const Scene& scene, ui::Publisher* publisher);
 
     void consume(const ui::KeyEvent& event) override;
     void consume(const ui::MouseEvent& event) override;
     void consume(const ui::MouseButtonEvent& event) override;
     void consume(const ui::ScrollEvent& event) override;
     void consume(const ui::DropEvent& event) override;
+
+    Scene& scene() { return _scene; }
 
 private:
     void pick_pixel();
@@ -73,6 +77,6 @@ private:
     CameraListener _camera_listener;
 
     bool _wire_mode = false;
-    Scene& _scene;
+    Scene _scene;
     ui::MouseEvent _last_mouse_event;
 };

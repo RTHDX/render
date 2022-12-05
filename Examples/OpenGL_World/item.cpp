@@ -8,9 +8,11 @@ namespace fs = std::filesystem;
 
 Item3D::Item3D(const fs::path& vertex,
                const fs::path& fragment,
-               const glm::vec4& color)
+               const glm::vec4& color,
+               bool is_selectable)
     : _program(opengl::create_program(vertex, fragment))
     , _color(color)
+    , _is_selectable(is_selectable)
 {}
 
 Item3D::Item3D(ItemInputData&& data)
@@ -18,6 +20,7 @@ Item3D::Item3D(ItemInputData&& data)
     , _color(data.color)
     , _selection_program(opengl::create_program(data.vertex, data.fragment))
     , _selection_color(data.selection_color)
+    , _is_selectable(data.is_selectable)
 {}
 
 Item3D::~Item3D() {
@@ -64,8 +67,11 @@ bool Item3D::activate(int id) {
     return _is_active;
 }
 
-void Item3D::activate() {
-    _is_active = true;
+bool Item3D::activate() {
+    if (_is_selectable) {
+        _is_active = true;
+    }
+    return _is_active;
 }
 
 void Item3D::deactivate() {
@@ -139,8 +145,7 @@ bool Scene::activate_index(GLuint index) {
     bool is_activated = false;
     for (auto& item : _items) {
         if (item.id() == index) {
-            item.activate();
-            is_activated = true;
+            is_activated = item.activate();
         } else {
             item.deactivate();
         }
