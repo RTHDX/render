@@ -207,6 +207,12 @@ void CameraListener::consume(const ui::KeyEvent& event) {
     if (is_key_press_or_hold(event, GLFW_KEY_D)) {
         return _camera.move(opengl::Direction::RIGHT);
     }
+    if (is_key_press_or_hold(event, GLFW_KEY_Q)) {
+        return _camera.move(opengl::Direction::ROTATE_LEFT);
+    }
+    if (is_key_press_or_hold(event, GLFW_KEY_E)) {
+        return _camera.move(opengl::Direction::ROTATE_RIGHT);
+    }
 }
 
 void CameraListener::consume(const ui::MouseEvent& event) {

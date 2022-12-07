@@ -20,8 +20,9 @@ static inline Item3D create_item(cell_t cell,
         .is_selectable      = false
     }};
     out.open("./cube.obj");
-    auto scale = glm::scale(out.model(), {1.0, float(cell), 1.0});
-    auto taransform = glm::translate(scale, {x_pos, 0.0, z_pos});
+    //auto scale = glm::scale(out.model(), {1.0, float(cell), 1.0});
+    auto taransform = glm::translate(out.model(),
+                                     {float(x_pos), float(cell), float(z_pos)});
     out.modify(std::move(taransform));
     return out;
 }

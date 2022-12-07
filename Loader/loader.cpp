@@ -44,8 +44,8 @@ std::vector<Mesh> Loader::read(const std::string& path) {
     }
 
     std::vector<Mesh> out(scene->mNumMeshes);
-    dump_material(scene->mMaterials[0]);
-    dump_material(scene->mMaterials[1]);
+    //dump_material(scene->mMaterials[0]);
+    //dump_material(scene->mMaterials[1]);
     for (size_t i = 0; i < scene->mNumMeshes; ++i) {
         out[i] = process_mesh(scene->mMeshes[i], nullptr);
     }
