@@ -20,9 +20,9 @@ static inline Item3D create_item(cell_t cell,
         .is_selectable      = false
     }};
     out.open("./cube.obj");
-    //auto scale = glm::scale(out.model(), {1.0, float(cell), 1.0});
-    auto taransform = glm::translate(out.model(),
-                                     {float(x_pos), float(cell), float(z_pos)});
+    auto scale = glm::scale(out.model(), {1.0, float(cell), 1.0});
+    glm::vec3 coords {x_pos + 1.0, 0.0, z_pos + 1.0};
+    auto taransform = glm::translate(scale, coords);
     out.modify(std::move(taransform));
     return out;
 }
@@ -32,7 +32,7 @@ std::vector<Item3D> create_ground(const map_t& map, uint32_t w, uint32_t h) {
     std::vector<Item3D> out(w * h);
     for (uint32_t i = 0; i < w; ++i) {
         for (uint32_t j = 0; j < h; ++j) {
-            out[index] = create_item(map[i], w, h, i, j);
+            out[index] = create_item(map[index], w, h, i, j);
             index++;
         }
     }
