@@ -34,6 +34,14 @@ void Context::initialize(bool to_dump) {
     if (to_dump) { dump(); }
 }
 
+void Context::initialize_light(bool to_dump) {
+    if (!gladLoadGL()) {
+        std::cerr << "Failed to initialize GLAD" << std::endl;
+        std::terminate();
+    }
+    if (to_dump) { dump(); }
+}
+
 void Context::dump() const {
 #define PRINT_OPENGL_FEATURE_INTV(FEATURE) \
     std::cout << " - " << #FEATURE << ": " << get(FEATURE) << std::endl;

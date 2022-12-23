@@ -1,5 +1,4 @@
 #include <iostream>
-#include <boost/stacktrace.hpp>
 
 #include "opengl_functions.hpp"
 

@@ -20,7 +20,7 @@ bool init_glfw(int major, int minor) {
 
 bool init_glfw_lite() {
     auto result = glfwInit();
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+    //glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
     return result == GLFW_TRUE;
 }
 

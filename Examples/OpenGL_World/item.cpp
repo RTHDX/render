@@ -157,3 +157,7 @@ bool Scene::activate_index(GLuint index) {
 void Scene::append(Item3D&& item) {
     _items.push_back(std::move(item));
 }
+
+void Scene::clear() {
+    _items.clear();
+}

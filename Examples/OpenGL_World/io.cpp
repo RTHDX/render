@@ -71,7 +71,11 @@ void GlobalListener::consume(const ui::DropEvent& event) {
         return;
     }
 
-    if (!reader.read()) { return; }
+    if (reader.read()) {
+        _scene.clear();
+    } else {
+        return;
+    }
 
     const auto& map = reader.map();
     const auto w = reader.width();
@@ -96,7 +100,6 @@ void GlobalListener::pick_pixel() {
 }
 
 bool GlobalListener::is_item_active() {
-    //return _item_listener.item().is_active();
     return std::any_of(_scene.items().cbegin(), _scene.items().cend(),
         [](const Item3D& item) { return item.is_active(); }
     );

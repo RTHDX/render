@@ -217,7 +217,8 @@ void render(std::vector<Color>& framebuffer,
     for (size_t i = 0; i < HEIGHT; ++i) {
         for (size_t j = 0; j < WIDTH; ++j) {
             const size_t index = eval_index(i, j);
-            framebuffer[index] = cast_ray(emit_ray(i, j), spheres, lights);
+            auto pixel = cast_ray(emit_ray(i, j), spheres, lights);
+            framebuffer[index] = pixel;
         }
     }
 }

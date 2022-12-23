@@ -18,6 +18,7 @@ public:
     static Context& instance();
 
     void initialize(bool = false);
+    void initialize_light(bool = false);
     void dump() const;
 
     void viewport(int width, int height) const;

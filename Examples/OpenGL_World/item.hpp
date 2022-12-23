@@ -116,6 +116,7 @@ public:
     bool activate_index(GLuint index);
 
     void append(Item3D&& item);
+    void clear();
 
     int width() const  { return _camera.width(); }
     int height() const { return _camera.height(); }

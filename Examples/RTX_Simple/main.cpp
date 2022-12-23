@@ -73,10 +73,7 @@ rtx::Sphere make_ground(const rtx::Material& material, float radius) {
 int main() {
     if (!ui::init_glfw_lite()) { return EXIT_FAILURE; }
     auto* window = ui::create_window(rtx::WIDTH, rtx::HEIGHT, "RTX Simple");
-    //glfwSetFramebufferSizeCallback(window, opengl::framebuffer_size_callback);
-
-    opengl::Context::instance().initialize();
-    opengl::Context::instance().dump();
+    opengl::Context::instance().initialize_light(true);
 
     std::vector<rtx::Color> framebuffer(rtx::WIDTH * rtx::HEIGHT);
 
@@ -85,25 +82,24 @@ int main() {
         rtx::Sphere({-5.0, 10.0, -30.0}, ivory(), 3.0),
         rtx::Sphere({0.0, 0.0, -40.0}, mirror(), 10.0f),
         rtx::Sphere({5.0, 20.0, -45.0}, red_rubber(), 5.0f),
-        //make_ground(red_rubber(), 10'000'000)
     };
     std::vector<rtx::Light> lights {
         rtx::Light({10.0, 60.0, 0.0}, 1.0),
         rtx::Light({-10.0, 60.0, 0.0}, 1.1)
     };
 
+    BENCHMARK(rtx::render(framebuffer, scene, lights));
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
 
-        BENCHMARK(rtx::render(framebuffer, scene, lights));
-        glDrawPixels(rtx::WIDTH, rtx::HEIGHT, GL_RGB, GL_FLOAT,
-                     glm::value_ptr(*framebuffer.data()));
+        SAFE_CALL(glDrawPixels(rtx::WIDTH, rtx::HEIGHT, GL_RGB, GL_FLOAT,
+                               glm::value_ptr(*framebuffer.data())));
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glfwTerminate();
+    ui::unload_glfw();
     return EXIT_SUCCESS;
 }
 

@@ -12,10 +12,7 @@
 int main() {
     if (!ui::init_glfw_lite()) { return EXIT_FAILURE; }
     auto* window = ui::create_window(rtx::WIDTH, rtx::HEIGHT, "RTX Simple 2");
-    //glfwSetFramebufferSizeCallback(window, opengl::framebuffer_size_callback);
-
-    opengl::Context::instance().initialize();
-    opengl::Context::instance().dump();
+    opengl::Context::instance().initialize_light(true);
 
     rtx::Render<rtx::Sphere> render(std::move(rtx::make_scene()),
                                     std::move(rtx::make_camera()),
