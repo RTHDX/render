@@ -113,13 +113,18 @@ public:
 
     std::vector<Item3D>& items() { return _items; }
     opengl::Camera& camera() { return _camera; }
+
+    bool is_any_item_active() const;
     bool activate_index(GLuint index);
+    Item3D* active_item();
 
     void append(Item3D&& item);
     void clear();
 
     int width() const  { return _camera.width(); }
     int height() const { return _camera.height(); }
+
+    const opengl::Camera& camera() const { return _camera; }
 
 private:
     std::vector<Item3D> _items;

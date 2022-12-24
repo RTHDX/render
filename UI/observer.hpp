@@ -4,7 +4,7 @@
 #include <ostream>
 #include <filesystem>
 
-
+struct GLFWwindow;
 namespace ui {
 
 struct KeyEvent {
@@ -52,8 +52,6 @@ std::ostream& operator << (std::ostream& os, const ScrollEvent& event);
 
 
 struct DropEvent {
-    //int count;
-    //const char** paths;
     std::vector<std::filesystem::path> paths;
 
 public:
@@ -61,6 +59,16 @@ public:
     DropEvent(std::vector<std::filesystem::path>&& p);
 };
 std::ostream& operator << (std::ostream& os, const DropEvent& event);
+
+struct FramebufferEvent {
+    GLFWwindow* window;
+    int width;
+    int height;
+
+public:
+    FramebufferEvent(GLFWwindow* win, int w, int h);
+};
+std::ostream& operator << (std::ostream& os, const FramebufferEvent& e);
 
 
 class Listener;
@@ -77,6 +85,7 @@ public:
     void emit(const MouseButtonEvent& event) const;
     void emit(const ScrollEvent& event) const;
     void emit(const DropEvent& event) const;
+    void emit(const FramebufferEvent& event) const;
 
 private:
     template <typename Event> void templated_emit(const Event&) const;
@@ -105,6 +114,7 @@ public:
     virtual void consume(const MouseButtonEvent& event) = 0;
     virtual void consume(const ScrollEvent& event) = 0;
     virtual void consume(const DropEvent& event) = 0;
+    virtual void consume(const FramebufferEvent& event) = 0;
 
 private:
     Publisher* _parent;

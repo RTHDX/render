@@ -23,8 +23,9 @@ public:
     void consume(const ui::MouseButtonEvent& event) override;
     void consume(const ui::ScrollEvent& event) override;
     void consume(const ui::DropEvent& event) override;
+    void consume(const ui::FramebufferEvent& event) override;
 
-    void item(Item3D* item) { _item = item; }
+    void item(Item3D* item) { if (item == _item) { return; } _item = item; }
     const Item3D* const item() const { return _item; }
 
 private:
@@ -48,6 +49,7 @@ public:
     void consume(const ui::MouseButtonEvent& event) override;
     void consume(const ui::ScrollEvent& event) override;
     void consume(const ui::DropEvent& event) override;
+    void consume(const ui::FramebufferEvent& event) override;
 
     const opengl::Camera& camera() const { return _camera; }
 
@@ -65,6 +67,7 @@ public:
     void consume(const ui::MouseButtonEvent& event) override;
     void consume(const ui::ScrollEvent& event) override;
     void consume(const ui::DropEvent& event) override;
+    void consume(const ui::FramebufferEvent& event) override;
 
     Scene& scene() { return _scene; }
 

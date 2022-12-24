@@ -153,6 +153,21 @@ bool Scene::activate_index(GLuint index) {
     return is_activated;
 }
 
+Item3D* Scene::active_item() {
+    for (Item3D& item : _items) {
+        if (item.is_active()) {
+            return &item;
+        }
+    }
+    return nullptr;
+}
+
+bool Scene::is_any_item_active() const {
+    return std::any_of(_items.cbegin(), _items.cend(), [](const Item3D& item) {
+        return item.is_active();
+    });
+}
+
 
 void Scene::append(Item3D&& item) {
     _items.push_back(std::move(item));

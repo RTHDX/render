@@ -69,11 +69,22 @@ std::ostream& operator << (std::ostream& os, const DropEvent& e) {
     return os << ">";
 }
 
+FramebufferEvent::FramebufferEvent(GLFWwindow* win, int w, int h)
+    : window(win)
+    , height(h)
+    , width(w)
+{}
+
+std::ostream& operator << (std::ostream& os, const FramebufferEvent& e) {
+    return os << "<FramebufferEvent width: "
+              << e.width << ", height: "
+              << e.height;
+}
+
 
 Publisher::Publisher()
     : _listeners(std::vector<Listener*>{})
-{
-}
+{}
 
 Publisher::~Publisher() {
     _listeners.clear();
@@ -109,6 +120,10 @@ void Publisher::emit(const ScrollEvent& event) const {
 
 void Publisher::emit(const DropEvent& event) const {
     templated_emit<DropEvent>(event);
+}
+
+void Publisher::emit(const FramebufferEvent& event) const {
+    templated_emit<FramebufferEvent>(event);
 }
 
 template <typename Event>

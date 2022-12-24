@@ -11,6 +11,7 @@
 
 #include "io.hpp"
 #include "item.hpp"
+#include "ui-imgui.hpp"
 
 
 constexpr int WIDTH = 800;
@@ -67,6 +68,7 @@ int main() {
     opengl::Context::instance().initialize(true);
     opengl::Context::instance().background(background);
     opengl::Camera camera(WIDTH, HEIGHT, glm::radians(45.0), {10, 10, 10});
+    auto& imgui_io = ui::imgui::init_imgui(window, "#version 460");
 
     GlobalListener g_listener(std::move(create_empty_scene()),
                               &ui::io::IO::instance());
@@ -74,13 +76,15 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
+        ui::imgui::pre_process();
 
         g_listener.scene().draw();
+        ui::imgui::show_main_widget(g_listener.scene());
 
+        ui::imgui::render_imgui();
         glfwSwapBuffers(window);
     }
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    ui::imgui::cleanup(window);
     return 0;
 }

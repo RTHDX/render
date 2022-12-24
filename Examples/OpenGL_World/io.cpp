@@ -35,6 +35,7 @@ void GlobalListener::consume(const ui::KeyEvent& event) {
         _item_listener.consume(event) :
         _camera_listener.consume(event);
 }
+
 void GlobalListener::consume(const ui::MouseEvent& event) {
     _last_mouse_event = event;
 
@@ -42,6 +43,7 @@ void GlobalListener::consume(const ui::MouseEvent& event) {
         _item_listener.consume(event) :
         _camera_listener.consume(event);
 }
+
 void GlobalListener::consume(const ui::MouseButtonEvent& event) {
     if (event.button == GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW_PRESS) {
         return pick_pixel();
@@ -85,6 +87,12 @@ void GlobalListener::consume(const ui::DropEvent& event) {
     }
 }
 
+void GlobalListener::consume(const ui::FramebufferEvent& event) {
+    opengl::Context::instance().viewport(event.width, event.height);
+    _scene.camera().width(event.width);
+    _scene.camera().height(event.height);
+}
+
 void GlobalListener::pick_pixel() {
     GLuint index;
     int x = _last_mouse_event.xpos;
@@ -96,7 +104,14 @@ void GlobalListener::pick_pixel() {
         GL_UNSIGNED_INT,
         &index
     ));
-    _scene.activate_index(index);
+    if (_scene.activate_index(index)) {
+        std::cout << "item activated: " << index << std::endl;
+        auto* active_item = _scene.active_item();
+        _item_listener.item(active_item);
+    } else {
+        std::cout << "item not activated" << std::endl;
+        _item_listener.item(nullptr);
+    }
 }
 
 bool GlobalListener::is_item_active() {
@@ -119,12 +134,14 @@ void ItemListener::consume(const ui::KeyEvent& event) {
     if (is_key_press_or_hold(event, GLFW_KEY_D)) {
         return move_right();
     }
+/*
     if (is_key_press_or_hold(event, GLFW_KEY_Q)) {
         return rotate_left();
     }
     if (is_key_press_or_hold(event, GLFW_KEY_E)) {
         return rotate_right();
     }
+*/
 }
 
 void ItemListener::consume(const ui::MouseEvent& event) {
@@ -140,6 +157,10 @@ void ItemListener::consume(const ui::ScrollEvent& event) {
 }
 
 void ItemListener::consume(const ui::DropEvent& event) {
+    ;
+}
+
+void ItemListener::consume(const ui::FramebufferEvent& event) {
     ;
 }
 
@@ -231,6 +252,10 @@ void CameraListener::consume(const ui::ScrollEvent& event) {
 }
 
 void CameraListener::consume(const ui::DropEvent& event) {
+    ;
+}
+
+void CameraListener::consume(const ui::FramebufferEvent& event) {
     ;
 }
 

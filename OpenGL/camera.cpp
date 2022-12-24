@@ -81,6 +81,7 @@ void CameraHandler::consume(const ui::ScrollEvent& event) {
 
 void CameraHandler::consume(const ui::DropEvent& event) {}
 
+void CameraHandler::consume(const ui::FramebufferEvent&) {}
 
 static glm::mat4 move_modifiers(Direction dir) {
     float rot = glm::radians(ROTATION_SPEED);

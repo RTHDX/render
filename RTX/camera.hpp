@@ -71,6 +71,7 @@ public:
     void consume(const ui::MouseButtonEvent& event) override;
     void consume(const ui::ScrollEvent& event) override;
     void consume(const ui::DropEvent& event) override;
+    void consume(const ui::FramebufferEvent& event) override;
 
 private:
     Camera& _camera;

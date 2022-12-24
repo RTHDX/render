@@ -190,6 +190,10 @@ void CameraListener::consume(const ui::DropEvent& event) {
     ;
 }
 
+void CameraListener::consume(const ui::FramebufferEvent& event) {
+    ;
+}
+
 std::ostream& operator << (std::ostream& os, const glm::mat4& mat) {
     static constexpr char TEMPL[] =
         "({:6.4f};{:6.4f};{:6.4f};{:6.4f}\n"

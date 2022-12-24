@@ -17,7 +17,7 @@ static inline Item3D create_item(cell_t cell,
         .fragment_selection = fs::path("./selection.frag"),
         .color              = {0.2, 0.2, 0.2, 1.0},
         .selection_color    = {1.0, 0.0, 0.0, 1.0},
-        .is_selectable      = false
+        .is_selectable      = true
     }};
     out.open("./cube.obj");
     auto scale = glm::scale(out.model(), {1.0, float(cell), 1.0});

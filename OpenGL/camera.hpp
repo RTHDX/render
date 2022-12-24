@@ -67,6 +67,7 @@ public:
     virtual void consume(const ui::MouseButtonEvent& event);
     virtual void consume(const ui::ScrollEvent& event);
     virtual void consume(const ui::DropEvent& event);
+    virtual void consume(const ui::FramebufferEvent& event);
 
 private:
     Camera& _camera;

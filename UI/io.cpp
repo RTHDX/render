@@ -26,12 +26,17 @@ static void on_dropped(GLFWwindow*, int count, const char** paths) {
     ui::io::IO::instance().emit(DropEvent(count, paths));
 }
 
+static void on_framebuffer_size(GLFWwindow* win, int w, int h) {
+    ui::io::IO::instance().emit(FramebufferEvent(win, w, h));
+}
+
 void IO::bind(GLFWwindow* window) {
     glfwSetKeyCallback(window, on_key);
     glfwSetCursorPosCallback(window, on_mouse_moved);
     glfwSetMouseButtonCallback(window, on_mouse_pressed);
     glfwSetScrollCallback(window, on_scrolled);
     glfwSetDropCallback(window, on_dropped);
+    glfwSetFramebufferSizeCallback(window, on_framebuffer_size);
     _is_bound = true;
 }
 
