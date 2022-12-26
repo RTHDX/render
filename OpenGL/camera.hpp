@@ -23,6 +23,8 @@ enum class Direction {
 class Camera {
     static const glm::vec3 UP;
     static const glm::vec3 FORWARD;
+    static constexpr float Z_NEAR = 0.1;
+    static constexpr float Z_FAR = 100.0;
 
 public:
     Camera(float width, float height, float fov,
@@ -37,15 +39,16 @@ public:
 
     void move(Direction direction);
 
-    void width(float width) { _width = width; }
+    void width(float width) { _width = width; eveal_projection(); }
     int width() const { return _width; }
-    void height(float val) { _height = val; }
+    void height(float val) { _height = val; eveal_projection(); }
     int height() const { return _height; }
 
 private:
     glm::vec3 up() const;
     glm::vec3 right() const;
     glm::vec3 direction() const;
+    void eveal_projection();
 
 private:
     float _width, _height, _fov;

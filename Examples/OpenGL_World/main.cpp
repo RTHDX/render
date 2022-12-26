@@ -14,8 +14,8 @@
 #include "ui-imgui.hpp"
 
 
-constexpr int WIDTH = 800;
-constexpr int HEIGHT = 600;
+constexpr int WIDTH = 1280;
+constexpr int HEIGHT = 960;
 
 
 glm::vec4 background   = {0.5, 0.8, 0.8, 1.0};
@@ -56,7 +56,7 @@ auto create_ground() {
 auto create_empty_scene() {
     return Scene {
         opengl::Light({20.0, 20.0, 20.0}, {0.8, 0.8, 1.0, 1.0}),
-        opengl::Camera(WIDTH, HEIGHT, glm::radians(45.0), {10, 10, 10})
+        opengl::Camera(WIDTH, HEIGHT, glm::radians(45.0), {30, 30, 30})
     };
 }
 
@@ -73,13 +73,15 @@ int main() {
     GlobalListener g_listener(std::move(create_empty_scene()),
                               &ui::io::IO::instance());
 
+    ui::imgui::Context ui_context(g_listener.scene());
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
         ui::imgui::pre_process();
 
         g_listener.scene().draw();
-        ui::imgui::show_main_widget(g_listener.scene());
+        ui_context.show_main_window();
 
         ui::imgui::render_imgui();
         glfwSwapBuffers(window);

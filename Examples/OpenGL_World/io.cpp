@@ -9,6 +9,7 @@
 #include "map_reader.hpp"
 #include "ground_builder.hpp"
 
+
 static bool is_key_press_or_hold(const ui::KeyEvent& event, int key);
 
 
@@ -134,14 +135,6 @@ void ItemListener::consume(const ui::KeyEvent& event) {
     if (is_key_press_or_hold(event, GLFW_KEY_D)) {
         return move_right();
     }
-/*
-    if (is_key_press_or_hold(event, GLFW_KEY_Q)) {
-        return rotate_left();
-    }
-    if (is_key_press_or_hold(event, GLFW_KEY_E)) {
-        return rotate_right();
-    }
-*/
 }
 
 void ItemListener::consume(const ui::MouseEvent& event) {

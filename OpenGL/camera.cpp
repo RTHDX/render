@@ -23,7 +23,8 @@ Camera::Camera(float width, float height, float fov,
                const glm::vec3& position, const glm::vec3& look_at)
     : _width(width)
     , _height(height)
-    , _projection(glm::perspective(fov, aspect_ratio(), 0.1f, 100.0f))
+    , _fov(fov)
+    , _projection(glm::perspective(fov, aspect_ratio(), Z_NEAR, Z_FAR))
     , _position(position)
     , _target(look_at)
 {}
@@ -56,6 +57,10 @@ void Camera::move(Direction direction) {
         direction == Direction::UP || direction == Direction::DOWN) {
         _target = glm::vec4(_target, 1.0) * mat;
     }
+}
+
+void Camera::eveal_projection() {
+    _projection = glm::perspective(_fov, aspect_ratio(), Z_NEAR, Z_FAR);
 }
 
 

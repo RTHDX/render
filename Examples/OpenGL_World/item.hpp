@@ -47,6 +47,8 @@ public:
         return is_active() ? _selection_color : _color;
     }
 
+    const std::vector<loader::Vertices>& vertices() const { return _vertices; }
+
     GLuint selection_program() const { return _selection_program; }
     const glm::vec4& selection_color() const { return _selection_color; }
 
@@ -103,7 +105,6 @@ void pass_selection_shader_uniforms(
 
 class Scene {
 public:
-    Scene() = default;
     Scene(std::vector<Item3D>&& items, opengl::Light&& light,
           opengl::Camera&& camera);
     Scene(opengl::Light&& light, opengl::Camera&& camera);

@@ -20,10 +20,12 @@ static inline Item3D create_item(cell_t cell,
         .is_selectable      = true
     }};
     out.open("./cube.obj");
-    auto scale = glm::scale(out.model(), {1.0, float(cell), 1.0});
-    glm::vec3 coords {x_pos + 1.0, 0.0, z_pos + 1.0};
-    auto taransform = glm::translate(scale, coords);
-    out.modify(std::move(taransform));
+    float h = cell;
+    glm::vec3 centroid{ x_pos * 2, h - 1, z_pos * 2 };
+
+    auto transform = glm::translate(out.model(), centroid);
+    auto scale = glm::scale(transform, {1.0, h, 1.0});
+    out.modify(std::move(scale));
     return out;
 }
 
