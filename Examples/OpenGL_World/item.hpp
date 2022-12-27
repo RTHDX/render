@@ -58,20 +58,19 @@ public:
     bool is_valid() const { return _vao != 0 && _program != 0; }
     bool is_active() const { return _is_active; }
 
-    bool activate(int);
     bool activate();
     void deactivate();
 
 private:
     glm::mat4 _model {1.0};
-    GLuint _vao {0};
-    GLuint _program {0};
+    GLuint _vao      {0};
+    GLuint _program  {0};
     glm::vec4 _color {0.0, 0.0, 0.0, 0.5};
 
-    GLuint _selection_program {0};
+    GLuint _selection_program  {0};
     glm::vec4 _selection_color {0.0, 0.0, 0.0, 1.0};
 
-    int _id {-1};
+    int _id         {-1};
     bool _is_active {false};
     bool _is_selectable;
 

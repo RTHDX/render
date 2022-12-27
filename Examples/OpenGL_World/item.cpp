@@ -23,12 +23,7 @@ Item3D::Item3D(ItemInputData&& data)
     , _is_selectable(data.is_selectable)
 {}
 
-Item3D::~Item3D() {
-    //for (opengl::buffers_t& v_data : _vertex_input) {
-    //    opengl::free_vertex_buffers(v_data);
-    //}
-    //opengl::free_vertex_array(_vao);
-}
+Item3D::~Item3D() {}
 
 void Item3D::finalyze() {
     opengl::free_vertex_array(_vao);
@@ -56,15 +51,6 @@ void Item3D::draw() const {
 void Item3D::modify(glm::mat4&& modificator) {
     //_model = modificator;
     std::swap(_model, modificator);
-}
-
-bool Item3D::activate(int id) {
-    if (id == _id) {
-        _is_active = true;
-    } else {
-        _is_active = false;
-    }
-    return _is_active;
 }
 
 bool Item3D::activate() {
@@ -130,12 +116,12 @@ void Scene::draw() {
         item.id(stencil_ref);
         ++stencil_ref;
         pass_shader_uniforms(item.program(), {
-            .color = item.color(),
+            .color          = item.color(),
             .light_position = _light.position(),
-            .light_color = _light.color(),
-            .view = _camera.view(),
-            .projection = _camera.projection(),
-            .model = item.model()
+            .light_color    = _light.color(),
+            .view           = _camera.view(),
+            .projection     = _camera.projection(),
+            .model          = item.model()
         }, item);
     }
 }
