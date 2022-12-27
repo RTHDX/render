@@ -26,7 +26,7 @@ namespace fs = std::filesystem;
 
 auto create_empty_scene() {
     return Scene {
-        opengl::Light({20.0, 20.0, 20.0}, {0.8, 0.8, 1.0, 1.0}),
+        opengl::Light({120.0, 120.0, 120.0}, {0.8, 0.8, 1.0, 1.0}),
         opengl::Camera(WIDTH, HEIGHT, glm::radians(45.0), {30, 30, 30})
     };
 }

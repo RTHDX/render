@@ -24,8 +24,7 @@ struct Context {
                                             | ImGuiTableFlags_RowBg;
 
     static constexpr ImGuiTableFlags VERT = ImGuiTableFlags_Borders
-                                            | ImGuiTableFlags_RowBg
-                                            | ImGuiTableFlags_ScrollY;
+                                            | ImGuiTableFlags_RowBg;
 
 public:
     explicit Context(Scene& scene);

@@ -4,7 +4,7 @@ project(RTX_Mesh)
 create_executable(
     TARGET ${PROJECT_NAME}
     SOURCES main.cpp
-    LIBS OpenGL RTX UI-Nuklear
+    LIBS OpenGL RTX
 )
 
 copy_files(FILES

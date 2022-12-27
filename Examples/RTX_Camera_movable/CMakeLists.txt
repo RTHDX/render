@@ -5,5 +5,5 @@ project(${PROJECT_NAME})
 create_executable(
     TARGET ${PROJECT_NAME}
     SOURCES main.cpp
-    LIBS OpenGL RTX UI-Nuklear Default-RTX-Scene
+    LIBS OpenGL RTX Default-RTX-Scene
 )

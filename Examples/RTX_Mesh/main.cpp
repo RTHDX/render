@@ -4,17 +4,13 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <nuklear.h>
-#include <nuklear_glfw_gl4.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-//#include <OpenGL/opengl.hpp>
 #include <UI/ui.hpp>
 #include <UI/property.hpp>
+#include <OpenGL/opengl_proc.hpp>
 #include <RTX/rtx.hpp>
-#include <UI-Nuklear/rtx_application.hpp>
-#include <UI-Nuklear/nuklear_widgets.hpp>
 
 size_t WIDTH = 860;
 size_t HEIGHT = 680;
@@ -103,7 +99,7 @@ auto create_scene() {
 }
 
 auto create_render() {
-    rtx::Color back{ 0.5, 0.7, 0.7 };
+    rtx::Color back {0.5, 0.7, 0.7};
 
 #if(DEBUG)
     return rtx::Render<rtx::Mesh> (std::move(create_scene()),
@@ -116,10 +112,25 @@ auto create_render() {
 #endif
 }
 
+
 int main() {
-    ui::nuklear::RTX_App app("Meshes", WIDTH, HEIGHT);
-    app.initialize();
+    if (!ui::init_glfw_lite()) { return EXIT_FAILURE; }
+    auto* window = ui::create_window(WIDTH, HEIGHT, "mesh");
+    opengl::Context::instance().initialize_light(true);
+
     auto render = create_render();
-    app.run(render);
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
+        BENCHMARK(render.render());
+        const auto& buffer = render.buffer();
+        SAFE_CALL(glDrawPixels(WIDTH, HEIGHT, GL_RGB, GL_FLOAT,
+                               glm::value_ptr(*buffer.data())));
+
+        glfwSwapBuffers(window);
+    }
+
+    glfwTerminate();
     return 0;
 }

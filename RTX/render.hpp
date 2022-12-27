@@ -10,7 +10,7 @@
 namespace rtx {
 using Framebuffer = std::vector<Color>;
 
-template<Traceable T> class BaseRender {
+template<traceable_c T> class BaseRender {
 public:
     BaseRender(Scene<T>&& scene, Camera&& camera,
                const Color& background = {0.5, 0.5, 0.5});
@@ -42,7 +42,7 @@ protected:
     CameraListener _cam_handler;
 };
 
-template <Traceable T>
+template <traceable_c T>
 BaseRender<T>::BaseRender(Scene<T>&& scene, Camera&& camera,
                           const Color& back)
     : _scene(std::move(scene))
@@ -52,13 +52,13 @@ BaseRender<T>::BaseRender(Scene<T>&& scene, Camera&& camera,
     , _cam_handler(_camera)
 {}
 
-template <Traceable T>
+template <traceable_c T>
 Color BaseRender<T>::cast_ray(const Ray& ray, size_t depth) const {
     Hit last_hit = _scene.ray_intersect(ray);
     if (depth > 4 || !last_hit.is_valid()) { return _background; }
 
-    Color reflect_color = cast_ray(reflection_ray(ray, last_hit), depth + 1);
-    Color refract_color = cast_ray(refraction_ray(ray, last_hit), depth + 1);
+    auto reflect_color = cast_ray(reflection_ray(ray, last_hit), depth + 1);
+    auto refract_color = cast_ray(refraction_ray(ray, last_hit), depth + 1);
 
     float diffuse_light_intensity = 0, specular_light_intensity = 0;
     const auto* material = last_hit.material;
@@ -71,7 +71,7 @@ Color BaseRender<T>::cast_ray(const Ray& ray, size_t depth) const {
             material->specular_exponent);
     }
 
-    auto& albedo = material->albedo;
+    const auto& albedo = material->albedo;
     Color total_color =
         material->diffuse_color * diffuse_light_intensity * albedo.x +
         Color(1.0, 1.0, 1.0) * specular_light_intensity * albedo.y +
@@ -80,46 +80,46 @@ Color BaseRender<T>::cast_ray(const Ray& ray, size_t depth) const {
     return total_color;
 }
 
-template <Traceable T>
+template <traceable_c T>
 size_t BaseRender<T>::eval_index(const size_t h_pos, const size_t w_pos) const {
     return w_pos + h_pos * width();
 }
 
-template <Traceable T>
+template <traceable_c T>
 Ray BaseRender<T>::reflection_ray(const Ray& primary, const Hit& last_hit) const {
-    Vector direction = reflect(primary.direction, last_hit.normal);
-    Vector origin = glm::dot(direction, last_hit.normal) < 0.0 ?
+    auto direction = reflect(primary.direction, last_hit.normal);
+    auto origin = glm::dot(direction, last_hit.normal) < 0.0 ?
         last_hit.point - last_hit.normal * DELTA :
         last_hit.point + last_hit.normal * DELTA;
-    return Ray(origin, glm::normalize(direction));
+    return {origin, glm::normalize(direction)};
 }
 
-template <Traceable T>
+template <traceable_c T>
 Ray BaseRender<T>::refraction_ray(const Ray& primary, const Hit& last_hit) const {
     float ref_i = last_hit.material->refractive_index;
-    Vector direction = refract(primary.direction, last_hit.normal, ref_i);
-    Vector origin = glm::dot(direction, last_hit.normal) < 0.0f ?
+    auto direction = refract(primary.direction, last_hit.normal, ref_i);
+    auto origin = glm::dot(direction, last_hit.normal) < 0.0f ?
         last_hit.point - last_hit.normal * DELTA :
         last_hit.point + last_hit.normal * DELTA;
-    return Ray(origin, glm::normalize(direction));
+    return {origin, glm::normalize(direction)};
 }
 
-template <Traceable T>
+template <traceable_c T>
 bool BaseRender<T>::is_shaded(const Light& light, const Hit& hit) const {
-    Vector light_direction = glm::normalize(light.position - hit.point);
+    auto light_direction = glm::normalize(light.position - hit.point);
     float light_distance = glm::length(light.position - hit.point);
 
-    Point shadow_origin = glm::dot(light_direction, hit.normal) < 0.0f ?
+    auto shadow_origin = glm::dot(light_direction, hit.normal) < 0.0f ?
         hit.point - hit.normal * DELTA :
         hit.point + hit.normal * DELTA;
 
-    Hit shadow_hit = _scene.ray_intersect(Ray(shadow_origin, light_direction));
+    auto shadow_hit = _scene.ray_intersect({shadow_origin, light_direction});
     return shadow_hit.is_valid() &&
         glm::length(shadow_hit.point - shadow_origin) < light_distance;
 }
 
 
-template<Traceable T> class Render final : public BaseRender<T> {
+template<traceable_c T> class Render final : public BaseRender<T> {
 public:
     using BaseRender<T>::BaseRender;
     ~Render() override = default;
@@ -136,7 +136,7 @@ public:
 };
 
 
-template<Traceable T> class MultiThreadRender final : public BaseRender<T> {
+template<traceable_c T> class MultiThreadRender final : public BaseRender<T> {
 public:
     MultiThreadRender(Scene<T>&& s, Camera&& camera, Color back)
         : BaseRender<T>(std::move(s), std::move(camera), std::move(back))
