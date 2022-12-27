@@ -8,47 +8,47 @@
 
 
 namespace rtx {
-using Color = glm::vec3;
-using Point = glm::vec3;
-using Vector = glm::vec3;
-using Albedo = glm::vec4;
+using color_t = glm::vec3;
+using point_t = glm::vec3;
+using vector_t = glm::vec3;
+using albedo_t = glm::vec4;
 
 static constexpr int WIDTH = 1024;
 static constexpr int HEIGHT = 768;
 
-struct Ray {
-    Point origin;
-    Vector direction;
+struct ray_t {
+    point_t origin;
+    vector_t direction;
 
 public:
-    Ray(const Point& origin, const Vector& direction)
+    ray_t(const point_t& origin, const vector_t& direction)
         : origin(origin)
         , direction(direction)
     {}
 
-    Point at(float t) const { return origin + t * direction; }
+    point_t at(float t) const { return origin + t * direction; }
 };
 
-struct Light {
-    Point position;
+struct light_t {
+    point_t position;
     float intensity;
 
 public:
-    Light(const Point& position, float intensity)
+    light_t(const point_t& position, float intensity)
         : position(position)
         , intensity(intensity)
     {}
 };
 
-struct Material {
-    Albedo albedo;
-    Color diffuse_color;
+struct material_t {
+    albedo_t albedo;
+    color_t diffuse_color;
     float specular_exponent;
     float refractive_index;
 
 public:
-    Material() = default;
-    Material(const Albedo& albedo, const Color& color, float exponent, float ref)
+    material_t() = default;
+    material_t(const albedo_t& albedo, const color_t& color, float exponent, float ref)
         : albedo(albedo)
         , diffuse_color(color)
         , specular_exponent(exponent)
@@ -56,14 +56,14 @@ public:
     {}
 };
 
-Vector reflect(const Vector& input, const Vector& normal) {
+vector_t reflect(const vector_t& input, const vector_t& normal) {
     return input - normal * 2.0f * glm::dot(input, normal);
 }
 
-Vector refract(const Vector& input, const Vector& normal, float refract) {
+vector_t refract(const vector_t& input, const vector_t& normal, float refract) {
     float cosi = std::max(-1.0f, std::min(1.0f, glm::dot(input, normal)));
     float etai = 1.0f, etat = refract;
-    Vector n = normal;
+    vector_t n = normal;
     if (cosi < 0.0) {
         cosi = -cosi;
         std::swap(etai, etat);
@@ -71,16 +71,16 @@ Vector refract(const Vector& input, const Vector& normal, float refract) {
     }
     float eta = etai / etat;
     float k = 1.0 - eta * eta * (1 - cosi * cosi);
-    return k < 0.0 ? Vector(0.0, 0.0, 0.0) :
+    return k < 0.0 ? vector_t(0.0, 0.0, 0.0) :
         input * eta + n * (eta * cosi - sqrtf(k));
 }
 
 class Sphere;
-struct Hit {
+struct hit_t {
     float t = std::numeric_limits<float>::min();
     Sphere const* sphere = nullptr;
-    Point point;
-    Vector normal;
+    point_t point;
+    vector_t normal;
 
 public:
     bool is_valid() const {
@@ -91,29 +91,29 @@ public:
 
 
 struct Sphere {
-    Point center;
-    Material material;
+    point_t center;
+    material_t material;
     float radius;
 
 public:
-    Sphere(const Point& center, const Material& material, float radius)
+    Sphere(const point_t& center, const material_t& material, float radius)
         : center(center)
         , material(material)
         , radius(radius)
     {}
 
-    Hit ray_intersect(const Ray& ray) const {
-        Vector L = center - ray.origin;
+    hit_t ray_intersect(const ray_t& ray) const {
+        vector_t L = center - ray.origin;
         float tca = glm::dot(L, ray.direction);
         float d2 = glm::dot(L, L) - tca * tca;
-        if (d2 > radius * radius) return Hit();
+        if (d2 > radius * radius) return hit_t();
         float thc = sqrtf(radius * radius - d2);
 
-        Hit hit;
+        hit_t hit;
         hit.t = tca - thc;
         float t1 = tca + thc;
         if (hit.t < 0) hit.t = t1;
-        if (hit.t < 0) return Hit();
+        if (hit.t < 0) return hit_t();
         hit.sphere = this;
         hit.point = ray.at(hit.t);
         hit.normal = glm::normalize(hit.point - center);
@@ -122,46 +122,46 @@ public:
 };
 
 
-Hit scene_intersect(const Ray& ray, const std::vector<Sphere>& spheres) {
+hit_t scene_intersect(const ray_t& ray, const std::vector<Sphere>& spheres) {
     static constexpr float LIMIT = 1000.0;
     float spheres_dist = std::numeric_limits<float>::max();
 
-    Hit out_hit;
+    hit_t out_hit;
     for (const Sphere& sphere: spheres) {
-        Hit hit = sphere.ray_intersect(ray);
+        hit_t hit = sphere.ray_intersect(ray);
         if (hit.is_valid() && hit.t < spheres_dist) {
             spheres_dist = hit.t;
             out_hit = hit;
         }
     }
 
-    return spheres_dist < LIMIT ? out_hit : Hit();
+    return spheres_dist < LIMIT ? out_hit : hit_t();
 }
 
 
-Color cast_ray(const Ray& ray,
+color_t cast_ray(const ray_t& ray,
                const std::vector<Sphere>& spheres,
-               const std::vector<Light>& lights,
+               const std::vector<light_t>& lights,
                size_t depth = 0) {
-    static constexpr Color BACKGROUND(0.2, 0.85, 0.6);
+    static constexpr color_t BACKGROUND(0.2, 0.85, 0.6);
 
-    Hit last_hit = scene_intersect(ray, spheres);
+    hit_t last_hit = scene_intersect(ray, spheres);
     if (depth > 4 || !last_hit.is_valid()) { return BACKGROUND; }
 
-    Vector reflect_direction = glm::normalize(reflect(ray.direction, last_hit.normal));
-    Vector reflect_origin = glm::dot(reflect_direction, last_hit.normal) < 0.0 ?
+    vector_t reflect_direction = glm::normalize(reflect(ray.direction, last_hit.normal));
+    vector_t reflect_origin = glm::dot(reflect_direction, last_hit.normal) < 0.0 ?
         last_hit.point - last_hit.normal * 0.0001f :
         last_hit.point + last_hit.normal * 0.0001f;
-    Color reflect_color = cast_ray(Ray(reflect_origin, reflect_direction),
+    color_t reflect_color = cast_ray(ray_t(reflect_origin, reflect_direction),
                                    spheres, lights, depth + 1);
 
-    Vector refract_dir = glm::normalize(
+    vector_t refract_dir = glm::normalize(
         refract(ray.direction, last_hit.normal,
                 last_hit.sphere->material.refractive_index));
-    Vector refract_orig = glm::dot(refract_dir, last_hit.normal) < 0.0f ?
+    vector_t refract_orig = glm::dot(refract_dir, last_hit.normal) < 0.0f ?
         last_hit.point - last_hit.normal * 0.0001f :
         last_hit.point + last_hit.normal * 0.0001f;
-    Color refract_color = cast_ray(Ray(refract_orig, refract_dir),
+    color_t refract_color = cast_ray(ray_t(refract_orig, refract_dir),
                                    spheres, lights, depth + 1);
 
     float diffuse_light_intensity = 0, specular_light_intensity = 0;
@@ -169,14 +169,14 @@ Color cast_ray(const Ray& ray,
     const auto& normal = last_hit.normal;
     const auto& hit_point = last_hit.point;
     float exponent = material.specular_exponent;
-    for (const Light& light : lights) {
-        Vector light_direction = glm::normalize(light.position - last_hit.point);
+    for (const light_t& light : lights) {
+        vector_t light_direction = glm::normalize(light.position - last_hit.point);
         float light_distance = glm::length(light.position - hit_point);
 
-        Point shadow_origin = glm::dot(light_direction, normal) < 0.0f ?
+        point_t shadow_origin = glm::dot(light_direction, normal) < 0.0f ?
               hit_point - normal * 0.0001f : hit_point + normal * 0.0001f;
-        Ray shadow_ray(shadow_origin, light_direction);
-        Hit shadow_hit = scene_intersect(shadow_ray, spheres);
+        ray_t shadow_ray(shadow_origin, light_direction);
+        hit_t shadow_hit = scene_intersect(shadow_ray, spheres);
         if (shadow_hit.is_valid() && glm::length(shadow_hit.point - shadow_origin) < light_distance) {
             continue;
         }
@@ -188,30 +188,30 @@ Color cast_ray(const Ray& ray,
     }
 
     auto& albedo = material.albedo;
-    Color total_color = material.diffuse_color *
+    color_t total_color = material.diffuse_color *
                         diffuse_light_intensity * albedo.x +
-                        Color(1.0, 1.0, 1.0) * specular_light_intensity * albedo.y +
+                        color_t(1.0, 1.0, 1.0) * specular_light_intensity * albedo.y +
                         reflect_color * albedo.z +
                         refract_color * albedo.w;
     return total_color;
 }
 
-Ray emit_ray(size_t i, size_t j) {
+ray_t emit_ray(size_t i, size_t j) {
     static constexpr int fov = std::numbers::pi_v<float> / 2.0;
 
     float x = (2 * (i + 0.5) / (float)WIDTH - 1) * tan(fov / 2.) * WIDTH / (float)HEIGHT;
     float y = (2 * (j + 0.5) / (float)HEIGHT - 1) * tan(fov / 2.);
-    Vector direction = glm::normalize(Vector(x, y, -1));
-    return Ray{Point(0.0, 0.0, 0.0), direction};
+    vector_t direction = glm::normalize(vector_t{x, y, -1});
+    return {{0.0, 0.0, 0.0}, direction};
 }
 
 size_t eval_index(const size_t h_pos, const size_t w_pos) {
     return w_pos + h_pos * WIDTH;
 }
 
-void render(std::vector<Color>& framebuffer,
+void render(std::vector<color_t>& framebuffer,
             const std::vector<Sphere>& spheres,
-            const std::vector<Light>& lights) {
+            const std::vector<light_t>& lights) {
     static constexpr int fov = std::numbers::pi_v<float> / 2.;
 
     for (size_t i = 0; i < HEIGHT; ++i) {

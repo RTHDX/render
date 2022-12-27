@@ -17,43 +17,43 @@
 
 void process_input(GLFWwindow* window);
 
-#define BENCHMARK(FUNCTION_CALL)                        \
-    {                                                   \
-        auto before = std::chrono::system_clock::now(); \
-        FUNCTION_CALL;                                  \
-        auto after = std::chrono::system_clock::now();  \
-        std::cout << (after - before) << std::endl;     \
+#define BENCHMARK(FUNCTION_CALL)                                         \
+    {                                                                    \
+        auto before = std::chrono::system_clock::now();                  \
+        FUNCTION_CALL;                                                   \
+        auto after = std::chrono::system_clock::now();                   \
+        std::cout << (after - before).count() << " ms" << std::endl;     \
     }
 
 
-rtx::Material mirror() {
+rtx::material_t mirror() {
     return {
         {0.0, 10.0, 0.8, 0.0},
-        rtx::Color(1.0, 1.0, 1.0),
+        {1.0, 1.0, 1.0},
         1425.0,
         1.0
     };
 }
 
-rtx::Material ivory() {
+rtx::material_t ivory() {
     return {
         {0.6, 0.3, 0.1, 0.0},
-        rtx::Color(0.45, 0.45, 0.35),
+        {0.45, 0.45, 0.35},
         50.0,
         1.0
     };
 }
 
-rtx::Material red_rubber() {
+rtx::material_t red_rubber() {
     return {
         {0.9, 0.1, 0.0, 0.0},
-        rtx::Color(0.3, 0.1, 0.1),
+        {0.3, 0.1, 0.1},
         10.0f,
         1.0
     };
 }
 
-rtx::Material glass() {
+rtx::material_t glass() {
     return {
         {0.0, 0.5, 0.1, 0.8},
         {0.6, 0.7, 0.8},
@@ -62,9 +62,9 @@ rtx::Material glass() {
     };
 }
 
-rtx::Sphere make_ground(const rtx::Material& material, float radius) {
-    return rtx::Sphere {
-        rtx::Point(-(radius + 10), 0.0, 0.0),
+rtx::Sphere make_ground(const rtx::material_t& material, float radius) {
+    return {
+        {-(radius + 10), 0.0, 0.0},
         material,
         radius
     };
@@ -75,17 +75,17 @@ int main() {
     auto* window = ui::create_window(rtx::WIDTH, rtx::HEIGHT, "RTX Simple");
     opengl::Context::instance().initialize_light(true);
 
-    std::vector<rtx::Color> framebuffer(rtx::WIDTH * rtx::HEIGHT);
+    std::vector<rtx::color_t> framebuffer(rtx::WIDTH * rtx::HEIGHT);
 
     std::vector<rtx::Sphere> scene {
-        rtx::Sphere({0.0, -10.0, -30.0}, glass(), 5.0f),
-        rtx::Sphere({-5.0, 10.0, -30.0}, ivory(), 3.0),
-        rtx::Sphere({0.0, 0.0, -40.0}, mirror(), 10.0f),
-        rtx::Sphere({5.0, 20.0, -45.0}, red_rubber(), 5.0f),
+        {{0.0, -10.0, -30.0}, glass(), 5.0f},
+        {{-5.0, 10.0, -30.0}, ivory(), 3.0},
+        {{0.0, 0.0, -40.0}, mirror(), 10.0f},
+        {{5.0, 20.0, -45.0}, red_rubber(), 5.0f},
     };
-    std::vector<rtx::Light> lights {
-        rtx::Light({10.0, 60.0, 0.0}, 1.0),
-        rtx::Light({-10.0, 60.0, 0.0}, 1.1)
+    std::vector<rtx::light_t> lights {
+        {{10.0, 60.0, 0.0}, 1.0},
+        {{-10.0, 60.0, 0.0}, 1.1}
     };
 
     BENCHMARK(rtx::render(framebuffer, scene, lights));
