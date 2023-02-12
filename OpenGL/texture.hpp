@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <filesystem>
 
 #include <glad/glad.h>
 
@@ -76,5 +77,17 @@ public:
         return buffer == nullptr ? 0 : tiles_count_h * tiles_count_w;
     }
 };
+
+enum class ColorMode {
+    RGB = 3,
+    RGBA
+};
+
+bool save_as_image(std::filesystem::path path,
+                   const byte_t* data,
+                   int len,
+                   int w,
+                   int h,
+                   ColorMode m);
 
 }

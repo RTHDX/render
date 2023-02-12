@@ -2,6 +2,9 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "3rdParty/stb/stb_image.h"
+#define STBI_MSC_SECURE_CRT
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 #include "opengl_proc.hpp"
 #include "texture.hpp"
@@ -113,6 +116,31 @@ bool TextureArray::read() {
 
 void TextureArray::bind() {
     SAFE_CALL(glBindTexture(TARGET, id));
+}
+
+static inline std::string cast_to_str(const std::filesystem::path& path) {
+    const auto& str = path.string();
+    return {str.begin(), str.end()};
+}
+
+bool save_as_image(std::filesystem::path path,
+                   const byte_t* data,
+                   int len,
+                   int w,
+                   int h,
+                   ColorMode m) {
+    int ret = 0;
+    if (m == ColorMode::RGB) {
+        path.replace_extension(".jpg");
+        ret = stbi_write_jpg(cast_to_str(path).c_str(), w, h, (int)m, data,
+            w * (int)m);
+    }
+    else {
+        path.replace_extension(".png");
+        ret = stbi_write_png(cast_to_str(path).c_str(), w, h, (int)m, data,
+            w * (int)m);
+    }
+    return ret != 0;
 }
 
 }
