@@ -14,6 +14,7 @@ struct KeyEvent {
     int mode;
 
 public:
+    KeyEvent() = default;
     KeyEvent(int k, int s, int a, int m);
 };
 std::ostream& operator << (std::ostream& os, const KeyEvent& event);
@@ -36,6 +37,7 @@ struct MouseButtonEvent {
     int mode;
 
 public:
+    MouseButtonEvent() = default;
     MouseButtonEvent(int b, int a, int m);
 };
 std::ostream& operator << (std::ostream& os, const MouseButtonEvent& event);
@@ -46,6 +48,7 @@ struct ScrollEvent {
     double yoffset;
 
 public:
+    ScrollEvent() = default;
     ScrollEvent(double x, double y);
 };
 std::ostream& operator << (std::ostream& os, const ScrollEvent& event);
@@ -55,6 +58,7 @@ struct DropEvent {
     std::vector<std::filesystem::path> paths;
 
 public:
+    DropEvent() = default;
     DropEvent(int c, const char** p);
     DropEvent(std::vector<std::filesystem::path>&& p);
 };
@@ -66,6 +70,7 @@ struct FramebufferEvent {
     int height;
 
 public:
+    FramebufferEvent() = default;
     FramebufferEvent(GLFWwindow* win, int w, int h);
 };
 std::ostream& operator << (std::ostream& os, const FramebufferEvent& e);
