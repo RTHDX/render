@@ -126,12 +126,23 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
     }
 }
 
+struct TextureData {
+    GLint id;
+    GLenum target;
+    int w, h;
+    GLint format; // GL_DEPTH_COMPONENT GL_DEPTH_STENCIL GL_RED GL_RG GL_RGB GL_RGBA
+    GLenum type;
+    GLenum wrap_s, wrap_t, min_filter, mag_filter;
+};
+std::ostream& operator << (std::ostream& os, const TextureData& tex);
+
 GLuint gen_texture(GLenum target = GL_TEXTURE_2D);
 void bind_texture(const glm::ivec2& dims,
                   std::vector<glm::vec3>&& texture);
 void bind_texture(const glm::ivec2& dims,
                   byte_t* texture);
 void bind_texture(GLenum target, GLuint id);
+void set_texture_meta(byte_t* raw_data, const TextureData& params);
 void activate_texture(GLuint id);
 void free_texture(GLuint id);
 

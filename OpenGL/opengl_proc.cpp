@@ -174,7 +174,6 @@ void free_vertex_buffer(GLuint id) {
     SAFE_CALL(glDeleteBuffers(1, &id));
 }
 
-
 std::vector<GLuint> gen_pixel_buffers(size_t count) {
     std::vector<GLuint> out(count);
     SAFE_CALL(glGenBuffers(count, out.data()));
@@ -195,15 +194,58 @@ void free_pixel_buffer(GLuint id) {
     SAFE_CALL(glDeleteVertexArrays(1, &id));
 }
 
-
 void bind_vao(GLuint id) {
     SAFE_CALL(glBindVertexArray(id));
 }
 
+static std::string gl_enum_to_string(GLenum e) {
+    switch (e) {
+    case GL_DEPTH_COMPONENT:
+        return "GL_DEPTH_COMPONENT";
+    case GL_DEPTH_STENCIL:
+        return "GL_DEPTH_STENCIL";
+    case GL_RED:
+        return "GL_RED";
+    case GL_RG:
+        return "GL_RG";
+    case GL_RGB:
+        return "GL_RGB";
+    case GL_RGBA:
+        return "GL_RGBA";
+    case GL_REPEAT:
+        return "GL_REPEAT";
+    case GL_LINEAR:
+        return "GL_LINEAR";
+        // ... add cases for other GLenum values as needed
+    default:
+        return "Unknown GLenum value";
+    }
+}
+
+std::ostream& operator<<(std::ostream& os, const TextureData& tex) {
+    os << "| Property     | Value                       |\n"
+        << "|--------------|-----------------------------|\n"
+        << std::format("| Target       | {}                           |\n",
+           gl_enum_to_string(tex.target))
+        << std::format("| Width        | {:<28}|\n", tex.w)
+        << std::format("| Height       | {:<28}|\n", tex.h)
+        << std::format("| Format       | {}                           |\n",
+            gl_enum_to_string(tex.format))
+        << std::format("| Type         | {}                           |\n",
+            gl_enum_to_string(tex.type))
+        << std::format("| Wrap S       | {}                           |\n",
+            gl_enum_to_string(tex.wrap_s))
+        << std::format("| Wrap T       | {}                           |\n",
+            gl_enum_to_string(tex.wrap_t))
+        << std::format("| Min Filter   | {}                           |\n",
+            gl_enum_to_string(tex.min_filter))
+        << std::format("| Mag Filter   | {}                           |\n",
+            gl_enum_to_string(tex.mag_filter));
+    return os;
+}
 
 GLuint gen_texture(GLenum target) {
     GLuint tex;
-    //opengl::function().gen_textures(1, &tex);
     SAFE_CALL(glGenTextures(1, &tex));
     SAFE_CALL(glBindTexture(target, tex));
     return tex;
@@ -219,13 +261,26 @@ void bind_texture(const glm::ivec2& dims, // x - width, y - height
 
 void bind_texture(const glm::ivec2& dims, byte_t* texture) {
     assert(Context::instance().bound_texture_2d() > 0);
-    SAFE_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dims.x, dims.y, 0, GL_RGBA,
-                           GL_UNSIGNED_BYTE, texture));
+    SAFE_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dims.x, dims.y, 0,
+                           GL_RGBA, GL_UNSIGNED_BYTE, texture));
     SAFE_CALL(glGenerateMipmap(GL_TEXTURE_2D));
 }
 
 void bind_texture(GLenum target, GLuint id) {
     SAFE_CALL(glBindTexture(target, id));
+}
+
+void set_texture_meta(byte_t* raw_data, const TextureData& params) {
+    SAFE_CALL(glBindTexture(params.target, params.id));
+    SAFE_CALL(glTexImage2D(params.target, 0, params.format, params.w, params.h,
+                           0, params.format, params.type, raw_data));
+    SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_WRAP_S, params.wrap_s));
+    SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_WRAP_T, params.wrap_t));
+    SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_MIN_FILTER,
+                              params.min_filter));
+    SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_MAG_FILTER,
+                              params.mag_filter));
+    SAFE_CALL(glBindTexture(params.target, 0));
 }
 
 void activate_texture(GLuint id) {
@@ -345,6 +400,26 @@ static std::string type_to_string(GLenum type) {
     }
 }
 
+std::ostream& operator << (std::ostream& os, const ShaderProgramInterface& i) {
+    constexpr std::string_view ROW_FORMAT = "|{:<20}|{:<20}|";
+    constexpr std::string_view DELIM_FORMAT = "|{:-^20}|{:-^20}|";
+
+    os << "Input attributes amount: " << i.input_count << std::endl;
+    os << std::format(ROW_FORMAT, "Name", "Type") << std::endl;
+    os << std::format(DELIM_FORMAT, "", "") << std::endl;
+    for (const auto& [name, type] : i.input_block) {
+        os << std::format(ROW_FORMAT, name, type_to_string(type)) << std::endl;
+    } os << std::endl;
+
+    os << "Uniform variables amount: " << i.uniforms_count << std::endl;
+    os << std::format(ROW_FORMAT, "Name", "Type") << std::endl;
+    os << std::format(DELIM_FORMAT, "", "") << std::endl;
+    for (const auto& [name, type] : i.uniform_block) {
+        os << std::format(ROW_FORMAT, name, type_to_string(type)) << std::endl;
+    } os << std::endl;
+    return os;
+}
+
 ShaderProgramInterface get_program_interface(GLuint program) {
     ShaderProgramInterface intf;
     // Get number of active uniforms in program
@@ -398,26 +473,5 @@ ShaderProgramInterface get_program_interface(GLuint program) {
 
     return intf;
 }
-
-std::ostream& operator << (std::ostream& os, const ShaderProgramInterface& i) {
-    constexpr std::string_view ROW_FORMAT = "|{:<20}|{:<20}|";
-    constexpr std::string_view DELIM_FORMAT = "|{:-^20}|{:-^20}|";
-
-    os << "Input attributes amount: " << i.input_count << std::endl;
-    os << std::format(ROW_FORMAT, "Name", "Type") << std::endl;
-    os << std::format(DELIM_FORMAT, "", "") << std::endl;
-    for (const auto& [name, type] : i.input_block) {
-        os << std::format(ROW_FORMAT, name, type_to_string(type)) << std::endl;
-    } os << std::endl;
-
-    os << "Uniform variables amount: " << i.uniforms_count << std::endl;
-    os << std::format(ROW_FORMAT, "Name", "Type") << std::endl;
-    os << std::format(DELIM_FORMAT, "", "") << std::endl;
-    for (const auto& [name, type]: i.uniform_block) {
-        os << std::format(ROW_FORMAT, name, type_to_string(type)) << std::endl;
-    } os << std::endl;
-    return os;
-}
-
 
 }
