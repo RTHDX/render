@@ -52,6 +52,8 @@ int main() {
     auto program = opengl::create_program(vertex_path, fragment_path);
     auto vao = opengl::gen_vertex_array();
     auto ebo = opengl::gen_element_buffer();
+    auto intf = opengl::get_program_interface(program);
+    std::cout << intf << std::endl;
 
     auto vertices = create_vertices();
     auto indices = create_indices();
@@ -61,9 +63,8 @@ int main() {
     opengl::bind_ebo(ebo, indices);
 
     opengl::TextureArray texture(R"(.\fire.jpg)", 6, 6);
-    if (!texture.read()) {
-        return EXIT_FAILURE;
-    }
+    if (!texture.read()) { return EXIT_FAILURE; }
+
     glm::mat4 projection(1.0);
     glm::mat4 view(1.0);
     glm::mat4 model(1.0);

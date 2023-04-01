@@ -203,8 +203,9 @@ void bind_vao(GLuint id) {
 
 GLuint gen_texture(GLenum target) {
     GLuint tex;
-    opengl::function().gen_textures(1, &tex);
-    opengl::function().bind_texture(target, tex);
+    //opengl::function().gen_textures(1, &tex);
+    SAFE_CALL(glGenTextures(1, &tex));
+    SAFE_CALL(glBindTexture(target, tex));
     return tex;
 }
 
@@ -300,5 +301,123 @@ bool set_int(GLuint id, const std::string_view name, GLint value) {
     SAFE_CALL(glUniform1i(loc, value));
     return true;
 }
+
+static std::string type_to_string(GLenum type) {
+    switch (type) {
+    case GL_FLOAT:
+        return "float";
+    case GL_FLOAT_VEC2:
+        return "vec2";
+    case GL_FLOAT_VEC3:
+        return "vec3";
+    case GL_FLOAT_VEC4:
+        return "vec4";
+    case GL_INT:
+        return "int";
+    case GL_INT_VEC2:
+        return "ivec2";
+    case GL_INT_VEC3:
+        return "ivec3";
+    case GL_INT_VEC4:
+        return "ivec4";
+    case GL_UNSIGNED_INT:
+        return "unsigned int";
+    case GL_BOOL:
+        return "bool";
+    case GL_BOOL_VEC2:
+        return "bvec2";
+    case GL_BOOL_VEC3:
+        return "bvec3";
+    case GL_BOOL_VEC4:
+        return "bvec4";
+    case GL_FLOAT_MAT2:
+        return "mat2";
+    case GL_FLOAT_MAT3:
+        return "mat3";
+    case GL_FLOAT_MAT4:
+        return "mat4";
+    case GL_SAMPLER_2D:
+        return "sampler2D";
+    case GL_SAMPLER_CUBE:
+        return "samplerCube";
+    default:
+        return "unknown type";
+    }
+}
+
+ShaderProgramInterface get_program_interface(GLuint program) {
+    ShaderProgramInterface intf;
+    // Get number of active uniforms in program
+    SAFE_CALL(glGetProgramInterfaceiv(program, GL_UNIFORM, GL_ACTIVE_RESOURCES,
+                                      &intf.uniforms_count));
+
+    // Loop through all active uniforms and print their names and types
+    for (GLint i = 0; i < intf.uniforms_count; i++) {
+        GLenum properties[] = {GL_NAME_LENGTH, GL_TYPE};
+        GLint values[2];
+        SAFE_CALL(glGetProgramResourceiv(program, GL_UNIFORM, i, 2, properties,
+                                         2, NULL, values));
+
+        GLint len = values[0];
+        GLint type = values[1];
+
+        char* name = new char[len];
+        SAFE_CALL(glGetProgramResourceName(program, GL_UNIFORM, i, len, NULL,
+                                           name));
+        intf.uniform_block.insert({std::string(name), type});
+        //std::cout << "Uniform " << i << ": " << name << " (type "
+        //          << getTypeString(type) << ")" << std::endl;
+
+        delete[] name;
+    }
+
+    // Get number of active attributes in program
+    SAFE_CALL(glGetProgramInterfaceiv(program, GL_PROGRAM_INPUT,
+                                      GL_ACTIVE_RESOURCES, &intf.input_count));
+
+    // Loop through all active attributes and print their names and types
+    for (GLint i = 0; i < intf.input_count; i++) {
+        GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE };
+        GLint values[2];
+        SAFE_CALL(glGetProgramResourceiv(program, GL_PROGRAM_INPUT, i, 2,
+                                         properties, 2, NULL, values));
+
+        GLint len = values[0];
+        GLint type = values[1];
+
+        char* name = new char[len];
+        SAFE_CALL(glGetProgramResourceName(program, GL_PROGRAM_INPUT, i, len,
+                                           NULL, name));
+
+        //std::cout << "Attribute " << i << ": " << name << " (type "
+        //          << getTypeString(type) << ")" << std::endl;
+        intf.input_block.insert({std::string(name), type});
+
+        delete[] name;
+    }
+
+    return intf;
+}
+
+std::ostream& operator << (std::ostream& os, const ShaderProgramInterface& i) {
+    constexpr std::string_view ROW_FORMAT = "|{:<20}|{:<20}|";
+    constexpr std::string_view DELIM_FORMAT = "|{:-^20}|{:-^20}|";
+
+    os << "Input attributes amount: " << i.input_count << std::endl;
+    os << std::format(ROW_FORMAT, "Name", "Type") << std::endl;
+    os << std::format(DELIM_FORMAT, "", "") << std::endl;
+    for (const auto& [name, type] : i.input_block) {
+        os << std::format(ROW_FORMAT, name, type_to_string(type)) << std::endl;
+    } os << std::endl;
+
+    os << "Uniform variables amount: " << i.uniforms_count << std::endl;
+    os << std::format(ROW_FORMAT, "Name", "Type") << std::endl;
+    os << std::format(DELIM_FORMAT, "", "") << std::endl;
+    for (const auto& [name, type]: i.uniform_block) {
+        os << std::format(ROW_FORMAT, name, type_to_string(type)) << std::endl;
+    } os << std::endl;
+    return os;
+}
+
 
 }

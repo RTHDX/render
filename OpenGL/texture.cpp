@@ -134,8 +134,7 @@ bool save_as_image(std::filesystem::path path,
         path.replace_extension(".jpg");
         ret = stbi_write_jpg(cast_to_str(path).c_str(), w, h, (int)m, data,
             w * (int)m);
-    }
-    else {
+    } else {
         path.replace_extension(".png");
         ret = stbi_write_png(cast_to_str(path).c_str(), w, h, (int)m, data,
             w * (int)m);

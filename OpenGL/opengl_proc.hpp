@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <string_view>
 #include <string>
+#include <unordered_map>
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
@@ -143,5 +144,15 @@ bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);
 bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val);
 bool set_int(GLuint id, const std::string_view name, GLint value);
+
+struct ShaderProgramInterface final {
+    GLint uniforms_count = 0;
+    std::unordered_map<std::string, GLenum> uniform_block;
+    GLint input_count = 0;
+    std::unordered_map<std::string, GLenum> input_block;
+};
+std::ostream& operator << (std::ostream& os, const ShaderProgramInterface& i);
+
+ShaderProgramInterface get_program_interface(GLuint program);
 
 }
