@@ -62,8 +62,14 @@ int main() {
         processInput(window);
 
         opengl::Context::instance().draw_background();
-        opengl::activate_texture(tex.id);
         opengl::use(program);
+        opengl::activate_texture({
+            .tex_type     = GL_TEXTURE0,
+            .sampler_type = GL_TEXTURE_2D,
+            .id           = tex.id,
+            .program      = program,
+            .sampler_name = "texture1"
+        });
         opengl::draw(opengl::DrawElementsCommand{.vao=vao, .count=6});
 
         glfwSwapBuffers(window);

@@ -87,8 +87,14 @@ int main() {
             std::move(gen_frame(WIDTH, HEIGHT, make_color(radians)))
         );
         radians += 0.01;
-        opengl::activate_texture(tex);
         opengl::use(program);
+        opengl::activate_texture({
+            .tex_type     = GL_TEXTURE0,
+            .sampler_type = GL_TEXTURE_2D,
+            .id           = tex,
+            .program      = program,
+            .sampler_name = "texture_1"
+        });
         opengl::draw(
             opengl::DrawArrayCommand{.vao = vao, .count = vertices.size()}
         );

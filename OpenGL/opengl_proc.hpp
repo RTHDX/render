@@ -88,10 +88,10 @@ inline void bind_vbo(GLuint id, const std::vector<T>& in) {
     SAFE_CALL(glBufferData(GL_ARRAY_BUFFER, width, data, GL_STATIC_DRAW));
 }
 
-inline void bind_ebo(GLuint id, const std::vector<uint32_t>& in) {
+inline void bind_ebo(GLuint id, const std::vector<GLuint>& in) {
     assert(Context::instance().bound_vao() > 0);
-    const uint32_t* data = in.data();
-    const size_t width = in.size() * sizeof(uint32_t);
+    const auto* data = in.data();
+    const size_t width = in.size() * sizeof(GLuint);
     SAFE_CALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id));
     SAFE_CALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, width, data, GL_STATIC_DRAW));
 }
@@ -129,9 +129,9 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
 struct TextureData {
     GLuint id;
     GLenum target;
-    int w, h;
+    GLint w, h;
     GLint format; // GL_DEPTH_COMPONENT GL_DEPTH_STENCIL GL_RED GL_RG GL_RGB GL_RGBA
-    GLenum type;
+    GLenum type; // GL_UNSIGNED_BYTE...
     GLenum wrap_s, wrap_t, min_filter, mag_filter;
 };
 std::ostream& operator << (std::ostream& os, const TextureData& tex);

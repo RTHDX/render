@@ -105,8 +105,8 @@ buffers_t vec3pos_vec2tex_t::gen_buffers(GLuint vao,
     bind_vao(vao);
     for (GLuint id : buffers) {
         bind_vbo<this_t>(id, in);
-        bind_ebo(ebo, ebo_v);
     }
+    bind_ebo(ebo, ebo_v);
     do_vertex_attrib_cmds(std::move(this_t::commands()));
     bind_vao(0);
     return buffers;
