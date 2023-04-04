@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <UI/ui.hpp>
 #include <OpenGL/texture.hpp>
@@ -13,38 +15,48 @@
 namespace fs = std::filesystem;
 using vertex_t = opengl::vec3pos_vec2tex_t;
 
-std::vector<vertex_t> create_vertices() {
+std::vector<vertex_t> create_vertices_xz() {
     return {
-        {{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}}, // top right
-        {{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}}, // bottom right
-        {{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}}, // bottom left
-        {{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}}  // top left 
+        {{-1.0, 0.0, -1.0}, {0, 1}},
+        {{ 1.0, 0.0, -1.0}, {1, 1}},
+        {{ 1.0, 0.0,  1.0}, {1, 0}},
+        {{-1.0, 0.0,  1.0}, {0, 0}}
     };
 }
 
 std::vector<GLuint> create_indices() {
     return {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+        3, 0, 1,
+        1, 2, 3
     };
 }
 
 const GLuint SCR_WIDTH  = 800;
 const GLuint SCR_HEIGHT = 800;
-const GLint T_W = 200, T_H = 200;
+const GLint T_W = 800, T_H = 800;
 
 
-opengl::byte_t* create_texture(const glm::vec4& color, int w, int h) {
-    const size_t len = w * h;
-    opengl::byte_t* data = new opengl::byte_t [len * 4];
-    size_t i = 0;
-    while (i < len) {
-        data[i++] = 255 * color.r;
-        data[i++] = 255 * color.g;
-        data[i++] = 255 * color.b;
-        data[i++] = 255 * color.a;
-    }
-    return data;
+void update_ortho(glm::vec4& clip_space, float d) {
+    clip_space.x -= d;
+    clip_space.y += d;
+    clip_space.z -= d;
+    clip_space.w += d;
+}
+
+glm::mat4 get_ortho_projection(const glm::vec4& space) {
+    return glm::ortho(
+        space.x, space.y,
+        space.z, space.w,
+        0.1f, 100.0f
+    );
+}
+
+glm::mat4 get_perspective_projection() {
+    return glm::perspective(
+        glm::radians(90.0f),
+        float(SCR_WIDTH) / float(SCR_HEIGHT),
+        0.1f, 100.0f
+    );
 }
 
 
@@ -63,13 +75,13 @@ int main() {
 
     auto vao = opengl::gen_vertex_array();
     auto ebo = opengl::gen_element_buffer();
-    auto vbos = vertex_t::gen_buffers(vao, create_vertices(),
+    auto vbos = vertex_t::gen_buffers(vao, create_vertices_xz(),
                                       ebo, create_indices());
     opengl::TextureData tex_data {
         .id         = opengl::gen_texture(),
         .target     = GL_TEXTURE_2D,
-        .w          = T_W,
-        .h          = T_H,
+        .w          = 1,
+        .h          = 1,
         .format     = GL_RGBA,
         .type       = GL_UNSIGNED_BYTE,
         .wrap_s     = GL_CLAMP_TO_EDGE,
@@ -77,37 +89,36 @@ int main() {
         .min_filter = GL_LINEAR,
         .mag_filter = GL_LINEAR
     };
-    opengl::byte_t* raw_tex_data = create_texture({0.0, 1.0, 0.0, 1.0}, T_W,
-                                                  T_H);
-    opengl::set_texture_meta(raw_tex_data, tex_data);
-    delete [] raw_tex_data;
 
-    glm::mat4 projection = glm::ortho(
+    glm::u8vec4 color (255, 0, 0, 255);
+    std::vector<glm::u8vec4> image(1, color);
+    opengl::set_texture_meta(glm::value_ptr(*(image.data())), tex_data);
+
+    glm::vec4 ortho_corners{
         -2.0f, 2.0f,
         -2.0f, 2.0f,
-        0.001f, 100.0f
-    );
-    float delta = 0.01;
-    glm::mat4 view = glm::lookAt(
-        glm::vec3(delta, 2.0f - delta, delta),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, 1.0f)
-    );
+    };
+    glm::mat4 projection = get_ortho_projection(ortho_corners);
 
-    glm::mat4 model (1.0);
+    glm::vec3 pos = {0.0, 5.0, 0.0};
+    glm::vec3 center = {0.0, 0.0, 0.0};
+    glm::vec3 up = {0.0, 0.0, 1.0};
+    glm::mat4 view = glm::lookAt(pos, center, up);
+
+    glm::mat4 model(1.0);
     while (!glfwWindowShouldClose(window)) {
+        SAFE_CALL(glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT));
+
         auto action = glfwGetKey(window, GLFW_KEY_ESCAPE);
-        if (action == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window, true);
-        }
+        if (action == GLFW_PRESS) { glfwSetWindowShouldClose(window, true); }
         opengl::Context::instance().draw_background();
 
         opengl::use(program);
         opengl::activate_texture({
-            .tex_type = GL_TEXTURE0,
+            .tex_type     = GL_TEXTURE0,
             .sampler_type = tex_data.target,
-            .id = tex_data.id,
-            .program = program,
+            .id           = tex_data.id,
+            .program      = program,
             .sampler_name = "texture_sampler"
         });
         opengl::set_mat4(program, "projection", projection);

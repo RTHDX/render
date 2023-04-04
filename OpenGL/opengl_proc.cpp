@@ -271,7 +271,7 @@ void bind_texture(GLenum target, GLuint id) {
 }
 
 void set_texture_meta(byte_t* raw_data, const TextureData& params) {
-    SAFE_CALL(glBindTexture(params.target, params.id));
+    //SAFE_CALL(glBindTexture(params.target, params.id));
     SAFE_CALL(glTexImage2D(params.target, 0, params.format, params.w, params.h,
                            0, params.format, params.type, raw_data));
     SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_WRAP_S, params.wrap_s));
