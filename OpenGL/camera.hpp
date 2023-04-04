@@ -19,7 +19,6 @@ enum class Direction {
     DOWN
 };
 
-
 class Camera {
     static const glm::vec3 UP;
     static const glm::vec3 FORWARD;
@@ -55,6 +54,14 @@ private:
 
     glm::mat4 _projection;
     glm::vec3 _position, _target;
+};
+
+class OrthoCamera final {
+    static constexpr float Z_NEAR = 0.1;
+    static constexpr float Z_FAR = 100.0;
+
+public:
+    OrthoCamera();
 };
 
 

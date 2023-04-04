@@ -77,6 +77,8 @@ public:
 
     static buffers_t gen_buffers(GLuint vao,
                                  const std::vector<this_t>& in);
+    static buffers_t gen_buffers(GLuint vao, const std::vector<this_t>& in,
+                                 GLuint ebo, const std::vector<GLuint>& ebo_v);
     static commands_t commands();
 };
 

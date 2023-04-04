@@ -97,6 +97,21 @@ buffers_t vec3pos_vec2tex_t::gen_buffers(GLuint vao,
     return buffers;
 }
 
+buffers_t vec3pos_vec2tex_t::gen_buffers(GLuint vao,
+                                         const std::vector<this_t>& in,
+                                         GLuint ebo,
+                                         const std::vector<GLuint>& ebo_v) {
+    auto buffers = gen_vertex_buffers(1);
+    bind_vao(vao);
+    for (GLuint id : buffers) {
+        bind_vbo<this_t>(id, in);
+        bind_ebo(ebo, ebo_v);
+    }
+    do_vertex_attrib_cmds(std::move(this_t::commands()));
+    bind_vao(0);
+    return buffers;
+}
+
 vec3pos_vec2tex_t::commands_t vec3pos_vec2tex_t::commands() {
     return {
         {.index=0, .stride=3, .offset=(void*)offsetof(this_t, pos)},
