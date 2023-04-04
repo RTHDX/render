@@ -127,7 +127,7 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
 }
 
 struct TextureData {
-    GLint id;
+    GLuint id;
     GLenum target;
     int w, h;
     GLint format; // GL_DEPTH_COMPONENT GL_DEPTH_STENCIL GL_RED GL_RG GL_RGB GL_RGBA
@@ -143,7 +143,7 @@ void bind_texture(const glm::ivec2& dims,
                   byte_t* texture);
 void bind_texture(GLenum target, GLuint id);
 void set_texture_meta(byte_t* raw_data, const TextureData& params);
-void activate_texture(GLuint id);
+void activate_texture(TextureActivationCommand&& cmd);
 void free_texture(GLuint id);
 
 void use(GLuint id);

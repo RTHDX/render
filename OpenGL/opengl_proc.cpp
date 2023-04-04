@@ -283,6 +283,12 @@ void set_texture_meta(byte_t* raw_data, const TextureData& params) {
     SAFE_CALL(glBindTexture(params.target, 0));
 }
 
+void activate_texture(TextureActivationCommand&& cmd) {
+    SAFE_CALL(glActiveTexture(cmd.tex_type));
+    SAFE_CALL(glBindTexture(cmd.sampler_type, cmd.id));
+    set_int(cmd.program, cmd.sampler_name, 0);
+}
+
 void activate_texture(GLuint id) {
     SAFE_CALL(glBindTexture(GL_TEXTURE_2D, id));
     SAFE_CALL(glActiveTexture(GL_TEXTURE0));
@@ -440,9 +446,6 @@ ShaderProgramInterface get_program_interface(GLuint program) {
         SAFE_CALL(glGetProgramResourceName(program, GL_UNIFORM, i, len, NULL,
                                            name));
         intf.uniform_block.insert({std::string(name), type});
-        //std::cout << "Uniform " << i << ": " << name << " (type "
-        //          << getTypeString(type) << ")" << std::endl;
-
         delete[] name;
     }
 
@@ -463,11 +466,7 @@ ShaderProgramInterface get_program_interface(GLuint program) {
         char* name = new char[len];
         SAFE_CALL(glGetProgramResourceName(program, GL_PROGRAM_INPUT, i, len,
                                            NULL, name));
-
-        //std::cout << "Attribute " << i << ": " << name << " (type "
-        //          << getTypeString(type) << ")" << std::endl;
         intf.input_block.insert({std::string(name), type});
-
         delete[] name;
     }
 

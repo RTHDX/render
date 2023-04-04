@@ -18,6 +18,14 @@ struct TextureBindCommand {
     GLenum value;
 };
 
+struct TextureActivationCommand {
+    GLenum tex_type;
+    GLenum sampler_type;
+    GLuint id;
+    GLuint program;
+    std::string_view sampler_name;
+};
+
 struct DrawArrayCommand {
     GLuint vao;
     size_t count;
