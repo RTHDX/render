@@ -64,6 +64,7 @@ class OrthoCamera final {
     struct ortho_clip_t {
         float factor;
         float width, height;
+
         float half_width() const { return (width * factor) / 2.0; }
         float half_height() const { return (height * factor) / 2.0; }
     };
