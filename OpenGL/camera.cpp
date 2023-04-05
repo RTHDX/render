@@ -64,6 +64,29 @@ void Camera::eveal_projection() {
 }
 
 
+OrthoCamera::OrthoCamera(const glm::vec3& pos, float w, float h, float factor)
+    : pos_(pos)
+    , clip_space_{
+        .width  = w,
+        .height = h,
+        .factor = factor
+    }
+    , view_(std::move(glm::lookAt(pos, {0.0, 0.0, 0.0}, UP)))
+{}
+
+glm::mat4 OrthoCamera::projection() const {
+    return glm::ortho(
+        -clip_space_.half_width(), clip_space_.half_width(),
+        -clip_space_.half_height(), clip_space_.half_height(),
+        Z_NEAR, Z_FAR
+    );
+}
+
+glm::mat4 OrthoCamera::view() const {
+    return glm::lookAt(pos_, {pos_.x, 0.0, pos_.z}, UP);
+}
+
+
 CameraHandler::CameraHandler(Camera& camera)
     : ui::Listener(&ui::io::IO::instance())
     , _camera(camera)

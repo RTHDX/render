@@ -59,9 +59,32 @@ private:
 class OrthoCamera final {
     static constexpr float Z_NEAR = 0.1;
     static constexpr float Z_FAR = 100.0;
+    static constexpr glm::vec3 UP {0.0, 0.0, 1.0};
+
+    struct ortho_clip_t {
+        float factor;
+        float width, height;
+        float half_width() const { return (width * factor) / 2.0; }
+        float half_height() const { return (height * factor) / 2.0; }
+    };
 
 public:
-    OrthoCamera();
+    OrthoCamera(const glm::vec3& pos, float width, float height,
+                float factor = 1.0);
+
+    glm::mat4 projection() const;
+    glm::mat4 view() const;
+
+    void zoom_in();
+    void zoom_out();
+    void zoom_step(float step);
+
+private:
+    glm::vec3 pos_;
+    glm::mat4 projection_;
+    glm::mat4 view_;
+    float step_ = 0.01;
+    ortho_clip_t clip_space_;
 };
 
 
