@@ -18,6 +18,19 @@ struct TextureBindCommand {
     GLenum value;
 };
 
+struct StencilCommand {
+    // GL_KEEP, GL_ZERO, GL_REPLACE, GL_INCR, GL_INCR_WRAP, GL_DECR,
+    // GL_DECR_WRAP, GL_INVERT
+    GLenum s_fail;
+    GLenum dp_fail;
+    GLenum dp_pass;
+    // GL_NEVER, GL_LESS, GL_LEQUAL, GL_GREATER, GL_GEQUAL, GL_EQUAL,
+    // GL_NOTEQUAL, GL_ALWAYS
+    GLenum function;
+    GLint ref;
+    GLuint mask;
+};
+
 struct TextureActivationCommand {
     GLenum tex_type;
     GLenum sampler_type;

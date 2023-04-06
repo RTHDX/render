@@ -146,6 +146,8 @@ void set_texture_meta(byte_t* raw_data, const TextureData& params);
 void activate_texture(TextureActivationCommand&& cmd);
 void free_texture(GLuint id);
 
+void apply_stencil(StencilCommand&& cmd);
+
 void use(GLuint id);
 
 void draw(DrawArrayCommand&& cmd);

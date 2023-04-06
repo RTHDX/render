@@ -298,6 +298,11 @@ void free_texture(GLuint id) {
     SAFE_CALL(glDeleteTextures(1, &id));
 }
 
+void apply_stencil(StencilCommand&& cmd) {
+    SAFE_CALL(glStencilOp(cmd.s_fail, cmd.dp_fail, cmd.dp_pass));
+    SAFE_CALL(glStencilFunc(cmd.function, cmd.ref, cmd.mask));
+}
+
 void use(GLuint id) {
     SAFE_CALL(glUseProgram(id));
 }
