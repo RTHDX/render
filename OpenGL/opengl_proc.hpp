@@ -80,6 +80,12 @@ void free_pixel_buffers(const std::vector<GLuint>& id);
 void free_pixel_buffer(GLuint id);
 
 template <typename T>
+T read_pixel(GLint x, GLint y, GLenum t, GLenum f, T* d) {
+    SAFE_CALL(glReadPixels(x, y, 1, 1, t, f, (void*)d));
+    return *d;
+}
+
+template <typename T>
 inline void bind_vbo(GLuint id, const std::vector<T>& in) {
     assert(Context::instance().bound_vao() > 0);
     const T* data = in.data();
