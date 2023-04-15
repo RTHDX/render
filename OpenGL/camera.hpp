@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <glm/glm.hpp>
 
 #include <UI/observer.hpp>
@@ -62,16 +63,30 @@ class OrthoCamera final {
     static constexpr glm::vec3 UP {0.0, 0.0, 1.0};
 
     struct ortho_clip_t {
-        float factor;
-        float width, height;
+        float factor = 0.0f;
+        float width = 0.0f, height = 0.0;
 
         float half_width() const { return (width * factor) / 2.0; }
         float half_height() const { return (height * factor) / 2.0; }
+        bool is_empty() const {
+            const auto e = std::numeric_limits<float>::epsilon();
+            return (
+                std::fabs(factor - 0.0) <= e * std::fmax(std::fabs(factor), 0) &&
+                std::fabs(width - 0.0) <= e * std::fmax(std::fabs(width), 0) &&
+                std::fabs(height - 0.0) <= e * std::fmax(std::fabs(height), 0)
+            );
+        }
     };
 
 public:
+    OrthoCamera() = default;
     OrthoCamera(const glm::vec3& pos, float width, float height,
                 float factor = 1.0);
+    OrthoCamera(const OrthoCamera&) = default;
+    OrthoCamera& operator = (const OrthoCamera&) = default;
+    OrthoCamera(OrthoCamera&&) = default;
+    OrthoCamera& operator = (OrthoCamera&&) = default;
+    ~OrthoCamera() = default;
 
     glm::mat4 projection() const;
     glm::mat4 view() const;
@@ -80,10 +95,19 @@ public:
     void zoom_out();
     void zoom_step(float step);
 
+    bool is_empty() const {
+        return pos_ == glm::vec3{0.0, 0.0, 0.0} &&
+               projection_ == glm::mat4(1.0) &&
+               view_ == glm::mat4(1.0) &&
+               std::fabs(step_ - 0.0) <= (std::numeric_limits<float>::epsilon() *
+                                          std::fmax(std::fabs(step_), 0)) &&
+               clip_space_.is_empty();
+    }
+
 private:
-    glm::vec3 pos_;
-    glm::mat4 projection_;
-    glm::mat4 view_;
+    glm::vec3 pos_ = {0.0, 0.0, 0.0};
+    glm::mat4 projection_ = glm::mat4{1.0};
+    glm::mat4 view_ = glm::mat4{1.0};
     float step_ = 0.01;
     ortho_clip_t clip_space_;
 };
