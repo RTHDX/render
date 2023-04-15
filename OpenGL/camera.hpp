@@ -96,12 +96,12 @@ public:
 
     const Camera& impl() const { return _camera; }
 
-    virtual void consume(const ui::KeyEvent& event);
-    virtual void consume(const ui::MouseEvent& event);
-    virtual void consume(const ui::MouseButtonEvent& event);
-    virtual void consume(const ui::ScrollEvent& event);
-    virtual void consume(const ui::DropEvent& event);
-    virtual void consume(const ui::FramebufferEvent& event);
+    void consume(const ui::KeyEvent& event) override;
+    void consume(const ui::MouseEvent& event) override;
+    void consume(const ui::MouseButtonEvent& event) override;
+    void consume(const ui::ScrollEvent& event) override;
+    void consume(const ui::DropEvent& event) override;
+    void consume(const ui::FramebufferEvent& event) override;
 
 private:
     Camera& _camera;

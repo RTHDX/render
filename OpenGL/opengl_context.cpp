@@ -23,6 +23,7 @@ Context& Context::instance() {
 void Context::initialize(bool to_dump) {
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
+        initialized_ = false;
         std::terminate();
     }
     SAFE_CALL(glDebugMessageCallback(utils::gl_debug_output, nullptr));
@@ -31,6 +32,7 @@ void Context::initialize(bool to_dump) {
     SAFE_CALL(glEnable(GL_DEPTH_TEST));
     SAFE_CALL(glEnable(GL_BLEND));
 
+    initialized_ = true;
     if (to_dump) { dump(); }
 }
 

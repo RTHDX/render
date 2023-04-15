@@ -26,6 +26,8 @@ public:
     glm::vec4& background() { return _background; }
     void background(const glm::vec4& color);
 
+    bool is_initialized() const { return initialized_; }
+
     void draw_background() const;
 
     GLint active_program() const;
@@ -38,6 +40,7 @@ private:
 
 private:
     glm::vec4 _background;
+    bool initialized_ = false;
 };
 
 
