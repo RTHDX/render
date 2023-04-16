@@ -90,6 +90,11 @@ void OrthoCamera::zoom_in() { clip_space_.factor -= step_; }
 void OrthoCamera::zoom_out() { clip_space_.factor += step_; }
 void OrthoCamera::zoom_step(float step) { step_ = step; }
 
+void OrthoCamera::update_sizes(size_t w, size_t h) {
+    clip_space_.width = float(w);
+    clip_space_.height = float(h);
+}
+
 
 CameraHandler::CameraHandler(Camera& camera)
     : ui::Listener(&ui::io::IO::instance())

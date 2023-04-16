@@ -71,9 +71,9 @@ class OrthoCamera final {
         bool is_empty() const {
             const auto e = std::numeric_limits<float>::epsilon();
             return (
-                std::fabs(factor - 0.0) <= e * std::fmax(std::fabs(factor), 0) &&
-                std::fabs(width - 0.0) <= e * std::fmax(std::fabs(width), 0) &&
-                std::fabs(height - 0.0) <= e * std::fmax(std::fabs(height), 0)
+                std::fabs(factor - 0) <= e * std::fmax(std::fabs(factor), 0) &&
+                std::fabs(width - 0)  <= e * std::fmax(std::fabs(width),  0) &&
+                std::fabs(height - 0) <= e * std::fmax(std::fabs(height), 0)
             );
         }
     };
@@ -94,13 +94,12 @@ public:
     void zoom_in();
     void zoom_out();
     void zoom_step(float step);
+    void update_sizes(size_t w, size_t h);
 
     bool is_empty() const {
         return pos_ == glm::vec3{0.0, 0.0, 0.0} &&
                projection_ == glm::mat4(1.0) &&
                view_ == glm::mat4(1.0) &&
-               std::fabs(step_ - 0.0) <= (std::numeric_limits<float>::epsilon() *
-                                          std::fmax(std::fabs(step_), 0)) &&
                clip_space_.is_empty();
     }
 
@@ -108,7 +107,7 @@ private:
     glm::vec3 pos_ = {0.0, 0.0, 0.0};
     glm::mat4 projection_ = glm::mat4{1.0};
     glm::mat4 view_ = glm::mat4{1.0};
-    float step_ = 0.01;
+    float step_ = 0.001;
     ortho_clip_t clip_space_;
 };
 

@@ -111,6 +111,11 @@ void on_gl_error(GLenum error_code, const char* call, const char* file,
 }
 
 
+void viewport(GLsizei w, GLsizei h) {
+    SAFE_CALL(glViewport(0, 0, w, h));
+}
+
+
 std::vector<GLuint> gen_vertex_array(size_t count) {
     std::vector<GLuint> out(count);
     SAFE_CALL(glGenVertexArrays(count, out.data()));

@@ -61,6 +61,8 @@ void free_program(GLuint id);
 bool check_shader(GLuint id);
 bool check_program(GLuint id);
 
+void viewport(GLsizei width, GLsizei height);
+
 
 std::vector<GLuint> gen_vertex_array(size_t count);
 GLuint gen_vertex_array();
