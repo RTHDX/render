@@ -31,6 +31,7 @@ void Context::initialize(bool to_dump) {
     SAFE_CALL(glEnable(GL_STENCIL_TEST));
     SAFE_CALL(glEnable(GL_DEPTH_TEST));
     SAFE_CALL(glEnable(GL_BLEND));
+    SAFE_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     initialized_ = true;
     if (to_dump) { dump(); }
