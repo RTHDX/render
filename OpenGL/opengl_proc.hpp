@@ -167,7 +167,9 @@ void draw(DrawElementsCommand cmd);
 bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);
 bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val);
+bool set_vec2(GLuint id, const std::string_view name, const glm::vec2& val);
 bool set_int(GLuint id, const std::string_view name, GLint value);
+bool set_float(GLuint id, const std::string_view name, GLfloat value);
 
 struct ShaderProgramInterface final {
     GLint uniforms_count = 0;

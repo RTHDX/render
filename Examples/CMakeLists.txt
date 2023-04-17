@@ -13,6 +13,7 @@ add_subdirectory(OpenGL_SpriteAnimation)
 add_subdirectory(OpenGL_ItemAnimation)
 add_subdirectory(OpenGL_World)
 add_subdirectory(OpenGL_OrthoCamTexture)
+add_subdirectory(OpenGL_Grid)
 
 add_subdirectory(RTX_Simple)
 add_subdirectory(RTX_Simple_2)

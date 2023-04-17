@@ -365,11 +365,27 @@ bool set_mat4(GLuint id, const std::string_view name, const glm::mat4& val) {
     return true;
 }
 
+bool set_vec2(GLuint id, const std::string_view name, glm::vec2& val) {
+    assert(Context::instance().active_program() > 0);
+    auto loc = find_location(id, name);
+    if (loc < 0) return false;
+    SAFE_CALL(glUniform2f(loc, val.x, val.y));
+    return true;
+}
+
 bool set_int(GLuint id, const std::string_view name, GLint value) {
     assert(Context::instance().active_program() > 0);
     auto loc = find_location(id, name);
     if (loc < 0) return false;
     SAFE_CALL(glUniform1i(loc, value));
+    return true;
+}
+
+bool set_float(GLuint id, const std::string_view name, GLfloat value) {
+    assert(Context::instance().active_program() > 0);
+    auto loc = find_location(id, name);
+    if (loc < 0) return false;
+    SAFE_CALL(glUniform1f(loc, value));
     return true;
 }
 

@@ -44,6 +44,12 @@ public:
     void height(float val) { _height = val; eveal_projection(); }
     int height() const { return _height; }
 
+    void update_sizes(size_t w, size_t h) {
+        _width  = float(w);
+        _height = float(h);
+        eveal_projection();
+    }
+
 private:
     glm::vec3 up() const;
     glm::vec3 right() const;
