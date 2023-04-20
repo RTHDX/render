@@ -18,8 +18,6 @@ add_subdirectory(3rdParty/glm)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/glm")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/imgui/backends")
-add_subdirectory(3rdParty/parselib)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty")
 add_subdirectory(3rdParty/tinygltf)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/tinygltf")
 
