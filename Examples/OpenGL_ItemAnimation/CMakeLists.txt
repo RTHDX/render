@@ -6,7 +6,7 @@ project(${PROJECT_NAME})
 create_executable(
     TARGET ${PROJECT_NAME}
     SOURCES main.cpp
-    LIBS OpenGL UI ImGui OpenGL-Loader Render
+    LIBS OpenGL UI ImGui Render
 )
 
 copy_files(FILES "vertex_shader.vert" "fragment_shader.frag"
