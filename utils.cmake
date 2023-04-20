@@ -33,7 +33,6 @@ function (create_executable)
                           ${OPENGL_LIBRARIES}
                           glfw
                           glad
-                          assimp
                           ${THIS_LIBS}
     )
     target_link_directories(${THIS_TARGET} PRIVATE ${RENDER_BOOST_LINK_DIR})

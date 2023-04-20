@@ -8,10 +8,10 @@ include(utils.cmake)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_subdirectory(3rdParty/assimp)
-set(ASSIMP_INCLUDE_DIRECTORY)
-get_target_property(ASSIMP_INCLUDE_DIRECTORY assimp INCLUDE_DIRECTORIES)
-include_directories(${ASSIMP_INCLUDE_DIRECTORY})
+#add_subdirectory(3rdParty/assimp)
+#set(ASSIMP_INCLUDE_DIRECTORY)
+#get_target_property(ASSIMP_INCLUDE_DIRECTORY assimp INCLUDE_DIRECTORIES)
+#include_directories(${ASSIMP_INCLUDE_DIRECTORY})
 
 
 add_subdirectory(3rdParty/glfw)
@@ -45,7 +45,7 @@ add_library(ImGui STATIC
 
 add_subdirectory(UI)
 add_subdirectory(OpenGL)
-add_subdirectory(RTX)
+#add_subdirectory(RTX)
 add_subdirectory(Loader)
 add_subdirectory(Render)
 option(RENDER_ENABLE_EXAMPLES OFF)
