@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <UI/io.hpp>
 
@@ -71,28 +72,88 @@ OrthoCamera::OrthoCamera(const glm::vec3& pos, float w, float h, float factor)
         .width  = w,
         .height = h
     }
-    , view_(std::move(glm::lookAt(pos, {0.0, 0.0, 0.0}, UP)))
-{}
-
-glm::mat4 OrthoCamera::projection() const {
-    return glm::ortho(
-        -clip_space_.half_width(),  clip_space_.half_width(),
-        -clip_space_.half_height(), clip_space_.half_height(),
-        Z_NEAR,                     Z_FAR
-    );
+{
+    update_projection();
+    update_view();
 }
 
-glm::mat4 OrthoCamera::view() const {
-    return glm::lookAt(pos_, {pos_.x, 0.0, pos_.z}, UP);
+const glm::mat4& OrthoCamera::projection() const {
+    return projection_;
 }
 
-void OrthoCamera::zoom_in() { clip_space_.factor -= step_; }
-void OrthoCamera::zoom_out() { clip_space_.factor += step_; }
+const glm::mat4& OrthoCamera::view() const {
+    return view_;
+}
+
+void OrthoCamera::move(Direction dir) {
+    glm::vec3 dir_vec = {0.0, 0.0, 0.0};
+    switch (dir) {
+    case Direction::FORWARD:
+        dir_vec = NORTH;
+        break;
+    case Direction::BACKWARD:
+        dir_vec = SOUTH;
+        break;
+    case Direction::LEFT:
+        dir_vec = WEST;
+        break;
+    case Direction::RIGHT:
+        dir_vec = EAST;
+        break;
+    case Direction::FORWARD_LEFT:
+        dir_vec = EAST_NORTH;
+        break;
+    case Direction::FORWARD_RIGHT:
+        dir_vec = WEST_NORTH;
+        break;
+    case Direction::BACKWARD_LEFT:
+        dir_vec = EAST_SOUTH;
+        break;
+    case Direction::BACKWARD_RIGHT:
+        dir_vec = WEST_SOUTH;
+        break;
+    case Direction::UP:
+        dir_vec = UP_MOVE;
+        break;
+    case Direction::DOWN:
+        dir_vec = DOWN_MOVE;
+        break;
+    }
+    auto move_mat = glm::translate(glm::mat4(1.0), dir_vec);
+    pos_ = move_mat * glm::vec4(pos_, 1.0);
+    update_view();
+}
+
+void OrthoCamera::zoom_in() {
+    clip_space_.factor -= step_;
+    move(Direction::DOWN);
+    update_projection();
+}
+
+void OrthoCamera::zoom_out() {
+    clip_space_.factor += step_;
+    move(Direction::UP);
+    update_projection();
+}
+
 void OrthoCamera::zoom_step(float step) { step_ = step; }
 
 void OrthoCamera::update_sizes(size_t w, size_t h) {
     clip_space_.width = float(w);
     clip_space_.height = float(h);
+    update_projection();
+}
+
+void OrthoCamera::update_projection() {
+    projection_ = glm::ortho(
+        -clip_space_.half_width(), clip_space_.half_width(),
+        -clip_space_.half_height(), clip_space_.half_height(),
+        Z_NEAR, Z_FAR
+    );
+}
+
+void OrthoCamera::update_view() {
+    view_ = glm::lookAt(pos_, pos_ + glm::vec3(0.0, -1.0, 0.0), UP);
 }
 
 

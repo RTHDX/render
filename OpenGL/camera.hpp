@@ -11,7 +11,11 @@ namespace opengl {
 enum class Direction {
     NONE,
     FORWARD,
+    FORWARD_LEFT,
+    FORWARD_RIGHT,
     BACKWARD,
+    BACKWARD_LEFT,
+    BACKWARD_RIGHT,
     LEFT,
     RIGHT,
     ROTATE_LEFT,
@@ -68,6 +72,18 @@ class OrthoCamera final {
     static constexpr float Z_FAR = 100.0;
     static constexpr glm::vec3 UP {0.0, 0.0, 1.0};
 
+    static constexpr float sq_2 = 1.414213562;
+    static constexpr glm::vec3 NORTH      = {0.0,   0.0, -1.0};
+    static constexpr glm::vec3 EAST_NORTH = {sq_2,  0.0, -sq_2};
+    static constexpr glm::vec3 EAST       = {1.0,   0.0, 0.0};
+    static constexpr glm::vec3 EAST_SOUTH = {sq_2,  0.0, sq_2};
+    static constexpr glm::vec3 SOUTH      = {0.0,   0.0, 1.0};
+    static constexpr glm::vec3 WEST_SOUTH = {-sq_2, 0.0, sq_2};
+    static constexpr glm::vec3 WEST       = {-1.0,  0.0, 0.0};
+    static constexpr glm::vec3 WEST_NORTH = {-sq_2, 0.0, -sq_2};
+    static constexpr glm::vec3 UP_MOVE    = {0.0,   1.0, 0.0};
+    static constexpr glm::vec3 DOWN_MOVE  = {0.0,  -1.0, 0.0};
+
     struct ortho_clip_t {
         float factor = 0.0f;
         float width = 0.0f, height = 0.0;
@@ -94,10 +110,11 @@ public:
     OrthoCamera& operator = (OrthoCamera&&) = default;
     ~OrthoCamera() = default;
 
-    glm::mat4 projection() const;
-    glm::mat4 view() const;
+    const glm::mat4& projection() const;
+    const glm::mat4& view() const;
     const glm::vec3& position() const { return pos_; }
 
+    void move(Direction dir);
     void zoom_in();
     void zoom_out();
     void zoom_step(float step);
@@ -109,6 +126,10 @@ public:
                view_ == glm::mat4(1.0) &&
                clip_space_.is_empty();
     }
+
+private:
+    void update_projection();
+    void update_view();
 
 private:
     glm::vec3 pos_ = {0.0, 0.0, 0.0};
