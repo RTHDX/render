@@ -122,6 +122,7 @@ void OrthoCamera::move(Direction dir) {
     auto move_mat = glm::translate(glm::mat4(1.0), dir_vec);
     pos_ = move_mat * glm::vec4(pos_, 1.0);
     update_view();
+    update_projection();
 }
 
 void OrthoCamera::zoom_in() {

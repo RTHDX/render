@@ -90,6 +90,8 @@ T read_pixel(GLint x, GLint y, GLenum t, GLenum f, T* d) {
     return *d;
 }
 
+glm::u8vec4 read_pixel_color(GLint x, GLint y);
+
 template <typename T>
 inline void bind_vbo(GLuint id, const std::vector<T>& in) {
     assert(Context::instance().bound_vao() > 0);

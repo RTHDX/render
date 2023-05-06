@@ -13,6 +13,7 @@ bool init_glfw(int major, int minor) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     return true;

@@ -199,6 +199,17 @@ void free_pixel_buffer(GLuint id) {
     SAFE_CALL(glDeleteVertexArrays(1, &id));
 }
 
+glm::u8vec4 read_pixel_color(GLint x, GLint y) {
+    GLubyte pixel_data[4];
+    SAFE_CALL(glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel_data));
+    return glm::u8vec4{
+        pixel_data[0],
+        pixel_data[1],
+        pixel_data[2],
+        pixel_data[3]
+    };
+}
+
 void bind_vao(GLuint id) {
     SAFE_CALL(glBindVertexArray(id));
 }
