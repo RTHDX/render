@@ -68,8 +68,8 @@ private:
 };
 
 class OrthoCamera final {
-    static constexpr float Z_NEAR = 0.1;
-    static constexpr float Z_FAR = 100.0;
+    static constexpr float Z_NEAR = 0.0001;
+    static constexpr float Z_FAR = 10000.0;
     static constexpr glm::vec3 UP {0.0, 0.0, 1.0};
 
     static constexpr float sq_2 = 1.414213562;
@@ -113,29 +113,36 @@ public:
     const glm::mat4& projection() const;
     const glm::mat4& view() const;
     const glm::vec3& position() const { return pos_; }
+    const glm::mat4& ipv() const;
 
     void move(Direction dir);
     void zoom_in();
     void zoom_out();
     void zoom_step(float step);
     void update_sizes(size_t w, size_t h);
+    glm::vec3 screen_to_world(const glm::ivec2& screen);
 
     bool is_empty() const {
-        return pos_ == glm::vec3{0.0, 0.0, 0.0} &&
+        return pos_        == glm::vec3{0.0, 0.0, 0.0} &&
                projection_ == glm::mat4(1.0) &&
-               view_ == glm::mat4(1.0) &&
+               view_       == glm::mat4(1.0) &&
+               viewport_   == glm::vec4(0, 0, 0, 0) &&
                clip_space_.is_empty();
     }
 
 private:
     void update_projection();
     void update_view();
+    void update_ipv();
+    void update_viewport(size_t w, size_t h);
 
 private:
-    glm::vec3 pos_ = {0.0, 0.0, 0.0};
+    glm::vec3 pos_        = {0.0, 0.0, 0.0};
+    glm::vec4 viewport_   = {0, 0, 0, 0};
     glm::mat4 projection_ = glm::mat4{1.0};
-    glm::mat4 view_ = glm::mat4{1.0};
-    float step_ = 0.001;
+    glm::mat4 view_       = glm::mat4{1.0};
+    glm::mat4 ipv_        = glm::mat4(1.0);
+    float step_           = 0.001;
     ortho_clip_t clip_space_;
 };
 

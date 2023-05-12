@@ -25,6 +25,7 @@ public:
     void viewport(int width, int height) const;
     glm::vec4& background() { return _background; }
     void background(const glm::vec4& color);
+    void background(glm::u8vec4 color);
 
     bool is_initialized() const { return initialized_; }
 

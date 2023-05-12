@@ -75,6 +75,13 @@ void Context::background(const glm::vec4& color) {
     _background = color;
 }
 
+void Context::background(glm::u8vec4 color) {
+    _background.r = float(color.r / 255);
+    _background.g = float(color.g / 255);
+    _background.b = float(color.b / 255);
+    _background.a = float(color.a / 255);
+}
+
 void Context::draw_background() const {
     static constexpr GLbitfield CLEAR_MODE = GL_COLOR_BUFFER_BIT
                                              | GL_DEPTH_BUFFER_BIT
