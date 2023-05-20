@@ -103,6 +103,13 @@ glm::vec3 OrthoCamera::screen_to_world(const glm::ivec2& screen) {
     return {out.x, 0.0f, out.z};
 }
 
+glm::vec2 OrthoCamera::world_pixel_size() const {
+    return {
+        2 * clip_space_.half_width() / viewport_.z,
+        2 * clip_space_.half_height() / viewport_.w
+    };
+}
+
 void OrthoCamera::update_viewport(size_t w, size_t h) {
     viewport_.z = float(w);
     viewport_.w = float(h);
