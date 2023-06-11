@@ -114,6 +114,7 @@ public:
     const glm::mat4& view() const;
     const glm::vec3& position() const { return pos_; }
     const glm::mat4& ipv() const;
+    const glm::vec4& viewport() const;
 
     void move(Direction dir);
     void zoom_in();

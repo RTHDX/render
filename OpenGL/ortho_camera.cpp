@@ -7,11 +7,7 @@ namespace opengl {
 
 OrthoCamera::OrthoCamera(const glm::vec3& pos, float w, float h, float factor)
     : pos_(pos)
-    , clip_space_{
-        .factor = factor,
-        .width = w,
-        .height = h
-    }
+    , clip_space_{.factor = factor, .width = w, .height = h}
 {
     update_projection();
     update_view();
@@ -28,6 +24,10 @@ const glm::mat4& OrthoCamera::view() const {
 
 const glm::mat4& OrthoCamera::ipv() const {
     return ipv_;
+}
+
+const glm::vec4& OrthoCamera::viewport() const {
+    return viewport_;
 }
 
 void OrthoCamera::move(Direction dir) {
@@ -100,7 +100,7 @@ glm::vec3 OrthoCamera::screen_to_world(const glm::ivec2& screen) {
     temp = temp * 2.0f - 1.0f;
 
     glm::vec4 out = ipv() * glm::vec4(temp, 1.0f);
-    return {out.x, 0.0f, out.z};
+    return {out.x * 0.5, 0.0f, out.z * 0.5};
 }
 
 glm::vec2 OrthoCamera::world_pixel_size() const {
