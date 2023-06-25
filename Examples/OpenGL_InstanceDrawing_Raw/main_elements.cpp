@@ -17,6 +17,7 @@
 
 #include <UI/io.hpp>
 
+
 namespace fs = std::filesystem;
 
 
@@ -29,31 +30,37 @@ static glm::mat4 SCALE_MAT = glm::scale(glm::mat4(1.0), glm::vec3(0.5));
 
 std::array<glm::mat4, SQUARES> model_matrices = {
     glm::translate(glm::mat4(1.0f), glm::vec3(-MOVE,  MOVE, 0.0f)) * SCALE_MAT,
-    glm::translate(glm::mat4(1.0f), glm::vec3( MOVE,  MOVE, 0.0f)) * SCALE_MAT,
+    glm::translate(glm::mat4(1.0f), glm::vec3(MOVE,  MOVE, 0.0f)) * SCALE_MAT,
     glm::translate(glm::mat4(1.0f), glm::vec3(-MOVE, -MOVE, 0.0f)) * SCALE_MAT,
-    glm::translate(glm::mat4(1.0f), glm::vec3( MOVE, -MOVE, 0.0f)) * SCALE_MAT
+    glm::translate(glm::mat4(1.0f), glm::vec3(MOVE, -MOVE, 0.0f)) * SCALE_MAT
 };
 
 
 float vertices[] = {
     // координаты      // текстурные координаты
-    0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-    0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+    0.5f,  0.5f, 0.0f, 1.0f, 1.0f, // Вершина 0
+    0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // Вершина 1
+   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // Вершина 2
+   -0.5f,  0.5f, 0.0f, 0.0f, 1.0f  // Вершина 3
+};
 
-   -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-   -0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-    0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+
+GLuint indices[] = {
+    0, 1, 3,
+    1, 2, 3
 };
 
 
 int main() {
     if (!ui::init_glfw(4, 6)) { return 1; }
 
-    auto* win = ui::create_window(WIDTH, HEIGHT, "Instance Drawing Raw");
+    auto* win = ui::create_window(WIDTH, HEIGHT, "Instance Element Drawing Raw");
     opengl::Context::instance().initialize(true);
     opengl::Context::instance().background(glm::vec4{0.2, 0.6, 1.0, 1.0});
     ui::io::IO::instance().bind(win);
+
+    const size_t vertices_size = sizeof(vertices);
+    const size_t indices_size = sizeof(indices);
 
     auto program = opengl::create_program(
         fs::path("./vec3pos_vec2tex_mat4mod.vert"),
@@ -61,21 +68,25 @@ int main() {
     );
     std::cout << opengl::get_program_interface(program) << std::endl;
 
-    GLuint VAO, VBO;
+    GLuint VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices,
+                     GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices,
+                     GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          (void*)(3 * sizeof(float)));
-
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                              (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                              (void*)(3 * sizeof(float)));
     glBindVertexArray(0);
 
     GLuint instanceVBO;
@@ -110,10 +121,10 @@ int main() {
     };
 
     const opengl::TextureActivationCommand tex_activation {
-        .tex_type = GL_TEXTURE0,
+        .tex_type     = GL_TEXTURE0,
         .sampler_type = tex_data.target,
-        .id = tex_data.id,
-        .program = program,
+        .id           = tex_data.id,
+        .program      = program,
         .sampler_name = "texture_1"
     };
 
@@ -136,11 +147,12 @@ int main() {
         // Привязываем VAO
         glBindVertexArray(VAO);
         // Рендерим инстансы
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, SQUARES);
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, SQUARES);
         // Отвязываем VAO
         glBindVertexArray(0);
 
         glfwSwapBuffers(win);
     }
+
     return 0;
 }
