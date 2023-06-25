@@ -157,7 +157,7 @@ void bind_texture(const glm::ivec2& dims,
                   byte_t* texture);
 void bind_texture(GLenum target, GLuint id);
 void set_texture_meta(byte_t* raw_data, const TextureData& params);
-void activate_texture(TextureActivationCommand&& cmd);
+void activate_texture(const TextureActivationCommand& cmd);
 void free_texture(GLuint id);
 
 void apply_stencil(StencilCommand&& cmd);

@@ -299,7 +299,7 @@ void set_texture_meta(byte_t* raw_data, const TextureData& params) {
     SAFE_CALL(glBindTexture(params.target, 0));
 }
 
-void activate_texture(TextureActivationCommand&& cmd) {
+void activate_texture(const TextureActivationCommand& cmd) {
     SAFE_CALL(glActiveTexture(cmd.tex_type));
     SAFE_CALL(glBindTexture(cmd.sampler_type, cmd.id));
     set_int(cmd.program, cmd.sampler_name, 0);
