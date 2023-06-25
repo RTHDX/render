@@ -51,7 +51,7 @@ int main() {
 
     auto* window = ui::create_window(WIDTH, HEIGHT, "Textures");
     opengl::Context::instance().initialize(true);
-    opengl::Context::instance().background({0.8, 0.1, 0.1, 0.1});
+    opengl::Context::instance().background(glm::vec4{0.8, 0.1, 0.1, 0.1});
 
     auto program = opengl::create_program(
         std::filesystem::path("./vertex_shader.vert"),

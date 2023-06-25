@@ -36,7 +36,7 @@ int main() {
 
     auto* win = ui::create_window(WIDTH, HEIGHT, "Infinite grid");
     opengl::Context::instance().initialize(true);
-    opengl::Context::instance().background({0.2, 0.6, 1.0, 1.0});
+    opengl::Context::instance().background(glm::vec4{0.2, 0.6, 1.0, 1.0});
     ui::io::IO::instance().bind(win);
     LocalListener listener;
 

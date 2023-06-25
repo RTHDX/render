@@ -67,7 +67,7 @@ int main() {
         "OpenGL_OrthoCamTexture"
     );
     opengl::Context::instance().initialize(true);
-    opengl::Context::instance().background({0.8, 0.8, 0.8, 1.0});
+    opengl::Context::instance().background(glm::vec4{0.8, 0.8, 0.8, 1.0});
     auto program = opengl::create_program(
         fs::path("pos3_uv2.vert"), fs::path("samp2d.frag")
     );

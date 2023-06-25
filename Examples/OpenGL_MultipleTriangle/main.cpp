@@ -58,7 +58,7 @@ int main() {
 
     opengl::Context::instance().initialize();
     opengl::Context::instance().dump();
-    opengl::Context::instance().background({0.2f, 0.5f, 0.5f, 1.0f});
+    opengl::Context::instance().background(glm::vec4{0.2f, 0.5f, 0.5f, 1.0f});
 
     std::vector<std::vector<VertexData>> objects {
         create_first_triangle(),
