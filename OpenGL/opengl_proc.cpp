@@ -341,6 +341,26 @@ void draw(DrawElementsCommand cmd) {
     bind_vao(0);
 }
 
+void draw_instance_array(const DrawArrayInstanced& cmd) {
+    assert(cmd.vao != 0);
+    assert(opengl::Context::instance().active_program() != 0);
+
+    bind_vao(cmd.vao);
+    SAFE_CALL(glDrawArraysInstanced(cmd.mode, cmd.first, cmd.count,
+                                    cmd.instancecount));
+    bind_vao(0);
+}
+
+void draw_instance_elements(const DrawElementInstanced& cmd) {
+    assert(cmd.vao != 0);
+    assert(opengl::Context::instance().active_program() != 0);
+
+    bind_vao(cmd.vao);
+    SAFE_CALL(glDrawElementsInstanced(cmd.mode, cmd.count, cmd.type,
+                                      cmd.indices, cmd.instancecount));
+    bind_vao(0);
+}
+
 static int find_location(GLuint id, const std::string_view name) {
     auto location = glGetUniformLocation(id, name.data());
     if (location < 0) {

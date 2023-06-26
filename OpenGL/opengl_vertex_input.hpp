@@ -107,11 +107,32 @@ public:
     static commands_t commands();
 };
 
+struct mat4_instanced final {
+    using this_t = mat4_instanced;
+    using col_t = glm::vec4;
+
+    glm::mat4 mat;
+
+public:
+    mat4_instanced() = default;
+    mat4_instanced(glm::mat4&& m);
+
+    static GLuint gen_buffer(GLuint vao,
+                             const std::vector<this_t>& in,
+                             GLuint index);
+};
+
 template <typename T> concept vertex_input_c =
     requires (T t) {
         typename T::vertex_attrib_t;
         typename T::commands_t;
         typename T::this_t;
         typename T::vertex_input_t;
+    };
+
+template <typename T> concept instanced_input_c =
+    requires (T t) {
+        typename T::this_t;
+        typename T::col_t;
     };
 }

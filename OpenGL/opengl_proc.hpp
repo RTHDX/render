@@ -166,6 +166,8 @@ void use(GLuint id);
 
 void draw(DrawArrayCommand&& cmd);
 void draw(DrawElementsCommand cmd);
+void draw_instance_array(const DrawArrayInstanced& cmd);
+void draw_instance_elements(const DrawElementInstanced& cmd);
 
 bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);

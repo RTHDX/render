@@ -4,7 +4,7 @@
 
 namespace opengl {
 
-template <typename T> struct VertexAttribCommand {
+template <typename T> struct VertexAttribCommand final {
     GLuint index;
     GLuint stride;
     void* offset;
@@ -12,13 +12,13 @@ template <typename T> struct VertexAttribCommand {
     size_t width = sizeof(T);
 };
 
-struct TextureBindCommand {
+struct TextureBindCommand final {
     GLenum target;
     GLenum feature;
     GLenum value;
 };
 
-struct StencilCommand {
+struct StencilCommand final {
     // GL_KEEP, GL_ZERO, GL_REPLACE, GL_INCR, GL_INCR_WRAP, GL_DECR,
     // GL_DECR_WRAP, GL_INVERT
     GLenum s_fail;
@@ -31,7 +31,7 @@ struct StencilCommand {
     GLuint mask;
 };
 
-struct TextureActivationCommand {
+struct TextureActivationCommand final {
     GLenum tex_type;
     GLenum sampler_type;
     GLuint id;
@@ -39,19 +39,36 @@ struct TextureActivationCommand {
     std::string_view sampler_name;
 };
 
-struct DrawArrayCommand {
+struct DrawArrayCommand final {
     GLuint vao;
     size_t count;
     size_t first = 0;
     GLenum mode = GL_TRIANGLES;
 };
 
-struct DrawElementsCommand {
+struct DrawElementsCommand final {
     GLuint vao;
     size_t count;
     size_t* indices = nullptr;
     GLenum type = GL_UNSIGNED_INT;
     GLenum mode = GL_TRIANGLES;
+};
+
+struct DrawArrayInstanced final {
+    GLuint vao;
+    GLsizei count;
+    GLsizei instancecount;
+    GLint first = 0;
+    GLenum mode = GL_TRIANGLES;
+};
+
+struct DrawElementInstanced final {
+    GLuint vao;
+    GLsizei count;
+    GLsizei instancecount;
+    GLuint* indices {nullptr};
+    GLenum type     {GL_UNSIGNED_INT};
+    GLenum mode     {GL_TRIANGLES};
 };
 
 }

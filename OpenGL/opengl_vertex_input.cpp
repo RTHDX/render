@@ -174,4 +174,46 @@ vec3pos_vec2tex_t::commands_t vec3pos_vec2tex_t::commands() {
     };
 }
 
+
+mat4_instanced::mat4_instanced(glm::mat4&& m)
+    : mat(std::move(m))
+{}
+
+GLuint mat4_instanced::gen_buffer(GLuint vao,
+                                  const std::vector<this_t>& in,
+                                  GLuint index) {
+    static constexpr GLuint STRIDE = 4;
+    static constexpr GLuint SIZE_OF_THIS = sizeof (this_t);
+    static constexpr GLuint SIZE_OF_COL = sizeof (this_t::col_t);
+
+    GLuint vbo;
+    SAFE_CALL(glGenBuffers(1, &vbo));
+    SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    SAFE_CALL(glBufferData(
+        GL_ARRAY_BUFFER,
+        SIZE_OF_THIS * in.size(),
+        in.data(),
+        GL_STATIC_DRAW
+    ));
+    SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+
+    SAFE_CALL(glBindVertexArray(vao));
+    SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    for (unsigned int i = 0; i < 4; i++) {
+        SAFE_CALL(glEnableVertexAttribArray(index + i));
+        SAFE_CALL(glVertexAttribPointer(
+            index + i,
+            STRIDE,
+            GL_FLOAT,
+            GL_FALSE,
+            SIZE_OF_THIS,
+            (void*)(SIZE_OF_COL * i)
+        ));
+        SAFE_CALL(glVertexAttribDivisor(index + i, 1));
+    }
+    SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    SAFE_CALL(glBindVertexArray(0));
+    return vbo;
+}
+
 }
