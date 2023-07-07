@@ -16,6 +16,7 @@ add_subdirectory(OpenGL_OrthoCamTexture)
 add_subdirectory(OpenGL_Grid)
 add_subdirectory(OpenGL_InstanceDrawing_Raw)
 add_subdirectory(OpenGL_InstanceDrawing)
+add_subdirectory(OpenGL_Framebuffer)
 
 #add_subdirectory(RTX_Simple)
 #add_subdirectory(RTX_Simple_2)
