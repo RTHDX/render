@@ -95,9 +95,21 @@ void Context::draw_background() const {
     SAFE_CALL(glClear(CLEAR_MODE));
 }
 
-GLint Context::active_program() const { return get(GL_CURRENT_PROGRAM); }
-GLint Context::bound_vao() const { return get(GL_VERTEX_ARRAY_BINDING); }
-GLint Context::bound_texture_2d() const { return get(GL_TEXTURE_BINDING_2D); }
+GLint Context::active_program() const {
+    return get(GL_CURRENT_PROGRAM);
+}
+
+GLint Context::bound_vao() const {
+    return get(GL_VERTEX_ARRAY_BINDING);
+}
+
+GLint Context::bound_texture_2d() const {
+    return get(GL_TEXTURE_BINDING_2D);
+}
+
+GLint Context::bound_framebuffer() const {
+    return get(GL_FRAMEBUFFER_BINDING);
+}
 
 GLint Context::bound_texture_2d_array() const {
     return get(GL_TEXTURE_BINDING_2D_ARRAY);

@@ -1,6 +1,8 @@
 #pragma once
 
+#include <glm/glm.hpp>
 #include <glad/glad.h>
+
 
 namespace opengl {
 
@@ -12,11 +14,13 @@ template <typename T> struct VertexAttribCommand final {
     size_t width = sizeof(T);
 };
 
+
 struct TextureBindCommand final {
     GLenum target;
     GLenum feature;
     GLenum value;
 };
+
 
 struct StencilCommand final {
     // GL_KEEP, GL_ZERO, GL_REPLACE, GL_INCR, GL_INCR_WRAP, GL_DECR,
@@ -31,36 +35,54 @@ struct StencilCommand final {
     GLuint mask;
 };
 
+
 struct TextureActivationCommand final {
     GLenum tex_type;
     GLenum sampler_type;
     GLuint id;
     GLuint program;
-    std::string_view sampler_name;
+    std::string sampler_name;
 };
+
 
 struct DrawArrayCommand final {
     GLuint vao;
     size_t count;
-    size_t first = 0;
-    GLenum mode = GL_TRIANGLES;
+    size_t first {0};
+    GLenum mode  {GL_TRIANGLES};
 };
+
 
 struct DrawElementsCommand final {
     GLuint vao;
     size_t count;
-    size_t* indices = nullptr;
-    GLenum type = GL_UNSIGNED_INT;
-    GLenum mode = GL_TRIANGLES;
+    size_t* indices {nullptr};
+    GLenum type     {GL_UNSIGNED_INT};
+    GLenum mode     {GL_TRIANGLES};
 };
+
+
+struct DrawArrayFramebuffer final {
+    GLuint fbo;
+    GLuint vao;
+    size_t count;
+    glm::ivec4 viewport;
+    glm::ivec4 screen_viewport;
+    glm::vec4 background;
+    GLbitfield clear_bits {GL_COLOR_BUFFER_BIT};
+    size_t first          {0};
+    GLenum mode           {GL_TRIANGLES};
+};
+
 
 struct DrawArrayInstanced final {
     GLuint vao;
     GLsizei count;
     GLsizei instancecount;
-    GLint first = 0;
-    GLenum mode = GL_TRIANGLES;
+    GLint first {0};
+    GLenum mode {GL_TRIANGLES};
 };
+
 
 struct DrawElementInstanced final {
     GLuint vao;

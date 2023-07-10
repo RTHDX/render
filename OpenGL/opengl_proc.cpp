@@ -199,6 +199,26 @@ void free_pixel_buffer(GLuint id) {
     SAFE_CALL(glDeleteVertexArrays(1, &id));
 }
 
+std::vector<GLuint> gen_framebuffers(size_t count) {
+    std::vector<GLuint> out(count);
+    SAFE_CALL(glGenFramebuffers(count, out.data()));
+    return out;
+}
+
+GLuint gen_framebuffer() {
+    GLuint id;
+    SAFE_CALL(glGenFramebuffers(1, &id));
+    return id;
+}
+
+void free_framebuffers(const std::vector<GLuint>& ids) {
+    SAFE_CALL(glDeleteFramebuffers(ids.size(), ids.data()));
+}
+
+void free_framebuffer(GLuint* id) {
+    SAFE_CALL(glDeleteFramebuffers(1, id));
+}
+
 glm::u8vec4 read_pixel_color(GLint x, GLint y) {
     GLubyte pixel_data[4];
     SAFE_CALL(glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel_data));
@@ -238,25 +258,66 @@ static std::string gl_enum_to_string(GLenum e) {
     }
 }
 
+
+GLenum FramebufferData::status() const {
+    GLenum res = glCheckNamedFramebufferStatus(fbo, target);
+    return res;
+}
+
+std::ostream& operator << (std::ostream& os, const FramebufferData& f) {
+    auto status = f.status();
+    os << "Framebuffer status: ";
+    switch (status) {
+    case GL_FRAMEBUFFER_COMPLETE:
+        os << "GL_FRAMEBUFFER_COMPLETE";
+        break;
+    case GL_FRAMEBUFFER_UNDEFINED:
+        os << "GL_FRAMEBUFFER_UNDEFINED";
+        break;
+    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+        os << "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+        break;
+    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+        os << "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+        break;
+    case GL_FRAMEBUFFER_UNSUPPORTED:
+        os << "GL_FRAMEBUFFER_UNSUPPORTED";
+        break;
+        // Add cases for other status codes as needed.
+    default:
+        os << "Unknown framebuffer status: " << status;
+        break;
+    }
+    return os;
+}
+
+void attach_texture(const FramebufferData& fbuff, const TextureData& tex) {
+    SAFE_CALL(glBindFramebuffer(fbuff.target, fbuff.fbo))
+    SAFE_CALL(glFramebufferTexture2D(fbuff.target, fbuff.attachment_point,
+                                     tex.target, tex.id, 0));
+    SAFE_CALL(glBindFramebuffer(fbuff.target, 0));
+}
+
+
 std::ostream& operator<<(std::ostream& os, const TextureData& tex) {
     os << "| Property     | Value                       |\n"
-        << "|--------------|-----------------------------|\n"
-        << std::format("| Target       | {}                           |\n",
-           gl_enum_to_string(tex.target))
-        << std::format("| Width        | {:<28}|\n", tex.w)
-        << std::format("| Height       | {:<28}|\n", tex.h)
-        << std::format("| Format       | {}                           |\n",
-            gl_enum_to_string(tex.format))
-        << std::format("| Type         | {}                           |\n",
-            gl_enum_to_string(tex.type))
-        << std::format("| Wrap S       | {}                           |\n",
-            gl_enum_to_string(tex.wrap_s))
-        << std::format("| Wrap T       | {}                           |\n",
-            gl_enum_to_string(tex.wrap_t))
-        << std::format("| Min Filter   | {}                           |\n",
-            gl_enum_to_string(tex.min_filter))
-        << std::format("| Mag Filter   | {}                           |\n",
-            gl_enum_to_string(tex.mag_filter));
+       << "|--------------|-----------------------------|\n"
+       << std::format("| Target       | {}                           |\n",
+          gl_enum_to_string(tex.target))
+       << std::format("| Width        | {:<28}|\n", tex.w)
+       << std::format("| Height       | {:<28}|\n", tex.h)
+       << std::format("| Format       | {}                           |\n",
+           gl_enum_to_string(tex.format))
+       << std::format("| Type         | {}                           |\n",
+           gl_enum_to_string(tex.type))
+       << std::format("| Wrap S       | {}                           |\n",
+           gl_enum_to_string(tex.wrap_s))
+       << std::format("| Wrap T       | {}                           |\n",
+           gl_enum_to_string(tex.wrap_t))
+       << std::format("| Min Filter   | {}                           |\n",
+           gl_enum_to_string(tex.min_filter))
+       << std::format("| Mag Filter   | {}                           |\n",
+           gl_enum_to_string(tex.mag_filter));
     return os;
 }
 
@@ -287,7 +348,7 @@ void bind_texture(GLenum target, GLuint id) {
 }
 
 void set_texture_meta(byte_t* raw_data, const TextureData& params) {
-    //SAFE_CALL(glBindTexture(params.target, params.id));
+    SAFE_CALL(glBindTexture(params.target, params.id));
     SAFE_CALL(glTexImage2D(params.target, 0, params.format, params.w, params.h,
                            0, params.format, params.type, raw_data));
     SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_WRAP_S, params.wrap_s));
@@ -324,7 +385,7 @@ void use(GLuint id) {
 }
 
 
-void draw(DrawArrayCommand&& cmd) {
+void draw(const DrawArrayCommand& cmd) {
     assert(cmd.vao != 0);
     assert(opengl::Context::instance().active_program() != 0);
     bind_vao(cmd.vao);
@@ -332,13 +393,28 @@ void draw(DrawArrayCommand&& cmd) {
     bind_vao(0);
 }
 
-void draw(DrawElementsCommand cmd) {
+void draw(const DrawElementsCommand& cmd) {
     assert(cmd.vao != 0);
     assert(opengl::Context::instance().active_program() != 0);
 
     bind_vao(cmd.vao);
     SAFE_CALL(glDrawElements(cmd.mode, cmd.count, cmd.type, cmd.indices));
     bind_vao(0);
+}
+
+void draw_array_framebuffer(const DrawArrayFramebuffer& cmd) {
+    SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, cmd.fbo));
+    SAFE_CALL(glClearColor(cmd.background.r, cmd.background.g,
+                           cmd.background.b, cmd.background.a));
+    SAFE_CALL(glClear(cmd.clear_bits));
+    bind_vao(cmd.vao);
+    const auto& fbuff_v = cmd.viewport;
+    SAFE_CALL(glViewport(fbuff_v.x, fbuff_v.y, fbuff_v.z, fbuff_v.w));
+    SAFE_CALL(glDrawArrays(cmd.mode, cmd.first, cmd.count));
+    bind_vao(0);
+    SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    const auto& screen_v = cmd.screen_viewport;
+    SAFE_CALL(glViewport(screen_v.x, screen_v.y, screen_v.z, screen_v.w));
 }
 
 void draw_instance_array(const DrawArrayInstanced& cmd) {

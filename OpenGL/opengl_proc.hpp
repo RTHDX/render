@@ -35,6 +35,7 @@ public:
     GLint bound_vao() const;
     GLint bound_texture_2d() const;
     GLint bound_texture_2d_array() const;
+    GLint bound_framebuffer() const;
 
 private:
     Context() = default;
@@ -84,6 +85,11 @@ std::vector<GLuint> gen_pixel_buffers(size_t count);
 GLuint gen_pixel_buffers();
 void free_pixel_buffers(const std::vector<GLuint>& id);
 void free_pixel_buffer(GLuint id);
+
+std::vector<GLuint> gen_framebuffers(size_t count);
+GLuint gen_framebuffer();
+void free_framebuffers(const std::vector<GLuint>& ids);
+void free_framebuffer(GLuint* id);
 
 template <typename T>
 T read_pixel(GLint x, GLint y, GLenum t, GLenum f, T* d) {
@@ -150,6 +156,19 @@ struct TextureData {
 };
 std::ostream& operator << (std::ostream& os, const TextureData& tex);
 
+
+struct FramebufferData {
+    GLuint fbo;
+    GLenum attachment_point; // GL_COLOR_ATTACHMENT0 ... GL_COLOR_ATTACHMENT31
+    TextureData texture;
+    GLenum target {GL_FRAMEBUFFER};
+
+    GLenum status() const;
+};
+std::ostream& operator << (std::ostream& os, const FramebufferData& f);
+
+void attach_texture(const FramebufferData& fbuff, const TextureData& tex);
+
 GLuint gen_texture(GLenum target = GL_TEXTURE_2D);
 void bind_texture(const glm::ivec2& dims,
                   std::vector<glm::vec3>&& texture);
@@ -164,8 +183,9 @@ void apply_stencil(StencilCommand&& cmd);
 
 void use(GLuint id);
 
-void draw(DrawArrayCommand&& cmd);
-void draw(DrawElementsCommand cmd);
+void draw(const DrawArrayCommand& cmd);
+void draw(const DrawElementsCommand& cmd);
+void draw_array_framebuffer(const DrawArrayFramebuffer& cmd);
 void draw_instance_array(const DrawArrayInstanced& cmd);
 void draw_instance_elements(const DrawElementInstanced& cmd);
 

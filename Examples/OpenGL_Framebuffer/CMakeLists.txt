@@ -6,5 +6,19 @@ project(${PROJECT_NAME})
 create_executable(
     TARGET "${PROJECT_NAME}_Raw"
     SOURCES framebuffer_raw.cpp
+    SHADERS
+        "Shaders/vec3pos.vert"
+        "Shaders/fixed_color.frag"
+        "Shaders/vec3pos_vec2uv.vert"
+        "Shaders/vec2uv.frag"
+    LIBS OpenGL UI ImGui
+)
+
+create_executable(
+    TARGET "${PROJECT_NAME}_draw_array"
+    SOURCES framebuffer_draw_array.cpp
+    SHADERS
+        "Shaders/vec3pos_vec2uv_MVP.vert"
+        "Shaders/vec3pos_MVP.vert"
     LIBS OpenGL UI ImGui
 )
