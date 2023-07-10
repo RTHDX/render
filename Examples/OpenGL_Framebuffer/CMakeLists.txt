@@ -22,3 +22,9 @@ create_executable(
         "Shaders/vec3pos_MVP.vert"
     LIBS OpenGL UI ImGui
 )
+
+create_executable(
+    TARGET "${PROJECT_NAME}_imgui"
+    SOURCES framebuffer_imgui.cpp
+    LIBS OpenGL UI ImGui
+)
