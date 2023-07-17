@@ -13,12 +13,15 @@
 #include <glm/gtx/transform.hpp>
 
 #include <UI/ui.hpp>
+#include <UI/widgets.hpp>
+#include <UI/imgui_widget_render.hpp>
+#include <UI/io.hpp>
+
 #include <OpenGL/texture.hpp>
 #include <OpenGL/opengl_proc.hpp>
 #include <OpenGL/opengl_vertex_input.hpp>
 #include <OpenGL/camera.hpp>
 
-#include <UI/io.hpp>
 
 namespace fs = std::filesystem;
 
@@ -58,46 +61,14 @@ const std::vector<fbuffer_input_t>& fbuffer_rect() {
     return data;
 }
 
-struct Window {
-    ImVec2 top_left;
-    ImVec2 win_sizes;
-    std::string title;
-    int flags = 0;
-};
 
-ImVec2 convert_to_abs(const ImVec2& parent, const ImVec2& rel) {
+std::vector<ui::widget_sptr_t> create_ui() {
     return {
-        parent.x * (rel.x / 100.0f),
-        parent.y * (rel.y / 100.0f)
+        ui::Window::create({2, 2}, {96, 96}, "Fbuff container",
+                           ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove),
     };
 }
 
-void draw_imgui_window(const glm::vec4& screen_viewport,
-                       const opengl::FramebufferData& fbuff_data,
-                       const Window& win) {
-    ImVec2 total_size(screen_viewport.z, screen_viewport.w);
-    ImGui::SetNextWindowPos(
-        convert_to_abs(total_size, win.top_left),
-        ImGuiCond_Always
-    );
-
-    auto win_size = convert_to_abs(total_size, win.win_sizes);
-    ImGui::SetNextWindowSize(win_size, ImGuiCond_Always);
-
-    ImGui::Begin(win.title.data(), nullptr, win.flags);
-
-    ImTextureID texID = reinterpret_cast<void*>(
-        static_cast<intptr_t>(fbuff_data.texture.id)
-    );
-    //ImVec2 texSize(static_cast<float>(fbuff_data.texture.w),
-    //               static_cast<float>(fbuff_data.texture.h));
-    ImVec2 tex_sizes(win_size.x * 0.98, win_size.y * 0.93);
-    ImVec2 tex_min(0, 1);
-    ImVec2 tex_max(1, 0);
-    ImGui::Image(texID, tex_sizes, tex_min, tex_max);
-
-    ImGui::End();
-}
 
 int main() {
     if (!ui::init_glfw(4, 6)) { return EXIT_FAILURE; }
@@ -109,6 +80,8 @@ int main() {
     opengl::Context::instance().background(glm::vec4{0.8, 1.0, 0.0, 1.0 });
     ui::io::IO::instance().bind(win);
 
+    auto ui_components = create_ui();
+/*
     IMGUI_CHECKVERSION();
     auto* ctx = ImGui::CreateContext();
     if (!ctx) { return EXIT_FAILURE; }
@@ -117,7 +90,8 @@ int main() {
     auto& style = ImGui::GetStyle();
     if (!ImGui_ImplGlfw_InitForOpenGL(win, true)) { return EXIT_FAILURE; }
     if (!ImGui_ImplOpenGL3_Init("#version 460")) { return EXIT_FAILURE; }
-
+*/
+    ui::init_imgui_opengl3_glfw(win);
     GLuint program = opengl::create_program(
         fs::path("./vec3pos_vec2uv_MVP.vert"),
         fs::path("./vec2uv.frag")
@@ -155,14 +129,9 @@ int main() {
 
     std::cout << fbuff_data << std::endl;
 
-    Window im_win {
-        .top_left  = {2, 2},
-        .win_sizes = {96, 96},
-        .title     = "Framebuffer window",
-        .flags     = ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-    };
     const glm::ivec4 screen_view = {0, 0, WIDTH, HEIGHT};
 
+    ui::ImGuiWidgetRender ui_render;
     glm::mat4 one(1.0);
     glm::mat4 fbuff_scale = glm::scale(one, {0.1, 0.1, 0.0});
     while (!glfwWindowShouldClose(win)) {
@@ -185,7 +154,9 @@ int main() {
             .background = {1.0, 1.0, 0.0, 0.4}
         });
         opengl::use(0);
-        draw_imgui_window(screen_view, fbuff_data, im_win);
+        for (const auto& widget : ui_components) {
+            widget->accept(ui_render);
+        }
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
