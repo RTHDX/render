@@ -146,7 +146,7 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
     }
 }
 
-struct TextureData {
+struct TextureData final {
     GLuint id;
     GLenum target;
     GLint w, h;
@@ -157,7 +157,16 @@ struct TextureData {
 std::ostream& operator << (std::ostream& os, const TextureData& tex);
 
 
-struct FramebufferData {
+struct RenderData final {
+    GLuint program;
+    GLuint vao;
+    std::vector<GLuint> vertex_buffers;
+    GLuint ebo;
+    GLuint stencil_ref;
+};
+
+
+struct FramebufferData final {
     GLuint fbo;
     GLenum attachment_point; // GL_COLOR_ATTACHMENT0 ... GL_COLOR_ATTACHMENT31
     TextureData texture;

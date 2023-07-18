@@ -63,10 +63,16 @@ const std::vector<fbuffer_input_t>& fbuffer_rect() {
 
 
 std::vector<ui::widget_sptr_t> create_ui() {
-    return {
-        ui::Window::create({2, 2}, {96, 96}, "Fbuff container",
-                           ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove),
-    };
+    auto canvas = ui::Canvas::create({100.0, 100.0}, "opengl_canvas");
+    auto window = ui::Window::create(
+        {2, 2},
+        {96, 96},
+        "Fbuff container",
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse,
+        {canvas}
+    );
+    return {window};
 }
 
 
@@ -81,17 +87,11 @@ int main() {
     ui::io::IO::instance().bind(win);
 
     auto ui_components = create_ui();
-/*
-    IMGUI_CHECKVERSION();
-    auto* ctx = ImGui::CreateContext();
-    if (!ctx) { return EXIT_FAILURE; }
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::StyleColorsDark();
-    auto& style = ImGui::GetStyle();
-    if (!ImGui_ImplGlfw_InitForOpenGL(win, true)) { return EXIT_FAILURE; }
-    if (!ImGui_ImplOpenGL3_Init("#version 460")) { return EXIT_FAILURE; }
-*/
-    ui::init_imgui_opengl3_glfw(win);
+
+    if (!ui::init_imgui_opengl3_glfw(win)) {
+        return EXIT_FAILURE;
+    }
+
     GLuint program = opengl::create_program(
         fs::path("./vec3pos_vec2uv_MVP.vert"),
         fs::path("./vec2uv.frag")

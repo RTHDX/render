@@ -23,6 +23,21 @@ void ImGuiWidgetRender::visit(Window& widget) {
     ImGui::End();
 }
 
+void ImGuiWidgetRender::visit(Canvas& widget) {
+    ImVec2 parent_size = ImGui::GetWindowSize();
+    ImVec2 size = absolute_vec2(parent_size, convert(widget.size()));
+    ImGui::Dummy(size);
+
+    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+
+    glm::vec4 c (1.0, 0.0, 0.0, 1.0);
+    ImVec2 p = ImGui::GetItemRectMin();
+    ImVec2 rect_min = ImVec2(p.x, p.y);
+    ImVec2 rect_max = ImVec2(p.x + ImGui::GetItemRectSize().x,
+                             p.y + ImGui::GetItemRectSize().y);
+    draw_list->AddRectFilled(rect_min, rect_max, ImColor(c.r, c.g, c.b, c.a));
+}
+
 ImVec2 ImGuiWidgetRender::absolute_vec2(const ImVec2& parent_size,
                                         const ImVec2& rel_vec) const {
     return {
