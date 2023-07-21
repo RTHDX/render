@@ -61,15 +61,45 @@ const std::vector<fbuffer_input_t>& fbuffer_rect() {
     return data;
 }
 
+const std::vector<fbuffer_input_t>& fbuff_vertex_input() {
+    static std::vector<fbuffer_input_t> out{
+        {{ F_RECT,  F_RECT, 0.0f}},
+        {{ F_RECT, -F_RECT, 0.0f}},
+        {{-F_RECT, -F_RECT, 0.0f}},
+        {{-F_RECT,  F_RECT, 0.0f}}
+    };
+    return out;
+}
+
+const std::vector<GLuint>& fbuff_vertex_indices() {
+    static std::vector<GLuint> out {
+        0, 1, 3,
+        1, 2, 3
+    };
+    return out;
+}
+
 
 std::vector<ui::widget_sptr_t> create_ui() {
-    auto canvas = ui::Canvas::create({100.0, 100.0}, "opengl_canvas");
+    auto rect_entity = ui::CanvasEntity::create<fbuffer_input_t>(
+        fs::path("./vec3pos_MVP.vert"),
+        fs::path("./fixed_color.frag"),
+        fbuff_vertex_input(),
+        fbuff_vertex_indices()
+    );
+    rect_entity->model(glm::scale(glm::mat4(1.0), {0.1, 0.1, 1.0}));
+    auto canvas = ui::Canvas::create({80.0, 100.0},
+                                     "opengl_canvas",
+                                     {rect_entity});
+    canvas->background(glm::vec4{0.8, 0.8, 0.8, 0.2});
     auto window = ui::Window::create(
         {2, 2},
         {96, 96},
         "Fbuff container",
-        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse,
+        ImGuiWindowFlags_NoResize    |
+        ImGuiWindowFlags_NoMove      |
+        ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoScrollWithMouse,
         {canvas}
     );
     return {window};
@@ -92,45 +122,6 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    GLuint program = opengl::create_program(
-        fs::path("./vec3pos_vec2uv_MVP.vert"),
-        fs::path("./vec2uv.frag")
-    );
-    GLuint fbuff_program = opengl::create_program(
-        fs::path("./vec3pos_MVP.vert"),
-        fs::path("./fixed_color.frag")
-    );
-    std::cout << opengl::get_program_interface(program) << std::endl;
-    std::cout << opengl::get_program_interface(fbuff_program) << std::endl;
-
-    const auto& fbuff_input = fbuffer_rect();
-    GLuint fbuff_vao = opengl::gen_vertex_array();
-    std::vector<GLuint> fbuff_vbo = fbuffer_input_t::gen_buffers(fbuff_vao,
-                                                                 fbuff_input);
-
-    opengl::FramebufferData fbuff_data {
-        .fbo = opengl::gen_framebuffer(),
-        .attachment_point = GL_COLOR_ATTACHMENT0,
-        .texture = {
-            .id = opengl::gen_texture(),
-            .target = GL_TEXTURE_2D,
-            .w = GLint(WIDTH),
-            .h = GLint(HEIGHT),
-            .format = GL_RGBA,
-            .type = GL_UNSIGNED_BYTE,
-            .wrap_s = GL_CLAMP_TO_EDGE,
-            .wrap_t = GL_CLAMP_TO_EDGE,
-            .min_filter = GL_LINEAR,
-            .mag_filter = GL_LINEAR
-        }
-    };
-    opengl::set_texture_meta(nullptr, fbuff_data.texture);
-    opengl::attach_texture(fbuff_data, fbuff_data.texture);
-
-    std::cout << fbuff_data << std::endl;
-
-    const glm::ivec4 screen_view = {0, 0, WIDTH, HEIGHT};
-
     ui::ImGuiWidgetRender ui_render;
     glm::mat4 one(1.0);
     glm::mat4 fbuff_scale = glm::scale(one, {0.1, 0.1, 0.0});
@@ -139,21 +130,8 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         glfwPollEvents();
-
         opengl::Context::instance().draw_background();
-        opengl::use(fbuff_program);
-        opengl::set_mat4(fbuff_program, "projection", one);
-        opengl::set_mat4(fbuff_program, "view", one);
-        opengl::set_mat4(fbuff_program, "model", fbuff_scale);
-        opengl::draw_array_framebuffer({
-            .fbo = fbuff_data.fbo,
-            .vao = fbuff_vao,
-            .count = fbuff_input.size(),
-            .viewport = {0, 0, fbuff_data.texture.w, fbuff_data.texture.h},
-            .screen_viewport = {0, 0, WIDTH, HEIGHT},
-            .background = {1.0, 1.0, 0.0, 0.4}
-        });
-        opengl::use(0);
+
         for (const auto& widget : ui_components) {
             widget->accept(ui_render);
         }

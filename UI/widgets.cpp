@@ -90,21 +90,44 @@ void Window::is_visible(bool v) {
 }
 
 
+const opengl::RenderData& CanvasEntity::render_data() const {
+    return render_data_;
+}
+
+void CanvasEntity::model(const glm::mat4& v) {
+    model_ = v;
+}
+
+const glm::mat4& CanvasEntity::model() const {
+    return model_;
+}
+
+opengl::DrawElementsCommand CanvasEntity::draw_command() const {
+    return {
+        .vao = render_data_.vao,
+        .count = count_,
+    };
+}
+
+
 std::shared_ptr<Canvas> Canvas::create(const glm::vec2& size,
                                        const std::string& title) {
     std::shared_ptr<Canvas> out(new Canvas(size, title));
-    out->fbuff_ = opengl::gen_framebuffer();
-    out->tex_data_ = {
-        .id         = opengl::gen_texture(),
-        .target     = GL_TEXTURE_2D,
-        .w          = 0,
-        .h          = 0,
-        .format     = GL_RGBA,
-        .type       = GL_UNSIGNED_BYTE,
-        .wrap_s     = GL_CLAMP_TO_EDGE,
-        .wrap_t     = GL_CLAMP_TO_EDGE,
-        .min_filter = GL_LINEAR,
-        .mag_filter = GL_LINEAR
+    out->fbuff_data_ = {
+        .fbo = opengl::gen_framebuffer(),
+        .attachment_point = GL_COLOR_ATTACHMENT0,
+        .texture = {
+            .id = opengl::gen_texture(),
+            .target = GL_TEXTURE_2D,
+            .w = 0,
+            .h = 0,
+            .format = GL_RGBA,
+            .type = GL_UNSIGNED_BYTE,
+            .wrap_s = GL_CLAMP_TO_EDGE,
+            .wrap_t = GL_CLAMP_TO_EDGE,
+            .min_filter = GL_LINEAR,
+            .mag_filter = GL_LINEAR
+        }
     };
     return out;
 }
@@ -118,15 +141,46 @@ std::shared_ptr<Canvas> Canvas::create(const glm::vec2& size,
 }
 
 Canvas::~Canvas() {
-    opengl::free_framebuffer(&fbuff_);
+    //opengl::free_framebuffer(&fbuff_data_.fbo);
 }
 
 void Canvas::accept(Visitor& v) {
     v.visit(*this);
 }
 
-const opengl::RenderData& CanvasEntity::render_data() const {
-    return render_data_;
+void Canvas::update(GLuint w, GLuint h) {
+    fbuff_data_.texture.w = w;
+    fbuff_data_.texture.h = h;
+    opengl::set_texture_meta(nullptr, fbuff_data_.texture);
+    opengl::attach_texture(fbuff_data_, fbuff_data_.texture);
+}
+
+void Canvas::append(entity_sptr_t&& entity) {
+    entities_.push_back(std::move(entity));
+}
+
+const opengl::FramebufferData& Canvas::fbuff() const {
+    return fbuff_data_;
+}
+
+const entities_list_t& Canvas::entities() const {
+    return entities_;
+}
+
+const glm::mat4& Canvas::projection() const {
+    return projection_;
+}
+
+const glm::mat4& Canvas::view() const {
+    return view_;
+}
+
+void Canvas::background(const glm::vec4& b) {
+    background_ = b;
+}
+
+const glm::vec4& Canvas::background() const {
+    return background_;
 }
 
 }

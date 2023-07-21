@@ -14,6 +14,7 @@ public:
 
 private:
     ImVec2 absolute_vec2(const ImVec2& parent_vec, const ImVec2& rel_vec) const;
+    ImVec2 screen_size() const;
 };
 
 }
