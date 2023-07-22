@@ -115,6 +115,15 @@ void viewport(GLsizei w, GLsizei h) {
     SAFE_CALL(glViewport(0, 0, w, h));
 }
 
+void viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h) {
+    SAFE_CALL(glViewport(x, y, w, h));
+}
+
+void background(const glm::vec4 color, GLbitfield clear_bits) {
+    SAFE_CALL(glClearColor(color.r, color.g, color.b, color.a));
+    SAFE_CALL(glClear(clear_bits));
+}
+
 
 std::vector<GLuint> gen_vertex_array(size_t count) {
     std::vector<GLuint> out(count);
@@ -232,6 +241,10 @@ glm::u8vec4 read_pixel_color(GLint x, GLint y) {
 
 void bind_vao(GLuint id) {
     SAFE_CALL(glBindVertexArray(id));
+}
+
+void bind_fbo(GLuint id) {
+    SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, id));
 }
 
 static std::string gl_enum_to_string(GLenum e) {

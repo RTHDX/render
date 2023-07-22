@@ -64,6 +64,8 @@ bool check_shader(GLuint id);
 bool check_program(GLuint id);
 
 void viewport(GLsizei width, GLsizei height);
+void viewport(GLsizei x, GLsizei y, GLsizei w, GLsizei h);
+void background(const glm::vec4 color, GLbitfield clear_bits);
 
 
 std::vector<GLuint> gen_vertex_array(size_t count);
@@ -126,6 +128,7 @@ inline void bind_pbo(GLuint id, const std::vector<T>& in) {
 }
 
 void bind_vao(GLuint id);
+void bind_fbo(GLuint id);
 
 template<typename T>
 inline void set_vertex_attrib(const VertexAttribCommand<T>& cmd) {

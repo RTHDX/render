@@ -36,10 +36,9 @@ void ImGuiWidgetRender::visit(Canvas& widget) {
     widget.update(size.x, size.y);
     const auto& fbuff = widget.fbuff();
     const auto& back = widget.background();
-    SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, fbuff.fbo));
-    SAFE_CALL(glClearColor(back.r, back.g, back.b, back.a));
-    SAFE_CALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-    SAFE_CALL(glViewport(0, 0, size.x, size.y));
+    opengl::bind_fbo(fbuff.fbo);
+    opengl::background(back, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    opengl::viewport(0, 0, size.x, size.y);
     for (const auto& entity : widget.entities()) {
         const auto& render_data = entity->render_data();
         auto program = render_data.program;
@@ -52,8 +51,8 @@ void ImGuiWidgetRender::visit(Canvas& widget) {
         opengl::bind_vao(0);
         opengl::use(0);
     }
-    SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-    SAFE_CALL(glViewport(0, 0, s_size.x, s_size.y));
+    opengl::viewport(0, 0, s_size.x, s_size.y);
+    opengl::bind_fbo(0);
 
     ImGui::BeginChild(widget.title().data(), size);
 
