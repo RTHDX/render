@@ -80,7 +80,7 @@ public:
     static std::shared_ptr<CanvasEntity> create(
            const fs::path& vertex,
            const fs::path& fragment,
-           const informat_t::vertex_input_t& vertex_input,
+           const typename informat_t::vertex_input_t& vertex_input,
            const opengl::elements_input_t& elements_input) {
         std::shared_ptr<CanvasEntity> self(new CanvasEntity());
         self->render_data_.program = opengl::create_program(vertex, fragment);
@@ -91,7 +91,6 @@ public:
             self->render_data_.ebo, elements_input
         );
         self->count_ = elements_input.size();
-        std::cout << opengl::get_program_interface(self->render_data_.program) << std::endl;
         return self;
     }
 
