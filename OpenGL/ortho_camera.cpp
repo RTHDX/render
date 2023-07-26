@@ -31,7 +31,7 @@ const glm::vec4& OrthoCamera::viewport() const {
 }
 
 void OrthoCamera::move(Direction dir) {
-    glm::vec3 dir_vec = { 0.0, 0.0, 0.0 };
+    glm::vec3 dir_vec = {0.0, 0.0, 0.0};
     switch (dir) {
     case Direction::FORWARD:
         dir_vec = NORTH;
@@ -82,6 +82,7 @@ void OrthoCamera::zoom_out() {
 }
 
 void OrthoCamera::zoom_step(float step) { step_ = step; }
+float OrthoCamera::zoom_step() const { return step_; }
 
 void OrthoCamera::update_sizes(size_t w, size_t h) {
     clip_space_.width = float(w);
@@ -108,6 +109,10 @@ glm::vec2 OrthoCamera::world_pixel_size() const {
         2 * clip_space_.half_width() / viewport_.z,
         2 * clip_space_.half_height() / viewport_.w
     };
+}
+
+float OrthoCamera::clip_space_factor() const {
+    return clip_space_.factor;
 }
 
 void OrthoCamera::update_viewport(size_t w, size_t h) {

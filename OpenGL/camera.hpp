@@ -120,9 +120,12 @@ public:
     void zoom_in();
     void zoom_out();
     void zoom_step(float step);
+    float zoom_step() const;
     void update_sizes(size_t w, size_t h);
     glm::vec3 screen_to_world(const glm::ivec2& screen);
     glm::vec2 world_pixel_size() const;
+
+    float clip_space_factor() const;
 
     bool is_empty() const {
         return pos_        == glm::vec3{0.0, 0.0, 0.0} &&

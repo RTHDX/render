@@ -76,10 +76,10 @@ void Context::background(const glm::vec4& color) {
 }
 
 void Context::background(glm::u8vec4 color) {
-    _background.r = float(color.r / 255);
-    _background.g = float(color.g / 255);
-    _background.b = float(color.b / 255);
-    _background.a = float(color.a / 255);
+    _background.r = float(color.r / 255.0f);
+    _background.g = float(color.g / 255.0f);
+    _background.b = float(color.b / 255.0f);
+    _background.a = float(color.a / 255.0f);
 }
 
 void Context::draw_background() const {
