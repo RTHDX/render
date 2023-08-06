@@ -28,6 +28,7 @@ public:
     void background(glm::u8vec4 color);
 
     bool is_initialized() const { return initialized_; }
+    bool is_context_active() const;
 
     void draw_background() const;
 
@@ -151,11 +152,13 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
 
 struct TextureData final {
     GLuint id;
-    GLenum target;
+    GLenum target; // GL_TEXTURE_1D, GL_TEXTURE_2D ...
     GLint w, h;
     GLint format; // GL_DEPTH_COMPONENT GL_DEPTH_STENCIL GL_RED GL_RG GL_RGB GL_RGBA
     GLenum type; // GL_UNSIGNED_BYTE...
     GLenum wrap_s, wrap_t, min_filter, mag_filter;
+
+    void free();
 };
 std::ostream& operator << (std::ostream& os, const TextureData& tex);
 
@@ -165,7 +168,10 @@ struct RenderData final {
     GLuint vao;
     std::vector<GLuint> vertex_buffers;
     GLuint ebo;
-    GLuint stencil_ref;
+    GLint stencil_ref;
+    size_t ebo_count;
+
+    void free();
 };
 
 

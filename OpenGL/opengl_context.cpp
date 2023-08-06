@@ -82,6 +82,10 @@ void Context::background(glm::u8vec4 color) {
     _background.a = float(color.a / 255.0f);
 }
 
+bool Context::is_context_active() const {
+    return glfwGetCurrentContext() != nullptr;
+}
+
 void Context::draw_background() const {
     static constexpr GLbitfield CLEAR_MODE = GL_COLOR_BUFFER_BIT
                                              | GL_DEPTH_BUFFER_BIT

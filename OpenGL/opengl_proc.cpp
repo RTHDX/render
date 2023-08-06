@@ -312,6 +312,15 @@ void attach_texture(const FramebufferData& fbuff, const TextureData& tex) {
 }
 
 
+void TextureData::free() {
+    if (id != 0 && Context::instance().is_context_active()) {
+        SAFE_CALL(glBindTexture(target, 0));
+        SAFE_CALL(glDeleteTextures(1, &id));
+        id = 0;
+    }
+}
+
+
 std::ostream& operator<<(std::ostream& os, const TextureData& tex) {
     os << "| Property     | Value                       |\n"
        << "|--------------|-----------------------------|\n"
@@ -332,6 +341,22 @@ std::ostream& operator<<(std::ostream& os, const TextureData& tex) {
        << std::format("| Mag Filter   | {}                           |\n",
            gl_enum_to_string(tex.mag_filter));
     return os;
+}
+
+
+void RenderData::free() {
+    if (Context::instance().is_context_active()) {
+        SAFE_CALL(glDeleteBuffers(1, &ebo));
+        SAFE_CALL(glDeleteBuffers(vertex_buffers.size(),
+                                  vertex_buffers.data()));
+        SAFE_CALL(glDeleteVertexArrays(1, &vao));
+        SAFE_CALL(glDeleteProgram(program));
+    }
+    ebo = 0;
+    vertex_buffers.clear();
+    vao = 0;
+    stencil_ref = -1;
+    ebo_count = 0;
 }
 
 GLuint gen_texture(GLenum target) {
