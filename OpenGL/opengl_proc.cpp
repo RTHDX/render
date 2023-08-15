@@ -239,6 +239,13 @@ glm::u8vec4 read_pixel_color(GLint x, GLint y) {
     };
 }
 
+stencil_idx_t read_stencil(GLint x, GLint y) {
+    stencil_idx_t ref = 0;
+    SAFE_CALL(glReadPixels(x, y, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_BYTE,
+                           &ref));
+    return ref;
+}
+
 void bind_vao(GLuint id) {
     SAFE_CALL(glBindVertexArray(id));
 }

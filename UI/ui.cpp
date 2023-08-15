@@ -15,6 +15,7 @@ bool init_glfw(int major, int minor) {
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_DEPTH_BITS, 64);
+    glfwWindowHint(GLFW_STENCIL_BITS, 8);
 
     glfwWindowHint(GLFW_SAMPLES, 4);
     glfwSwapInterval(0);

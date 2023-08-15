@@ -13,6 +13,8 @@
 
 namespace opengl {
 using byte_t = unsigned char;
+using stencil_idx_t = GLubyte;
+
 
 class Context {
 public:
@@ -101,6 +103,7 @@ T read_pixel(GLint x, GLint y, GLenum t, GLenum f, T* d) {
 }
 
 glm::u8vec4 read_pixel_color(GLint x, GLint y);
+stencil_idx_t read_stencil(GLint x, GLint y);
 
 template <typename T>
 inline void bind_vbo(GLuint id, const std::vector<T>& in) {
@@ -168,7 +171,7 @@ struct RenderData final {
     GLuint vao;
     std::vector<GLuint> vertex_buffers;
     GLuint ebo;
-    GLint stencil_ref;
+    stencil_idx_t stencil_ref;
     size_t ebo_count;
 
     void free();
