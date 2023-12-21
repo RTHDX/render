@@ -14,6 +14,7 @@ create_library(
         texture.cpp
         opengl_functions.cpp
         light.cpp
+        Imagedata.cpp
     HEADERS
         opengl_utils.hpp
         camera.cpp

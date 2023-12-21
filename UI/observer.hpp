@@ -3,6 +3,8 @@
 #include <vector>
 #include <ostream>
 #include <filesystem>
+#include <functional>
+
 
 struct GLFWwindow;
 namespace ui {
@@ -29,6 +31,8 @@ public:
     MouseEvent(double x, double y);
 };
 std::ostream& operator << (std::ostream& os, const MouseEvent& event);
+bool operator == (const MouseEvent& lhs, const MouseEvent& rhs);
+bool operator != (const MouseEvent& lhs, const MouseEvent& rhs);
 
 
 struct MouseButtonEvent {
@@ -92,10 +96,13 @@ public:
     void emit(const DropEvent& event) const;
     void emit(const FramebufferEvent& event) const;
 
+    void predicate(std::function<bool(void)> predicate);
+
 private:
     template <typename Event> void templated_emit(const Event&) const;
 
 private:
+    std::function<bool(void)> predicate_ {[]() { return true; }};
     std::vector<Listener*> _listeners;
 };
 

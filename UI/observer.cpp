@@ -27,6 +27,17 @@ std::ostream& operator << (std::ostream& os, const MouseEvent& event) {
     return os;
 }
 
+bool operator == (const MouseEvent& lhs, const MouseEvent& rhs) {
+    static constexpr double E = 1e-7;
+    double dx = std::abs(lhs.xpos - rhs.xpos);
+    double dy = std::abs(lhs.ypos - rhs.ypos);
+    return dx <= E || dy <= E;
+}
+
+bool operator != (const MouseEvent& lhs, const MouseEvent& rhs) {
+    return !(lhs == rhs);
+}
+
 MouseButtonEvent::MouseButtonEvent(int b, int a, int m)
     : button(b)
     , action(a)
@@ -126,10 +137,16 @@ void Publisher::emit(const FramebufferEvent& event) const {
     templated_emit<FramebufferEvent>(event);
 }
 
+void Publisher::predicate(std::function<bool(void)> p) {
+    predicate_ = p;
+}
+
 template <typename Event>
 inline void Publisher::templated_emit(const Event& e) const {
     for (Listener* l : _listeners) {
-        l->consume(e);
+        if (bool(predicate_) && predicate_()) {
+            l->consume(e);
+        }
     }
 }
 

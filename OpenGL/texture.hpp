@@ -79,8 +79,31 @@ public:
 };
 
 enum class ColorMode {
+    UNDEF = 0,
     RGB = 3,
     RGBA
+};
+
+struct ImageData final {
+    byte_t* data {nullptr};
+    int len {-1},
+        w   {-1},
+        h   {-1},
+        d   {-1};
+    ColorMode mode {ColorMode::UNDEF};
+
+public:
+    static ImageData read(const std::filesystem::path& path);
+    static bool write(std::filesystem::path path, const ImageData& d);
+
+    ImageData() = default;
+    ImageData(const ImageData& other);
+    ImageData& operator=(const ImageData& other);
+    ImageData(ImageData&& other) noexcept;
+    ImageData& operator=(ImageData&& other) noexcept;
+    ~ImageData();
+
+    bool is_valid() const;
 };
 
 bool save_as_image(std::filesystem::path path,

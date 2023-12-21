@@ -123,6 +123,7 @@ static inline std::string cast_to_str(const std::filesystem::path& path) {
     return {str.begin(), str.end()};
 }
 
+
 bool save_as_image(std::filesystem::path path,
                    const byte_t* data,
                    int len,
