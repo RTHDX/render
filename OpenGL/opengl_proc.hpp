@@ -154,7 +154,7 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
 }
 
 struct TextureData final {
-    GLuint id;
+    GLuint id = 0;
     GLenum target; // GL_TEXTURE_1D, GL_TEXTURE_2D ...
     GLint w, h;
     GLint format; // GL_DEPTH_COMPONENT GL_DEPTH_STENCIL GL_RED GL_RG GL_RGB GL_RGBA
@@ -162,8 +162,31 @@ struct TextureData final {
     GLenum wrap_s, wrap_t, min_filter, mag_filter;
 
     void free();
+    bool is_valid() const;
 };
 std::ostream& operator << (std::ostream& os, const TextureData& tex);
+
+
+struct TextureDataArray2D final {
+    TextureData tex_data;
+    size_t tile_count_w, tile_count_h;
+
+    GLsizei tile_w() const {
+        return tex_data.w / tile_count_w;
+    }
+
+    GLsizei tile_h() const {
+        return tex_data.h / tile_count_h;
+    }
+
+    GLsizei total_tiles() const {
+        return tile_count_h * tile_count_w;
+    }
+
+    bool is_valid() const {
+        return tex_data.is_valid() && tile_count_h != 0 && tile_count_w != 0;
+    }
+};
 
 
 struct RenderData final {
@@ -197,6 +220,7 @@ void bind_texture(const glm::ivec2& dims,
                   byte_t* texture);
 void bind_texture(GLenum target, GLuint id);
 void set_texture_meta(byte_t* raw_data, const TextureData& params);
+void set_texture_2d_array_meta(byte_t* raw_data, const TextureDataArray2D&);
 void activate_texture(const TextureActivationCommand& cmd);
 void free_texture(GLuint id);
 

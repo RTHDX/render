@@ -327,6 +327,10 @@ void TextureData::free() {
     }
 }
 
+bool TextureData::is_valid() const {
+    return id != 0;
+}
+
 
 std::ostream& operator<<(std::ostream& os, const TextureData& tex) {
     os << "| Property     | Value                       |\n"
@@ -403,6 +407,46 @@ void set_texture_meta(byte_t* raw_data, const TextureData& params) {
     SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_MAG_FILTER,
                               params.mag_filter));
     SAFE_CALL(glBindTexture(params.target, 0));
+}
+
+void set_texture_2d_array_meta(byte_t* raw_data,
+                               const TextureDataArray2D& data) {
+    const auto t = data.tex_data.target;
+    SAFE_CALL(glBindTexture(t, data.tex_data.id));
+
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_BASE_LEVEL, 0));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MAX_LEVEL, 1));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MAG_FILTER,
+              data.tex_data.mag_filter));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MIN_FILTER,
+              data.tex_data.min_filter));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_WRAP_S, data.tex_data.wrap_s));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_WRAP_T, data.tex_data.wrap_t));
+
+    SAFE_CALL(glTexStorage3D(t, 1, GL_RGBA8, data.tile_w(), data.tile_h(),
+              data.total_tiles()));
+
+    SAFE_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.tex_data.w));
+    SAFE_CALL(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, data.tex_data.h));
+
+    for (GLsizei i = 0; i < data.total_tiles(); ++i) {
+        int ix = i % data.tile_count_h;
+        int iy = i / data.tile_count_w;
+        int x = ix * data.tile_w();
+        int y = iy * data.tile_h();
+        SAFE_CALL(glTexSubImage3D(
+            GL_TEXTURE_2D_ARRAY,
+            0,
+            0, 0, i,
+            data.tile_w(), data.tile_h(), 1,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            raw_data + ((y * data.tex_data.w + x) * 4)
+        ));
+    }
+    SAFE_CALL(glGenerateMipmap(t));
+
+    SAFE_CALL(glBindTexture(t, 0));
 }
 
 void activate_texture(const TextureActivationCommand& cmd) {
