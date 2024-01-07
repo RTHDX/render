@@ -37,9 +37,9 @@ struct StencilCommand final {
 
 
 struct TextureActivationCommand final {
-    GLenum tex_type;
-    GLenum sampler_type;
-    GLuint id;
+    GLenum tex_type;     // GL_TEXTURE0, GL_TEXTURE_1, ...
+    GLenum sampler_type; // GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, ...
+    GLuint id;           // texure_id
     GLuint program;
     std::string sampler_name;
 };

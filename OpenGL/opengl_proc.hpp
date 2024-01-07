@@ -171,21 +171,10 @@ struct TextureDataArray2D final {
     TextureData tex_data;
     size_t tile_count_w, tile_count_h;
 
-    GLsizei tile_w() const {
-        return tex_data.w / tile_count_w;
-    }
-
-    GLsizei tile_h() const {
-        return tex_data.h / tile_count_h;
-    }
-
-    GLsizei total_tiles() const {
-        return tile_count_h * tile_count_w;
-    }
-
-    bool is_valid() const {
-        return tex_data.is_valid() && tile_count_h != 0 && tile_count_w != 0;
-    }
+    GLsizei tile_w() const;
+    GLsizei tile_h() const;
+    GLsizei total_tiles() const;
+    bool is_valid() const;
 };
 
 

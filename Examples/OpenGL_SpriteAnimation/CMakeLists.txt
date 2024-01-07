@@ -10,3 +10,9 @@ create_executable(
 
 copy_files(FILES "vertex_shader.vert" "fragment_shader.frag"
                  "hr-level1_running.png" "fire.jpg" "test_1.png")
+
+create_executable(
+    TARGET "${PROJECT_NAME}_2"
+    SOURCES main_2.cpp
+    LIBS OpenGL UI
+)

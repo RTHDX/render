@@ -18,7 +18,7 @@ int WIDTH = 1280;
 int HEIGHT = 860;
 const std::filesystem::path vertex_path(R"(.\vertex_shader.vert)");
 const std::filesystem::path fragment_path(R"(.\fragment_shader.frag)");
-glm::vec4 background = { 1.0, 0.8, 0.8, 1.0 };
+glm::vec4 background {1.0, 1.0, 1.0, 1.0};
 
 void frame_preprocess(GLuint id);
 void frame_postprocess(GLFWwindow* w);
@@ -45,7 +45,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    auto* window = ui::create_window(WIDTH, HEIGHT, "Sprite animation");
+    auto* window = ui::create_window(WIDTH, HEIGHT, "Sprite animation 2");
     opengl::Context::instance().initialize(true);
     opengl::Context::instance().background(background);
 
@@ -62,8 +62,29 @@ int main() {
     opengl::bind_vao(vao);
     opengl::bind_ebo(ebo, indices);
 
-    opengl::TextureArray texture(R"(.\fire.jpg)", 6, 6);
-    if (!texture.read()) { return EXIT_FAILURE; }
+    auto image = opengl::ImageData::read("fire.jpg");
+    if (!image.is_valid()) {
+        std::cout << "No image read" << std::endl;
+        return EXIT_FAILURE;
+    }
+    opengl::TextureDataArray2D tex_data {
+        .tex_data = {
+            .id         = opengl::gen_texture(GL_TEXTURE_2D_ARRAY),
+            .target     = GL_TEXTURE_2D_ARRAY,
+            .w          = image.w,
+            .h          = image.h,
+            .format     = GL_RGBA,
+            .type       = GL_UNSIGNED_BYTE,
+            .wrap_s     = GL_CLAMP_TO_EDGE,
+            .wrap_t     = GL_CLAMP_TO_EDGE,
+            .min_filter = GL_LINEAR,
+            .mag_filter = GL_LINEAR
+        },
+        .tile_count_w = 6,
+        .tile_count_h = 6
+    };
+
+    opengl::set_texture_2d_array_meta(image.data, tex_data);
 
     glm::mat4 projection(1.0);
     glm::mat4 view(1.0);
@@ -73,18 +94,24 @@ int main() {
     while (!glfwWindowShouldClose(window)) {
         frame_preprocess(vao);
         opengl::Context::instance().draw_background();
-        texture.bind();
         opengl::use(program);
+        opengl::activate_texture({
+            .tex_type     = GL_TEXTURE0,
+            .sampler_type = tex_data.tex_data.target,
+            .id           = tex_data.tex_data.id,
+            .program      = program,
+            .sampler_name = "texture_0"
+        });
         opengl::set_mat4(program, "projection", projection);
         opengl::set_mat4(program, "view", view);
         opengl::set_mat4(program, "model", model);
-        opengl::set_int(program, "total_frames", texture.total_tiles());
+        opengl::set_int(program, "total_frames", tex_data.total_tiles());
         opengl::set_int(program, "current_frame", frame);
         opengl::draw(opengl::DrawElementsCommand {
-            .vao=vao,
-            .count=indices.size()
+            .vao = vao,
+            .count = indices.size()
         });
-        frame = count % texture.total_tiles();
+        frame = count % tex_data.total_tiles();
         frame_postprocess(window);
         count = count == std::numeric_limits<uint64_t>::max() ?
             0 : count + 1;

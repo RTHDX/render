@@ -332,6 +332,23 @@ bool TextureData::is_valid() const {
 }
 
 
+GLsizei TextureDataArray2D::tile_w() const {
+    return tex_data.w / tile_count_w;
+}
+
+GLsizei TextureDataArray2D::tile_h() const {
+    return tex_data.h / tile_count_h;
+}
+
+GLsizei TextureDataArray2D::total_tiles() const {
+    return tile_count_h * tile_count_w;
+}
+
+bool TextureDataArray2D::is_valid() const {
+    return tex_data.is_valid() && tile_count_h != 0 && tile_count_w != 0;
+}
+
+
 std::ostream& operator<<(std::ostream& os, const TextureData& tex) {
     os << "| Property     | Value                       |\n"
        << "|--------------|-----------------------------|\n"
