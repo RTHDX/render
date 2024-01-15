@@ -638,6 +638,8 @@ static std::string type_to_string(GLenum type) {
         return "mat4";
     case GL_SAMPLER_2D:
         return "sampler2D";
+    case GL_SAMPLER_2D_ARRAY:
+        return "sampler2DArray";
     case GL_SAMPLER_CUBE:
         return "samplerCube";
     default:
