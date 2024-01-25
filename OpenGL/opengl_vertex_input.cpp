@@ -216,4 +216,58 @@ GLuint mat4_instanced::gen_buffer(GLuint vao,
     return vbo;
 }
 
+mat4_f_instanced::mat4_f_instanced(glm::mat4&& m, float v)
+    : mat(std::move(m))
+    , val(v)
+{}
+
+GLuint mat4_f_instanced::gen_buffer(GLuint vao,
+                                    const std::vector<this_t>& in,
+                                    GLuint index) {
+    static constexpr GLuint STRIDE = 4;
+    static constexpr GLuint SIZE_OF_THIS = sizeof(this_t);
+    static constexpr GLuint SIZE_OF_MAT = sizeof(glm::mat4);
+    static constexpr GLuint SIZE_OF_FLOAT = sizeof(float);
+
+    GLuint vbo;
+    SAFE_CALL(glGenBuffers(1, &vbo));
+    SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    SAFE_CALL(glBufferData(
+        GL_ARRAY_BUFFER,
+        SIZE_OF_THIS * in.size(),
+        in.data(),
+        GL_STATIC_DRAW
+    ));
+
+    SAFE_CALL(glBindVertexArray(vao));
+    SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+    for (unsigned int i = 0; i < 4; i++) {
+        SAFE_CALL(glEnableVertexAttribArray(index + i));
+        SAFE_CALL(glVertexAttribPointer(
+            index + i,
+            STRIDE,
+            GL_FLOAT,
+            GL_FALSE,
+            SIZE_OF_THIS,
+            (void*)(sizeof(glm::vec4) * i)
+        ));
+        SAFE_CALL(glVertexAttribDivisor(index + i, 1));
+    }
+    SAFE_CALL(glEnableVertexAttribArray(index + 4));
+    SAFE_CALL(glVertexAttribPointer(
+        index + 4,
+        1, // Only one float val
+        GL_FLOAT,
+        GL_FALSE,
+        SIZE_OF_THIS,
+        (void*)SIZE_OF_MAT // Offset after mat4
+    ));
+    SAFE_CALL(glVertexAttribDivisor(index + 4, 1));
+
+    SAFE_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    SAFE_CALL(glBindVertexArray(0));
+    return vbo;
+}
+
+
 }

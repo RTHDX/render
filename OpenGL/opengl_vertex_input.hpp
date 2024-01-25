@@ -122,6 +122,23 @@ public:
                              GLuint index);
 };
 
+struct mat4_f_instanced final {
+    using this_t = mat4_f_instanced;
+    using col_t = glm::vec4;
+
+    glm::mat4 mat;
+    float val;
+
+public:
+    mat4_f_instanced() = default;
+    mat4_f_instanced(glm::mat4&& mat, float val);
+
+    static GLuint gen_buffer(GLuint vao,
+                             const std::vector<this_t>& in,
+                             GLuint index);
+};
+
+
 template <typename T> concept vertex_input_c =
     requires (T t) {
         typename T::vertex_attrib_t;

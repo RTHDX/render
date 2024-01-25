@@ -714,4 +714,20 @@ ShaderProgramInterface get_program_interface(GLuint program) {
     return intf;
 }
 
+std::optional<std::string>
+ShaderProgramInterface::found_uname_by_value(GLenum v) const {
+    for (const auto& [key, val] : uniform_block) {
+        if (val == v) { return key; }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string>
+ShaderProgramInterface::found_iname_by_balue(GLenum v) const {
+    for (const auto& [key, val] : input_block) {
+        if (val == v) { return key; }
+    }
+    return std::nullopt;
+}
+
 }

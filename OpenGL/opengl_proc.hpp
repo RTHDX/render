@@ -235,6 +235,9 @@ struct ShaderProgramInterface final {
     std::unordered_map<std::string, GLenum> uniform_block;
     GLint input_count = 0;
     std::unordered_map<std::string, GLenum> input_block;
+
+    std::optional<std::string> found_uname_by_value(GLenum) const;
+    std::optional<std::string> found_iname_by_balue(GLenum) const;
 };
 std::ostream& operator << (std::ostream& os, const ShaderProgramInterface& i);
 
