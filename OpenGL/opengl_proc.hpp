@@ -169,10 +169,10 @@ std::ostream& operator << (std::ostream& os, const TextureData& tex);
 
 struct TextureDataArray2D final {
     TextureData tex_data;
-    size_t tile_count_w, tile_count_h;
+    size_t tile_count_w {0}, tile_count_h {0};
 
-    GLsizei tile_w() const;
-    GLsizei tile_h() const;
+    GLsizei tile_w() const; // pixels
+    GLsizei tile_h() const; // pixels
     GLsizei total_tiles() const;
     bool is_valid() const;
 };

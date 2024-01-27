@@ -1,3 +1,5 @@
+#include <exception>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "3rdParty/stb/stb_image.h"
 #define STBI_MSC_SECURE_CRT
@@ -9,13 +11,99 @@
 
 namespace opengl {
 
+ImageData ImageData::create(int w,
+                            int h,
+                            const std::vector<glm::u8vec4>& pixels) {
+    if (pixels.size() / w != h) {
+        throw std::runtime_error("Incorrect pixels.size()");
+    }
+
+    ImageData image;
+    image.w = w;
+    image.h = h;
+    image.mode = ColorMode::RGBA;
+    if (image.size() == 0) { return image; }
+    image.data = new byte_t[image.size()];
+    std::copy(
+        reinterpret_cast<const byte_t*>(pixels.data()),
+        reinterpret_cast<const byte_t*>(pixels.data() + w * h),
+        image.data
+    );
+    return image;
+}
+
+ImageData ImageData::create(int w,
+                            int h,
+                            const std::vector<glm::u8vec3>& pixels) {
+    if (pixels.size() / w != h) {
+        throw std::runtime_error("Incorrect pixels.size()");
+    }
+
+    ImageData image;
+    image.w = w;
+    image.h = h;
+    image.mode = ColorMode::RGB;
+    if (image.size() == 0) { return image; }
+    image.data = new byte_t[image.size()];
+    std::copy(
+        reinterpret_cast<const byte_t*>(pixels.data()),
+        reinterpret_cast<const byte_t*>(pixels.data() + w * h),
+        image.data
+    );
+    return image;
+}
+
+ImageData ImageData::create(int w,
+                            int h,
+                            glm::u8vec4 filler) {
+    if (w <= 0 || h <= 0) {
+        throw std::runtime_error("Incorrect format WxH");
+    }
+
+    ImageData image;
+    image.w = w;
+    image.h = h;
+    image.mode = ColorMode::RGBA;
+    image.data = new byte_t[image.size()];
+
+    for (size_t i = 0; i < image.size();) {
+        image.data[i++] = filler.r;
+        image.data[i++] = filler.g;
+        image.data[i++] = filler.b;
+        image.data[i++] = filler.a;
+    }
+
+    return image;
+}
+
+ImageData ImageData::create(int w,
+                            int h,
+                            glm::u8vec3 filler) {
+    if (w <= 0 || h <= 0) {
+        throw std::runtime_error("Incorrect format WxH");
+    }
+
+    ImageData image;
+    image.w = w;
+    image.h = h;
+    image.mode = ColorMode::RGB;
+    image.data = new byte_t[image.size()];
+
+    for (size_t i = 0; i < image.size();) {
+        image.data[i++] = filler.r;
+        image.data[i++] = filler.g;
+        image.data[i++] = filler.b;
+    }
+
+    return image;
+}
 
 ImageData ImageData::read(const std::filesystem::path& path) {
     ImageData out;
     std::string str_path = path.string();
-    out.data = stbi_load(str_path.c_str(), &out.w, &out.h, &out.d,
+    int depth = 0;
+    out.data = stbi_load(str_path.c_str(), &out.w, &out.h, &depth,
                          STBI_rgb_alpha);
-    out.len  = out.w * out.h * out.d;
     out.mode = ColorMode::RGBA;
     return out;
 }
@@ -42,15 +130,13 @@ bool ImageData::write(std::filesystem::path path,
 }
 
 ImageData::ImageData(const ImageData& other)
-    : len(other.len)
-    , w(other.w)
+    : w(other.w)
     , h(other.h)
-    , d(other.d)
     , mode(other.mode)
 {
-    if (other.data) {
-        data = new byte_t[other.len];
-        std::copy(other.data, other.data + other.len, data);
+    if (other.data && other.size() > 0) {
+        data = new byte_t[other.size()];
+        std::copy(other.data, other.data + other.size(), data);
     }
 }
 
@@ -58,14 +144,12 @@ ImageData& ImageData::operator=(const ImageData& other) {
     if (this != &other) {
         delete[] data;
         data = nullptr;
-        len = other.len;
         w = other.w;
         h = other.h;
-        d = other.d;
         mode = other.mode;
-        if (other.data) {
-            data = new byte_t[other.len];
-            std::copy(other.data, other.data + other.len, data);
+        if (other.data && other.size() > 0) {
+            data = new byte_t[other.size()];
+            std::copy(other.data, other.data + other.size(), data);
         }
     }
     return *this;
@@ -73,17 +157,13 @@ ImageData& ImageData::operator=(const ImageData& other) {
 
 ImageData::ImageData(ImageData&& other) noexcept
     : data(other.data)
-    , len(other.len)
     , w(other.w)
     , h(other.h)
-    , d(other.d)
     , mode(other.mode)
 {
     other.data = nullptr;
-    other.len = -1;
     other.w = -1;
     other.h = -1;
-    other.d = -1;
     other.mode = ColorMode::UNDEF;
 }
 
@@ -91,17 +171,13 @@ ImageData& ImageData::operator=(ImageData&& other) noexcept {
     if (this != &other) {
         delete[] data;
         data = other.data;
-        len = other.len;
         w = other.w;
         h = other.h;
-        d = other.d;
         mode = other.mode;
 
         other.data = nullptr;
-        other.len = -1;
         other.w = -1;
         other.h = -1;
-        other.d = -1;
         other.mode = ColorMode::UNDEF;
     }
 
@@ -113,7 +189,12 @@ ImageData::~ImageData() {
 }
 
 bool ImageData::is_valid() const {
-    return data != nullptr && len > 0;
+    return data != nullptr;
+}
+
+int ImageData::size() const {
+    if (mode == ColorMode::UNDEF) { return 0; }
+    return w * h * (mode == ColorMode::RGB ? 3 : 4);
 }
 
 }

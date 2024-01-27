@@ -14,3 +14,10 @@ create_executable(
 	SOURCES main_elements_draw.cpp
 	LIBS OpenGL UI ImGui Render
 )
+
+create_executable(
+	TARGET "OpenGL_InstanceDrawing_Mat4_F"
+	SOURCES main_mat4_f_draw.cpp
+	SHADERS vec3_vec2_mat4_f.vert samp_2D_array.frag
+	LIBS OpenGL UI ImGui Render
+)
