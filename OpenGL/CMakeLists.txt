@@ -10,6 +10,7 @@ create_library(
         opengl_proc.cpp
         opengl_context.cpp
         opengl_vertex_input.cpp
+        opengl_vertex_instance_input.cpp
         ortho_camera.cpp
         texture.cpp
         opengl_functions.cpp
