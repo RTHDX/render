@@ -21,3 +21,9 @@ create_executable(
 	SHADERS vec3_vec2_mat4_f.vert samp_2D_array.frag
 	LIBS OpenGL UI ImGui Render
 )
+
+create_executable(
+	TARGET "OpenGL_InstanceDrawing_Mat4_F_Animated"
+	SOURCES main_mat4_f_animated_draw.cpp
+	LIBS OpenGL UI ImGui Render
+)

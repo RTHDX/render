@@ -107,6 +107,7 @@ public:
     static commands_t commands();
 };
 
+
 struct mat4_instanced final {
     using this_t = mat4_instanced;
     using col_t = glm::vec4;
@@ -117,10 +118,34 @@ public:
     mat4_instanced() = default;
     mat4_instanced(glm::mat4&& m);
 
+    static std::vector<mat4_instanced> convert(const std::vector<glm::mat4>&);
     static GLuint gen_buffer(GLuint vao,
                              const std::vector<this_t>& in,
-                             GLuint index);
+                             GLuint index,
+                             GLenum usage = GL_STATIC_DRAW);
 };
+
+
+struct float_instanced final {
+    using this_t = float_instanced;
+    using col_t = float;
+
+    float val;
+
+public:
+    float_instanced() = default;
+    float_instanced(float v);
+
+    static std::vector<float_instanced> convert(const std::vector<float>& in);
+    static GLuint gen_buffer(GLuint vao,
+                             const std::vector<this_t>& in,
+                             GLuint index,
+                             GLenum usage = GL_STATIC_DRAW);
+    static void update(GLuint id,
+                       const std::vector<this_t>& in,
+                       size_t offset = 0);
+};
+
 
 struct mat4_f_instanced final {
     using this_t = mat4_f_instanced;
@@ -133,9 +158,14 @@ public:
     mat4_f_instanced() = default;
     mat4_f_instanced(glm::mat4&& mat, float val);
 
+    static std::vector<mat4_f_instanced> zip(
+        const std::vector<glm::mat4>& matrices,
+        const std::vector<float>& floats
+    );
     static GLuint gen_buffer(GLuint vao,
                              const std::vector<this_t>& in,
-                             GLuint index);
+                             GLuint index,
+                             GLenum usage = GL_STATIC_DRAW);
 };
 
 

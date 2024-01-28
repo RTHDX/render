@@ -175,6 +175,10 @@ struct TextureDataArray2D final {
     GLsizei tile_h() const; // pixels
     GLsizei total_tiles() const;
     bool is_valid() const;
+    GLenum internal_format() const;
+    GLsizei tile_offset(int x, int y) const;
+
+    void dump_meta() const;
 };
 
 
@@ -242,5 +246,25 @@ struct ShaderProgramInterface final {
 std::ostream& operator << (std::ostream& os, const ShaderProgramInterface& i);
 
 ShaderProgramInterface get_program_interface(GLuint program);
+
+
+struct buffer_bind_guard final {
+    buffer_bind_guard() = delete;
+    buffer_bind_guard(const buffer_bind_guard&) = delete;
+    buffer_bind_guard& operator = (const buffer_bind_guard&) = delete;
+    buffer_bind_guard(buffer_bind_guard&&) = delete;
+    buffer_bind_guard& operator = (buffer_bind_guard&&) = delete;
+
+    buffer_bind_guard(VertexArrayBindCommand&& cmd);
+    buffer_bind_guard(BufferBindCommand&& cmd);
+    ~buffer_bind_guard();
+
+private:
+    enum __buffer_bind_mode__ {
+        VAO_BINDER,
+        VBO_BINDER
+    } mode_;
+    GLenum buff_type_ = 0;
+};
 
 }

@@ -127,6 +127,7 @@ public:
 
     bool is_valid() const;
     int size() const;
+    void dump() const;
 };
 
 bool save_as_image(std::filesystem::path path,

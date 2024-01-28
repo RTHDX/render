@@ -1,4 +1,6 @@
 #include <exception>
+#include <iostream>
+#include <iomanip>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "3rdParty/stb/stb_image.h"
@@ -24,11 +26,17 @@ ImageData ImageData::create(int w,
     image.mode = ColorMode::RGBA;
     if (image.size() == 0) { return image; }
     image.data = new byte_t[image.size()];
-    std::copy(
-        reinterpret_cast<const byte_t*>(pixels.data()),
-        reinterpret_cast<const byte_t*>(pixels.data() + w * h),
-        image.data
-    );
+
+    size_t p_i = 0;
+    for (size_t i = 0; i < image.size();) {
+        const auto& pixel = pixels[p_i];
+        image.data[i++] = pixel.r;
+        image.data[i++] = pixel.g;
+        image.data[i++] = pixel.b;
+        image.data[i++] = pixel.a;
+        ++p_i;
+    }
+
     return image;
 }
 
@@ -195,6 +203,20 @@ bool ImageData::is_valid() const {
 int ImageData::size() const {
     if (mode == ColorMode::UNDEF) { return 0; }
     return w * h * (mode == ColorMode::RGB ? 3 : 4);
+}
+
+void ImageData::dump() const {
+    size_t d = size_t(mode);
+    for (size_t i = 0; i < size(); ++i) {
+        std::cout << std::setw(5) << int(data[i]);
+        if ((i + 1) % d != 0) {
+            std::cout << ", ";
+        }
+        if ((i + 1) % d == 0) {
+            std::cout << std::endl;
+        }
+    }
+    std::cout << std::endl;
 }
 
 }

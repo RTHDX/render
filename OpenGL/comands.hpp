@@ -93,4 +93,18 @@ struct DrawElementInstanced final {
     GLenum mode     {GL_TRIANGLES};
 };
 
+
+struct VertexArrayBindCommand final {
+    GLuint vao;
+};
+
+struct BufferBindCommand final {
+    GLuint id;
+    GLenum type;
+};
+
+struct BufferGenerationCommand final {
+    GLenum type; // GL_ARRAY_BUFFER
+};
+
 }

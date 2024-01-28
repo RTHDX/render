@@ -16,6 +16,7 @@ create_library(
         opengl_functions.cpp
         light.cpp
         Imagedata.cpp
+        buffer_bind_guard.cpp
     HEADERS
         opengl_utils.hpp
         camera.cpp

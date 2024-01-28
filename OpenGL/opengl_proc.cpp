@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -255,27 +256,62 @@ void bind_fbo(GLuint id) {
 }
 
 static std::string gl_enum_to_string(GLenum e) {
+#define ENUM_TO_STR(VAL) case VAL: return #VAL
+
     switch (e) {
-    case GL_DEPTH_COMPONENT:
-        return "GL_DEPTH_COMPONENT";
-    case GL_DEPTH_STENCIL:
-        return "GL_DEPTH_STENCIL";
-    case GL_RED:
-        return "GL_RED";
-    case GL_RG:
-        return "GL_RG";
-    case GL_RGB:
-        return "GL_RGB";
-    case GL_RGBA:
-        return "GL_RGBA";
-    case GL_REPEAT:
-        return "GL_REPEAT";
-    case GL_LINEAR:
-        return "GL_LINEAR";
-        // ... add cases for other GLenum values as needed
+    ENUM_TO_STR(GL_DEPTH_COMPONENT);
+    ENUM_TO_STR(GL_DEPTH_STENCIL);
+    ENUM_TO_STR(GL_RED);
+    ENUM_TO_STR(GL_RG);
+    ENUM_TO_STR(GL_RGB);
+    ENUM_TO_STR(GL_RGBA);
+    ENUM_TO_STR(GL_REPEAT);
+    ENUM_TO_STR(GL_LINEAR);
+    ENUM_TO_STR(GL_NEAREST);
+    ENUM_TO_STR(GL_CLAMP_TO_EDGE);
+    ENUM_TO_STR(GL_CLAMP_TO_BORDER);
+    ENUM_TO_STR(GL_MIRRORED_REPEAT);
+    ENUM_TO_STR(GL_TEXTURE_MAG_FILTER);
+    ENUM_TO_STR(GL_TEXTURE_MIN_FILTER);
+    ENUM_TO_STR(GL_TEXTURE_WRAP_S);
+    ENUM_TO_STR(GL_TEXTURE_WRAP_T);
+    ENUM_TO_STR(GL_TEXTURE_2D);
+    ENUM_TO_STR(GL_TEXTURE_CUBE_MAP);
+    ENUM_TO_STR(GL_TEXTURE_3D);
+    ENUM_TO_STR(GL_TEXTURE_2D_ARRAY);
+    ENUM_TO_STR(GL_FRAMEBUFFER);
+    ENUM_TO_STR(GL_RENDERBUFFER);
+    ENUM_TO_STR(GL_DEPTH_BUFFER_BIT);
+    ENUM_TO_STR(GL_COLOR_BUFFER_BIT);
+    ENUM_TO_STR(GL_STENCIL_BUFFER_BIT);
+    ENUM_TO_STR(GL_UNSIGNED_BYTE);
+    ENUM_TO_STR(GL_FLOAT);
+    ENUM_TO_STR(GL_STATIC_DRAW);
+    ENUM_TO_STR(GL_DYNAMIC_DRAW);
+    ENUM_TO_STR(GL_STREAM_DRAW);
+    ENUM_TO_STR(GL_FLOAT_VEC2);
+    ENUM_TO_STR(GL_FLOAT_VEC3);
+    ENUM_TO_STR(GL_FLOAT_VEC4);
+    ENUM_TO_STR(GL_INT);
+    ENUM_TO_STR(GL_INT_VEC2);
+    ENUM_TO_STR(GL_INT_VEC3);
+    ENUM_TO_STR(GL_INT_VEC4);
+    ENUM_TO_STR(GL_UNSIGNED_INT);
+    ENUM_TO_STR(GL_BOOL);
+    ENUM_TO_STR(GL_BOOL_VEC2);
+    ENUM_TO_STR(GL_BOOL_VEC3);
+    ENUM_TO_STR(GL_BOOL_VEC4);
+    ENUM_TO_STR(GL_FLOAT_MAT2);
+    ENUM_TO_STR(GL_FLOAT_MAT3);
+    ENUM_TO_STR(GL_FLOAT_MAT4);
+    ENUM_TO_STR(GL_SAMPLER_2D);
+    ENUM_TO_STR(GL_SAMPLER_2D_ARRAY);
+    ENUM_TO_STR(GL_SAMPLER_CUBE);
     default:
         return "Unknown GLenum value";
     }
+
+#undef ENUM_TO_STR
 }
 
 
@@ -348,25 +384,61 @@ bool TextureDataArray2D::is_valid() const {
     return tex_data.is_valid() && tile_count_h != 0 && tile_count_w != 0;
 }
 
+GLenum TextureDataArray2D::internal_format() const {
+    GLenum format = tex_data.format;
+    switch (format) {
+    case GL_RGB:  return GL_RGB8;
+    case GL_RGBA: return GL_RGBA8;
+    default:
+        std::cerr << "Invalid format " << format;
+        return 0;
+    }
+}
+
+GLsizei TextureDataArray2D::tile_offset(int x, int y) const {
+    GLenum format = tex_data.format;
+    GLsizei stride = 0;
+    if (format == GL_RGB) {
+        stride = 3;
+    } else if (format == GL_RGBA) {
+        stride = 4;
+    }
+
+    if (stride == 0) {
+        std::cerr << "Sride is zero" << std::endl;
+    }
+    return (y * tex_data.w + x) * stride;
+}
+
+void TextureDataArray2D::dump_meta() const {
+    std::cout << "<TextureDataArray2D:\n";
+    std::cout << " - tile count w: " << tile_count_w << "\n";
+    std::cout << " - tile count h: " << tile_count_h << "\n";
+    std::cout << " - total tiles: " << total_tiles() << "\n";
+    std::cout << " - tile width(px): " << tile_w() << "\n";
+    std::cout << " - tile height(px): " << tile_h() << "\n";
+    std::cout << tex_data << std::endl;
+}
+
 
 std::ostream& operator<<(std::ostream& os, const TextureData& tex) {
-    os << "| Property     | Value                       |\n"
-       << "|--------------|-----------------------------|\n"
-       << std::format("| Target       | {}                           |\n",
+    os << "| Property     | Value                         |\n"
+       << "|--------------|-------------------------------|\n"
+       << std::format("| Target       | {:<30}|\n",
           gl_enum_to_string(tex.target))
-       << std::format("| Width        | {:<28}|\n", tex.w)
-       << std::format("| Height       | {:<28}|\n", tex.h)
-       << std::format("| Format       | {}                           |\n",
+       << std::format("| Width        | {:<30}|\n", tex.w)
+       << std::format("| Height       | {:<30}|\n", tex.h)
+       << std::format("| Format       | {:<30}|\n",
            gl_enum_to_string(tex.format))
-       << std::format("| Type         | {}                           |\n",
+       << std::format("| Type         | {:<30}|\n",
            gl_enum_to_string(tex.type))
-       << std::format("| Wrap S       | {}                           |\n",
+       << std::format("| Wrap S       | {:<30}|\n",
            gl_enum_to_string(tex.wrap_s))
-       << std::format("| Wrap T       | {}                           |\n",
+       << std::format("| Wrap T       | {:<30}|\n",
            gl_enum_to_string(tex.wrap_t))
-       << std::format("| Min Filter   | {}                           |\n",
+       << std::format("| Min Filter   | {:<30}|\n",
            gl_enum_to_string(tex.min_filter))
-       << std::format("| Mag Filter   | {}                           |\n",
+       << std::format("| Mag Filter   | {:<30}|\n",
            gl_enum_to_string(tex.mag_filter));
     return os;
 }
@@ -426,9 +498,15 @@ void set_texture_meta(byte_t* raw_data, const TextureData& params) {
     SAFE_CALL(glBindTexture(params.target, 0));
 }
 
+void dump_image_part(byte_t* data, GLsizei stride) {
+    for (GLsizei i = 0; i < stride; ++i) {
+        std::cout << std::setw(4) << int(*(data + i)) << ", ";
+    }
+}
+
 void set_texture_2d_array_meta(byte_t* raw_data,
                                const TextureDataArray2D& data) {
-    const auto t = data.tex_data.target;
+    const GLenum t = data.tex_data.target;
     SAFE_CALL(glBindTexture(t, data.tex_data.id));
 
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_BASE_LEVEL, 0));
@@ -440,29 +518,39 @@ void set_texture_2d_array_meta(byte_t* raw_data,
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_WRAP_S, data.tex_data.wrap_s));
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_WRAP_T, data.tex_data.wrap_t));
 
-    SAFE_CALL(glTexStorage3D(t, 1, GL_RGBA8, data.tile_w(), data.tile_h(),
-              data.total_tiles()));
+    GLsizei tile_width  = data.tile_w();
+    GLsizei tile_height = data.tile_h();
+    GLsizei total_tiles = data.total_tiles();
+    SAFE_CALL(glTexStorage3D(
+        t,
+        1,
+        data.internal_format(),
+        tile_width,
+        tile_height,
+        total_tiles
+    ));
 
     SAFE_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.tex_data.w));
     SAFE_CALL(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, data.tex_data.h));
 
-    for (GLsizei i = 0; i < data.total_tiles(); ++i) {
-        int ix = i % data.tile_count_h;
+    for (GLsizei i = 0; i < total_tiles; ++i) {
+        int ix = i % data.tile_count_w;
         int iy = i / data.tile_count_w;
-        int x = ix * data.tile_w();
-        int y = iy * data.tile_h();
+        int x = ix * tile_width;
+        int y = iy * tile_height;
+        byte_t* offset = raw_data + data.tile_offset(x, y);
         SAFE_CALL(glTexSubImage3D(
-            GL_TEXTURE_2D_ARRAY,
+            t,
             0,
             0, 0, i,
             data.tile_w(), data.tile_h(), 1,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
-            raw_data + ((y * data.tex_data.w + x) * 4)
+            data.tex_data.format,
+            data.tex_data.type,
+            offset
         ));
     }
-    SAFE_CALL(glGenerateMipmap(t));
 
+    SAFE_CALL(glGenerateMipmap(t));
     SAFE_CALL(glBindTexture(t, 0));
 }
 
