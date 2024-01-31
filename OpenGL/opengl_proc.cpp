@@ -420,6 +420,12 @@ void TextureDataArray2D::dump_meta() const {
     std::cout << tex_data << std::endl;
 }
 
+void TextureDataArray2D::free() {
+    tex_data.free();
+    tile_count_w = 0;
+    tile_count_h = 0;
+}
+
 
 std::ostream& operator<<(std::ostream& os, const TextureData& tex) {
     os << "| Property     | Value                         |\n"
@@ -466,7 +472,7 @@ void InstantRenderData::free() {
             SAFE_CALL(glDeleteBuffers(1, &buff_id));
         }
     }
-    instant_count = 0;
+    instance_count = 0;
 }
 
 GLuint gen_texture(GLenum target) {

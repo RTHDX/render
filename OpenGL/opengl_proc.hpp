@@ -179,6 +179,7 @@ struct TextureDataArray2D final {
     GLsizei tile_offset(int x, int y) const;
 
     void dump_meta() const;
+    void free();
 };
 
 
@@ -197,7 +198,7 @@ struct RenderData final {
 struct InstantRenderData final {
     RenderData render_data;
     std::unordered_map<std::string, GLuint> buffers;
-    GLsizei instant_count;
+    GLsizei instance_count;
 
     void free();
 };
