@@ -194,6 +194,15 @@ struct RenderData final {
 };
 
 
+struct InstantRenderData final {
+    RenderData render_data;
+    std::unordered_map<std::string, GLuint> buffers;
+    GLsizei instant_count;
+
+    void free();
+};
+
+
 struct FramebufferData final {
     GLuint fbo;
     GLenum attachment_point; // GL_COLOR_ATTACHMENT0 ... GL_COLOR_ATTACHMENT31
