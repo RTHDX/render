@@ -101,7 +101,7 @@ int main() {
     };
 
     const opengl::TextureActivationCommand tex_activation{
-        .tex_type = GL_TEXTURE0,
+        .tex_unit = GL_TEXTURE0,
         .sampler_type = tex_data.target,
         .id = tex_data.id,
         .program = program,

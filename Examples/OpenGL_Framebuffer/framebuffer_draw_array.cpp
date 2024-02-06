@@ -148,7 +148,7 @@ int main() {
         opengl::set_mat4(program, "view", one);
         opengl::set_mat4(program, "model", main_model * main_scale);
         opengl::activate_texture({
-            .tex_type     = GL_TEXTURE0,
+            .tex_unit     = GL_TEXTURE0,
             .sampler_type = fbuff_data.texture.target,
             .id           = fbuff_data.texture.id,
             .program      = program,

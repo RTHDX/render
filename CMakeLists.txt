@@ -38,7 +38,6 @@ add_library(ImGui STATIC
 
 add_subdirectory(UI)
 add_subdirectory(OpenGL)
-#add_subdirectory(RTX)
 add_subdirectory(Render)
 option(RENDER_ENABLE_EXAMPLES OFF)
 if (${RENDER_ENABLE_EXAMPLES})
@@ -56,8 +55,6 @@ if (${RENDER_ENABLE_TESTING})
         "${CMAKE_CURRENT_SOURCE_DIR}/3rdParty/googletest/googlemock/include"
     )
     enable_testing()
-    #add_subdirectory("RTX-Test")
-    add_subdirectory("OpenGL-Test")
     add_subdirectory("Render-Test")
 endif ()
 

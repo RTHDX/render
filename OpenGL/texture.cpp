@@ -1,10 +1,5 @@
 #include <iostream>
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "3rdParty/stb/stb_image.h"
-#define STBI_MSC_SECURE_CRT
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include <format>
 
 #include "opengl_proc.hpp"
 #include "texture.hpp"
@@ -12,135 +7,134 @@
 
 namespace opengl {
 
-uint32_t Texture::channels() {
-    return STBI_rgb_alpha;
+void TextureData::bind_with_image(const ImageData& image) {
+    set_texture_meta(image.data, *this);
 }
 
-Texture::Texture(const char* filepath)
-    : path(filepath) {
-    stbi_set_flip_vertically_on_load(true);
-}
-
-bool Texture::read() {
-    buffer = stbi_load(path.c_str(), &width, &height, &depth, channels());
-    if (buffer == nullptr) {
-        std::cerr << "Unalble to load texture " << path << std::endl;
-        return false;
+void TextureData::free() {
+    if (id != 0 && Context::instance().is_context_active()) {
+        SAFE_CALL(glBindTexture(target, 0));
+        SAFE_CALL(glDeleteTextures(1, &id));
+        id = 0;
     }
-    id = gen_texture(TARGET);
-    Provider::instance().tex_parameter_i(TARGET, GL_TEXTURE_MIN_FILTER,
-                                         min_filter);
-    Provider::instance().tex_parameter_i(TARGET, GL_TEXTURE_MAG_FILTER,
-                                         mag_filter);
-    Provider::instance().tex_parameter_i(TARGET, GL_TEXTURE_WRAP_S, wrap_s);
-    Provider::instance().tex_parameter_i(TARGET, GL_TEXTURE_WRAP_T, wrap_t);
-    return true;
 }
 
-void Texture::bind() {
-    SAFE_CALL(glTexImage2D(TARGET, 0, GL_RGBA, width, height, 0, GL_RGBA,
-                           GL_UNSIGNED_BYTE, buffer));
-    SAFE_CALL(glGenerateMipmap(GL_TEXTURE_2D));
-}
-
-void Texture::activate() {
-    SAFE_CALL(glActiveTexture(GL_TEXTURE0));
-}
-
-Texture::~Texture() {
-    stbi_image_free(buffer);
-    SAFE_CALL(glDeleteTextures(1, &id));
+bool TextureData::is_valid() const {
+    return id != 0;
 }
 
 
-int TextureArray::read_mode() {
-    return STBI_rgb_alpha;
+GLsizei TextureDataArray2D::tile_w() const {
+    return tex_data.w / tile_count_w;
 }
 
-TextureArray::TextureArray(const char* filepath, uint32_t tcw, uint32_t tch)
-    : path(filepath)
-    , tiles_count_w(tcw)
-    , tiles_count_h(tch)
-{}
-
-TextureArray::~TextureArray() {
-    stbi_image_free(buffer);
+GLsizei TextureDataArray2D::tile_h() const {
+    return tex_data.h / tile_count_h;
 }
 
-bool TextureArray::read() {
-    buffer = stbi_load(path.c_str(), &width, &height, &depth, read_mode());
-    if (buffer == nullptr) {
-        std::cerr << "Unalble to load texture " << path << std::endl;
-        is_read = false;
-        return false;
+GLsizei TextureDataArray2D::total_tiles() const {
+    return tile_count_h * tile_count_w;
+}
+
+bool TextureDataArray2D::is_valid() const {
+    return tex_data.is_valid() && tile_count_h != 0 && tile_count_w != 0;
+}
+
+GLenum TextureDataArray2D::internal_format() const {
+    GLenum format = tex_data.format;
+    switch (format) {
+    case GL_RGB:  return GL_RGB8;
+    case GL_RGBA: return GL_RGBA8;
+    default:
+        std::cerr << "Invalid format " << format;
+        return 0;
     }
-    const GLsizei tile_w = width / tiles_count_w,
-                  tile_h = height / tiles_count_h,
-                  total_tiles = tiles_count_h * tiles_count_w;
-    // create texture;
-    SAFE_CALL(glGenTextures(1, &id));
-    SAFE_CALL(glBindTexture(TARGET, id));
-    // set texture parameters
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_BASE_LEVEL, 0));
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_MAX_LEVEL, 1));
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-    SAFE_CALL(glTexParameteri(TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-    // set tiles sizes and amount
-    SAFE_CALL(glTexStorage3D(TARGET, 1, GL_RGBA8, tile_w, tile_h,
-                             total_tiles));
-    // set image dims
-    SAFE_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, width));
-    SAFE_CALL(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, height));
-    // cropp frames
+}
+
+GLsizei TextureDataArray2D::tile_offset(int x, int y) const {
+    GLenum format = tex_data.format;
+    GLsizei stride = 0;
+    if (format == GL_RGB) {
+        stride = 3;
+    }
+    else if (format == GL_RGBA) {
+        stride = 4;
+    }
+
+    if (stride == 0) {
+        std::cerr << "Sride is zero" << std::endl;
+    }
+    return (y * tex_data.w + x) * stride;
+}
+
+void TextureDataArray2D::free() {
+    tex_data.free();
+    tile_count_w = 0;
+    tile_count_h = 0;
+}
+
+
+void set_texture_meta(byte_t* raw_data, const TextureData& params) {
+    SAFE_CALL(glBindTexture(params.target, params.id));
+    SAFE_CALL(glTexImage2D(params.target, 0, params.format, params.w, params.h,
+        0, params.format, params.type, raw_data));
+    SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_WRAP_S, params.wrap_s));
+    SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_WRAP_T, params.wrap_t));
+    SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_MIN_FILTER,
+        params.min_filter));
+    SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_MAG_FILTER,
+        params.mag_filter));
+    SAFE_CALL(glBindTexture(params.target, 0));
+}
+
+void set_texture_2d_array_meta(byte_t* raw_data,
+                               const TextureDataArray2D& data) {
+    const GLenum t = data.tex_data.target;
+    SAFE_CALL(glBindTexture(t, data.tex_data.id));
+
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_BASE_LEVEL, 0));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MAX_LEVEL, 1));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MAG_FILTER,
+        data.tex_data.mag_filter));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MIN_FILTER,
+        data.tex_data.min_filter));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_WRAP_S, data.tex_data.wrap_s));
+    SAFE_CALL(glTexParameteri(t, GL_TEXTURE_WRAP_T, data.tex_data.wrap_t));
+
+    GLsizei tile_width = data.tile_w();
+    GLsizei tile_height = data.tile_h();
+    GLsizei total_tiles = data.total_tiles();
+    SAFE_CALL(glTexStorage3D(
+        t,
+        1,
+        data.internal_format(),
+        tile_width,
+        tile_height,
+        total_tiles
+    ));
+
+    SAFE_CALL(glPixelStorei(GL_UNPACK_ROW_LENGTH, data.tex_data.w));
+    SAFE_CALL(glPixelStorei(GL_UNPACK_IMAGE_HEIGHT, data.tex_data.h));
+
     for (GLsizei i = 0; i < total_tiles; ++i) {
-        int ix = i % tiles_count_h;
-        int iy = i / tiles_count_w;
-        int x = ix * tile_w;
-        int y = iy * tile_h;
+        int ix = i % data.tile_count_w;
+        int iy = i / data.tile_count_w;
+        int x = ix * tile_width;
+        int y = iy * tile_height;
+        byte_t* offset = raw_data + data.tile_offset(x, y);
         SAFE_CALL(glTexSubImage3D(
-            GL_TEXTURE_2D_ARRAY,
+            t,
             0,
             0, 0, i,
-            tile_w, tile_h, 1,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
-            buffer + ((y * width + x) * 4)
+            data.tile_w(), data.tile_h(), 1,
+            data.tex_data.format,
+            data.tex_data.type,
+            offset
         ));
     }
-    SAFE_CALL(glGenerateMipmap(TARGET));
-    is_read = true;
-    return true;
-}
 
-void TextureArray::bind() {
-    SAFE_CALL(glBindTexture(TARGET, id));
-}
-
-static inline std::string cast_to_str(const std::filesystem::path& path) {
-    const auto& str = path.string();
-    return {str.begin(), str.end()};
-}
-
-
-bool save_as_image(std::filesystem::path path,
-                   const byte_t* data,
-                   int len,
-                   int w,
-                   int h,
-                   ColorMode m) {
-    int ret = 0;
-    if (m == ColorMode::RGB) {
-        path.replace_extension(".jpg");
-        ret = stbi_write_jpg(cast_to_str(path).c_str(), w, h, (int)m, data,
-            w * (int)m);
-    } else {
-        path.replace_extension(".png");
-        ret = stbi_write_png(cast_to_str(path).c_str(), w, h, (int)m, data,
-            w * (int)m);
-    }
-    return ret != 0;
+    SAFE_CALL(glGenerateMipmap(t));
+    SAFE_CALL(glBindTexture(t, 0));
 }
 
 }

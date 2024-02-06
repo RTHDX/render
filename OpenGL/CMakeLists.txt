@@ -15,7 +15,7 @@ create_library(
         texture.cpp
         opengl_functions.cpp
         light.cpp
-        Imagedata.cpp
+        image_data.cpp
         buffer_bind_guard.cpp
     HEADERS
         opengl_utils.hpp
@@ -25,5 +25,7 @@ create_library(
         texture.hpp
         opengl_functions.hpp
         light.hpp
+        texture_manager.hpp
+        image_manager.hpp
     LIBS UI
 )

@@ -115,7 +115,7 @@ int main() {
     opengl::set_texture_2d_array_meta(image.data, tex_data);
 
     opengl::TextureActivationCommand tex_activation {
-        .tex_type     = GL_TEXTURE0,
+        .tex_unit     = GL_TEXTURE0,
         .sampler_type = tex_data.tex_data.target,
         .id           = tex_data.tex_data.id,
         .program      = program,

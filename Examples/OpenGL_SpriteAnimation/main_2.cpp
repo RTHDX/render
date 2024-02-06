@@ -96,7 +96,7 @@ int main() {
         opengl::Context::instance().draw_background();
         opengl::use(program);
         opengl::activate_texture({
-            .tex_type     = GL_TEXTURE0,
+            .tex_unit     = GL_TEXTURE0,
             .sampler_type = tex_data.tex_data.target,
             .id           = tex_data.tex_data.id,
             .program      = program,

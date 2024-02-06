@@ -10,6 +10,8 @@
 #include <glad/glad.h>
 
 #include "comands.hpp"
+#include "texture.hpp"
+
 
 namespace opengl {
 using byte_t = unsigned char;
@@ -153,35 +155,6 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
     }
 }
 
-struct TextureData final {
-    GLuint id = 0;
-    GLenum target; // GL_TEXTURE_1D, GL_TEXTURE_2D ...
-    GLint w, h;
-    GLint format; // GL_DEPTH_COMPONENT GL_DEPTH_STENCIL GL_RED GL_RG GL_RGB GL_RGBA
-    GLenum type; // GL_UNSIGNED_BYTE...
-    GLenum wrap_s, wrap_t, min_filter, mag_filter;
-
-    void free();
-    bool is_valid() const;
-};
-std::ostream& operator << (std::ostream& os, const TextureData& tex);
-
-
-struct TextureDataArray2D final {
-    TextureData tex_data;
-    size_t tile_count_w {0}, tile_count_h {0};
-
-    GLsizei tile_w() const; // pixels
-    GLsizei tile_h() const; // pixels
-    GLsizei total_tiles() const;
-    bool is_valid() const;
-    GLenum internal_format() const;
-    GLsizei tile_offset(int x, int y) const;
-
-    void dump_meta() const;
-    void free();
-};
-
 
 struct RenderData final {
     GLuint program;
@@ -190,6 +163,31 @@ struct RenderData final {
     GLuint ebo;
     stencil_idx_t stencil_ref;
     size_t ebo_count;
+
+public:
+    template<typename vertex_input_f>
+    static RenderData create(const std::filesystem::path& vertex_shader,
+                             const std::filesystem::path& fragment_shader,
+                             const std::vector<vertex_input_f> vertex_in,
+                             const std::vector<GLuint> elements_in) {
+        RenderData self;
+        self.program = opengl::create_program(vertex_shader, fragment_shader);
+        self.vao = opengl::gen_vertex_array();
+        self.ebo = opengl::gen_element_buffer();
+        self.vertex_buffers = vertex_input_f::gen_buffers(
+            self.vao, vertex_in,
+            self.ebo, elements_in
+        );
+        self.ebo_count = elements_in.size();
+        return self;
+    }
+
+    DrawElementsCommand draw_elements() const {
+        return {
+            .vao = vao,
+            .count = ebo_count
+        };
+    }
 
     void free();
 };
@@ -222,8 +220,6 @@ void bind_texture(const glm::ivec2& dims,
 void bind_texture(const glm::ivec2& dims,
                   byte_t* texture);
 void bind_texture(GLenum target, GLuint id);
-void set_texture_meta(byte_t* raw_data, const TextureData& params);
-void set_texture_2d_array_meta(byte_t* raw_data, const TextureDataArray2D&);
 void activate_texture(const TextureActivationCommand& cmd);
 void free_texture(GLuint id);
 
