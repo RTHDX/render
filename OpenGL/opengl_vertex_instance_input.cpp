@@ -50,6 +50,20 @@ static void layout_float(GLuint index, GLuint total_size,
     SAFE_CALL(glVertexAttribDivisor(index, 1));
 }
 
+static void layout_uint32(GLuint index, GLuint size,
+                          GLsizei offset = sizeof(uint32_t)) {
+    SAFE_CALL(glEnableVertexAttribArray(index));
+    SAFE_CALL(glVertexAttribPointer(
+        index,
+        1, // 1 int
+        GL_UNSIGNED_INT,
+        GL_FALSE,
+        size,
+        (void*)offset
+    ));
+    SAFE_CALL(glVertexAttribDivisor(index, 1));
+}
+
 
 mat4_instanced::mat4_instanced(glm::mat4&& m)
     : mat(std::move(m))
@@ -113,6 +127,44 @@ void float_instanced::update(GLuint id,
         frames.data()
     ));
 }
+
+
+uint32_instanced::uint32_instanced(uint32_t v)
+    : val(v)
+{}
+
+std::vector<uint32_instanced>
+uint32_instanced::convert(const std::vector<uint32_t>& in) {
+    std::vector<this_t> out(in.size());
+    for (size_t i = 0; i < in.size(); ++i) {
+        out[i].val = in[i];
+    }
+    return out;
+}
+
+GLuint uint32_instanced::gen_buffer(GLuint vao,
+                                    const std::vector<this_t>& in,
+                                    GLuint index,
+                                    GLenum usage) {
+    GLuint abo = generate_abo(in, usage);
+    buffer_bind_guard vao_lock({.vao = vao});
+    buffer_bind_guard abo_lock({.id = abo, .type = GL_ARRAY_BUFFER});
+    layout_uint32(index, sizeof(this_t), 0);
+    return abo;
+}
+
+void uint32_instanced::update(GLuint id,
+                              const std::vector<this_t>& in,
+                              size_t offset) {
+    buffer_bind_guard abo_bind({.id = id, .type = GL_ARRAY_BUFFER});
+    SAFE_CALL(glBufferSubData(
+        GL_ARRAY_BUFFER,
+        offset,
+        in.size() * sizeof(this_t),
+        in.data()
+    ));
+}
+
 
 mat4_f_instanced::mat4_f_instanced(glm::mat4&& m, float v)
     : mat(std::move(m))

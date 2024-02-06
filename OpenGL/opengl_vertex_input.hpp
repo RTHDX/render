@@ -147,6 +147,27 @@ public:
 };
 
 
+struct uint32_instanced final {
+    using this_t = uint32_instanced;
+    using col_t= uint32_t;
+
+    uint32_t val;
+
+public:
+    uint32_instanced() = default;
+    uint32_instanced(uint32_t v);
+
+    static std::vector<uint32_instanced> convert(const std::vector<uint32_t>& in);
+    static GLuint gen_buffer(GLuint vao,
+                             const std::vector<this_t>& in,
+                             GLuint index,
+                             GLenum usage = GL_STATIC_DRAW);
+    static void update(GLuint id,
+                       const std::vector<this_t>& in,
+                       size_t offset = 0);
+};
+
+
 struct mat4_f_instanced final {
     using this_t = mat4_f_instanced;
     using col_t = glm::vec4;
