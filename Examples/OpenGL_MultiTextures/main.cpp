@@ -1,19 +1,24 @@
 #include <filesystem>
+#include <ranges>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
 
 #include <OpenGL/opengl_proc.hpp>
 #include <OpenGL/texture_manager.hpp>
 #include <OpenGL/image_data.hpp>
 #include <OpenGL/image_manager.hpp>
 #include <OpenGL/opengl_vertex_input.hpp>
+#include <OpenGL/camera.hpp>
 
 #include <UI/ui.hpp>
 #include <UI/io.hpp>
 
-static constexpr int WIDTH  = 1920;
-static constexpr int HEIGHT = 1000;
+static constexpr int WIDTH  = 860;
+static constexpr int HEIGHT = 600;
 
 using vertex_t = opengl::vec3pos_vec2tex_t;
 using maybe_texture_t = opengl::TextureManager::maybe_texture_t<
@@ -80,8 +85,35 @@ std::vector<item_2d> create_items(const std::string& tex_id,
             create_indices()
         );
         item.tex_data = tex_manager.get<opengl::TextureData>(tex_id);
+        item.rotation = glm::mat4(1.0);
+        item.scale = glm::scale(glm::mat4(1.0), {0.3, 0.0, 0.3});
     }
     return out;
+}
+
+void update_pos(std::vector<item_2d>& items, glm::vec3 pos, glm::vec3 step) {
+    for (auto& item : items) {
+        item.translation = glm::translate(glm::mat4(1.0), pos);
+        pos = pos + step;
+    }
+}
+
+void render(const std::vector<item_2d>& items,
+            const opengl::OrthoCamera& camera) {
+    for (const auto& item : items) {
+        auto program = item.render_data.program;
+        opengl::use(program);
+        opengl::bind_vao(item.render_data.vao);
+
+        opengl::activate_texture(item.tex_activation());
+        opengl::set_mat4(program, "projection", camera.projection());
+        opengl::set_mat4(program, "view", camera.view());
+        opengl::set_mat4(program, "model", item.model());
+        opengl::draw(item.draw());
+
+        opengl::bind_vao(0);
+        opengl::use(0);
+    }
 }
 
 
@@ -115,14 +147,35 @@ int main() {
         tex_manager.update(key, std::move(tex_data));
     }
 
-    std::vector<item_2d> red_items(10);
-    std::vector<item_2d> green_items(10);
-    std::vector<item_2d> blue_items(10);
+    std::vector<item_2d> red_items = create_items("red", tex_manager, 10);
+    update_pos(red_items, {-5.0, 0.0, -5.0}, {0.0, 0.0, 1.0});
+
+    std::vector<item_2d> blue_items = create_items("blue", tex_manager, 10);
+    update_pos(blue_items, {0.0, 0.0, -5.0}, {0.0, 0.0, 1.0});
+
+    std::vector<item_2d> green_items = create_items("green", tex_manager, 10);
+    update_pos(green_items, {5.0, 0.0, -5.0}, {0.0, 0.0, 1.0});
+
+    std::vector<std::reference_wrapper<const std::vector<item_2d>>>
+    all_items_refs = {red_items, blue_items, green_items};
+
+    glm::vec3 cam_pos {0.0, 30.0, 0.0};
+    opengl::OrthoCamera camera (
+        cam_pos,
+        WIDTH,
+        HEIGHT,
+        cam_pos.y / 1000
+    );
 
     glfwSetWindowPos(win, 0, 30);
     while (!glfwWindowShouldClose(win)) {
         glfwPollEvents();
         opengl::Context::instance().draw_background();
+
+        render(red_items, camera);
+        render(blue_items, camera);
+        render(green_items, camera);
+
         glfwSwapBuffers(win);
     }
 
