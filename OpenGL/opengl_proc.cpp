@@ -354,32 +354,6 @@ void attach_texture(const FramebufferData& fbuff, const TextureData& tex) {
     SAFE_CALL(glBindFramebuffer(fbuff.target, 0));
 }
 
-
-void RenderData::free() {
-    if (Context::instance().is_context_active()) {
-        SAFE_CALL(glDeleteBuffers(1, &ebo));
-        SAFE_CALL(glDeleteBuffers(vertex_buffers.size(),
-                                  vertex_buffers.data()));
-        SAFE_CALL(glDeleteVertexArrays(1, &vao));
-        SAFE_CALL(glDeleteProgram(program));
-    }
-    ebo = 0;
-    vertex_buffers.clear();
-    vao = 0;
-    stencil_ref = -1;
-    ebo_count = 0;
-}
-
-void InstantRenderData::free() {
-    render_data.free();
-    if (Context::instance().is_context_active()) {
-        for (auto& [name, buff_id]: buffers) {
-            SAFE_CALL(glDeleteBuffers(1, &buff_id));
-        }
-    }
-    instance_count = 0;
-}
-
 GLuint gen_texture(GLenum target) {
     GLuint tex;
     SAFE_CALL(glGenTextures(1, &tex));

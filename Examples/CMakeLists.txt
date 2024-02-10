@@ -12,4 +12,5 @@ add_subdirectory(OpenGL_InstanceDrawing_Raw)
 add_subdirectory(OpenGL_InstanceDrawing)
 add_subdirectory(OpenGL_Framebuffer)
 add_subdirectory(OpenGL_MultiTextures)
+add_subdirectory(OpenGL_FB_Instanced)
 

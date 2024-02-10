@@ -17,6 +17,10 @@ create_library(
         light.cpp
         image_data.cpp
         buffer_bind_guard.cpp
+        opengl_render_data.cpp
+        opengl_instanced_render_data.cpp
+        _camera.cpp
+
     HEADERS
         opengl_utils.hpp
         camera.cpp
@@ -27,5 +31,9 @@ create_library(
         light.hpp
         texture_manager.hpp
         image_manager.hpp
+        opengl_render_data.hpp
+        opengl_instanced_render_data.hpp
+        _camera.hpp
+
     LIBS UI
 )

@@ -75,6 +75,15 @@ struct DrawArrayFramebuffer final {
 };
 
 
+struct FramebufferRenderCtx final {
+    GLuint fbo;
+    glm::ivec4 viewport;
+    glm::ivec4 screen_viewport;
+    glm::vec4  background;
+    GLbitfield clear_bits {GL_COLOR_BUFFER_BIT};
+};
+
+
 struct DrawArrayInstanced final {
     GLuint vao;
     GLsizei count;
@@ -91,6 +100,11 @@ struct DrawElementInstanced final {
     GLuint* indices {nullptr};
     GLenum type     {GL_UNSIGNED_INT};
     GLenum mode     {GL_TRIANGLES};
+};
+
+struct DrawElementsInstancedFramebuffer final {
+    DrawElementInstanced draw_cmd;
+    FramebufferRenderCtx fb_ctx;
 };
 
 
