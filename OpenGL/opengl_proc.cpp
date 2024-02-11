@@ -6,7 +6,6 @@
 
 #include "opengl_utils.hpp"
 #include "opengl_proc.hpp"
-#include "opengl_functions.hpp"
 
 
 namespace opengl {
@@ -307,44 +306,16 @@ static std::string gl_enum_to_string(GLenum e) {
     ENUM_TO_STR(GL_SAMPLER_2D);
     ENUM_TO_STR(GL_SAMPLER_2D_ARRAY);
     ENUM_TO_STR(GL_SAMPLER_CUBE);
+    ENUM_TO_STR(GL_FRAMEBUFFER_COMPLETE);
+    ENUM_TO_STR(GL_FRAMEBUFFER_UNDEFINED);
+    ENUM_TO_STR(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT);
+    ENUM_TO_STR(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT);
+    ENUM_TO_STR(GL_FRAMEBUFFER_UNSUPPORTED);
     default:
         return "Unknown GLenum value";
     }
 
 #undef ENUM_TO_STR
-}
-
-
-GLenum FramebufferData::status() const {
-    GLenum res = glCheckNamedFramebufferStatus(fbo, target);
-    return res;
-}
-
-std::ostream& operator << (std::ostream& os, const FramebufferData& f) {
-    auto status = f.status();
-    os << "Framebuffer status: ";
-    switch (status) {
-    case GL_FRAMEBUFFER_COMPLETE:
-        os << "GL_FRAMEBUFFER_COMPLETE";
-        break;
-    case GL_FRAMEBUFFER_UNDEFINED:
-        os << "GL_FRAMEBUFFER_UNDEFINED";
-        break;
-    case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-        os << "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
-        break;
-    case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-        os << "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
-        break;
-    case GL_FRAMEBUFFER_UNSUPPORTED:
-        os << "GL_FRAMEBUFFER_UNSUPPORTED";
-        break;
-        // Add cases for other status codes as needed.
-    default:
-        os << "Unknown framebuffer status: " << status;
-        break;
-    }
-    return os;
 }
 
 void attach_texture(const FramebufferData& fbuff, const TextureData& tex) {
@@ -361,24 +332,6 @@ GLuint gen_texture(GLenum target) {
     return tex;
 }
 
-void bind_texture(const glm::ivec2& dims, // x - width, y - height
-                  std::vector<glm::vec3>&& texture) {
-    assert(Context::instance().bound_texture_2d() > 0);
-    SAFE_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, dims.x, dims.y, 0, GL_RGB,
-                           GL_FLOAT, glm::value_ptr(*texture.data())));
-    SAFE_CALL(glGenerateMipmap(GL_TEXTURE_2D));
-}
-
-void bind_texture(const glm::ivec2& dims, byte_t* texture) {
-    assert(Context::instance().bound_texture_2d() > 0);
-    SAFE_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dims.x, dims.y, 0,
-                           GL_RGBA, GL_UNSIGNED_BYTE, texture));
-    SAFE_CALL(glGenerateMipmap(GL_TEXTURE_2D));
-}
-
-void bind_texture(GLenum target, GLuint id) {
-    SAFE_CALL(glBindTexture(target, id));
-}
 
 void dump_image_part(byte_t* data, GLsizei stride) {
     for (GLsizei i = 0; i < stride; ++i) {
@@ -392,10 +345,6 @@ void activate_texture(const TextureActivationCommand& cmd) {
     set_int(cmd.program, cmd.sampler_name, 0);
 }
 
-void activate_texture(GLuint id) {
-    SAFE_CALL(glBindTexture(GL_TEXTURE_2D, id));
-    SAFE_CALL(glActiveTexture(GL_TEXTURE0));
-}
 
 void free_texture(GLuint id) {
     SAFE_CALL(glDeleteTextures(1, &id));

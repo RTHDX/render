@@ -25,6 +25,12 @@ public:
         const glm::vec3& pos
     );
 
+    static _Camera create_topdown(
+        float width,
+        float height,
+        const glm::vec3& pos
+    );
+
     glm::mat4 projection() const;
     glm::mat4 view() const;
     glm::mat4 ipv() const;

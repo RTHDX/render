@@ -3,7 +3,7 @@
 
 #include "opengl_proc.hpp"
 #include "texture.hpp"
-#include "opengl_functions.hpp"
+
 
 namespace opengl {
 

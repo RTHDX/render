@@ -8,6 +8,12 @@
 
 namespace opengl {
 
+template<class... Ts>
+struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
+
+
 class TextureManager final {
 public:
     using texture_map_t  = std::unordered_map<std::string, any_texture_t>;
@@ -22,6 +28,14 @@ public:
     TextureManager(texture_map_t&& map)
         : map_(std::move(map))
     {}
+    ~TextureManager() {
+        for (auto& [key, any_texture] : map_) {
+            std::visit(overloaded {
+                [](TextureData& tex)        { tex.free(); },
+                [](TextureDataArray2D& tex) { tex.free(); }
+            }, any_texture);
+        }
+    }
 
     void update(const std::string& key, const any_texture_t& val) {
         map_[key] = val;

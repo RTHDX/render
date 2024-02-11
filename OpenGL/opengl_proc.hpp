@@ -12,6 +12,8 @@
 #include "comands.hpp"
 #include "texture.hpp"
 #include "opengl_render_data.hpp"
+#include "opengl_instanced_render_data.hpp"
+#include "opengl_framebuffer_data.hpp"
 
 
 namespace opengl {
@@ -156,25 +158,9 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
     }
 }
 
-
-struct FramebufferData final {
-    GLuint fbo;
-    GLenum attachment_point; // GL_COLOR_ATTACHMENT0 ... GL_COLOR_ATTACHMENT31
-    TextureData texture;
-    GLenum target {GL_FRAMEBUFFER};
-
-    GLenum status() const;
-};
-std::ostream& operator << (std::ostream& os, const FramebufferData& f);
-
 void attach_texture(const FramebufferData& fbuff, const TextureData& tex);
 
 GLuint gen_texture(GLenum target = GL_TEXTURE_2D);
-void bind_texture(const glm::ivec2& dims,
-                  std::vector<glm::vec3>&& texture);
-void bind_texture(const glm::ivec2& dims,
-                  byte_t* texture);
-void bind_texture(GLenum target, GLuint id);
 void activate_texture(const TextureActivationCommand& cmd);
 void free_texture(GLuint id);
 

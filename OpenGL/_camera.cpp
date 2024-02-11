@@ -36,11 +36,17 @@ _Camera _Camera::create_topdown(float width,
     clip.width   = width;
     clip.height  = height;
     clip.factor  = factor;
-    clip.look_at = {pos.x, pos.y - 1.0, pos.z};
+    clip.look_at = {pos.x, 0.0, pos.z};
     _Camera cam;
     cam.clip_ = std::move(clip);
-    cam.pos_ = pos;
+    cam.pos_  = pos;
     return cam;
+}
+
+_Camera _Camera::create_topdown(float width,
+                                float height,
+                                const glm::vec3& pos) {
+    return _Camera::create_topdown(width, height, pos.y / 1'000, pos);
 }
 
 glm::mat4 _Camera::projection() const {
@@ -76,7 +82,8 @@ void _Camera::update_viewport(const glm::vec2& viewport) {
         [viewport](ortho_clip_t& clip) {
             clip.width = viewport.x;
             clip.height = viewport.y;
-        }, [viewport](perspective_clip_t& clip) {
+        },
+        [viewport](perspective_clip_t& clip) {
             clip.width = viewport.x;
             clip.height = viewport.y;
         }

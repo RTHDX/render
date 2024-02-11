@@ -7,4 +7,5 @@ create_executable(
 	TARGET "${PROJECT_NAME}"
 	SOURCES main.cpp
 	LIBS OpenGL UI ImGui
+	SHADERS pos3_uv2.vert samp2d.frag pos3_uv2_mod4.vert
 )

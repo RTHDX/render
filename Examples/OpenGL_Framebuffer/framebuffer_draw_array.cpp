@@ -116,8 +116,6 @@ int main() {
     opengl::set_texture_meta(nullptr, fbuff_data.texture);
     opengl::attach_texture(fbuff_data, fbuff_data.texture);
 
-    std::cout << fbuff_data << std::endl;
-
     glm::mat4 one(1.0);
     const glm::mat4 fbuff_scale = glm::scale(one, {0.5, 0.5, 0.5});
     const glm::mat4 main_scale = glm::scale(one, {0.5, 1.0, 0.0});

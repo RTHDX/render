@@ -11,7 +11,6 @@
 #include <OpenGL/opengl_proc.hpp>
 #include <OpenGL/opengl_vertex_input.hpp>
 #include <OpenGL/texture.hpp>
-#include <OpenGL/opengl_functions.hpp>
 
 
 int WIDTH = 1280;
