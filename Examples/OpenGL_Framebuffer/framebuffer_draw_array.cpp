@@ -97,7 +97,7 @@ int main() {
     GLuint fbuff_vao = opengl::gen_vertex_array();
     std::vector<GLuint> fbuff_vbo = fbuffer_input_t::gen_buffers(fbuff_vao,
                                                                  fbuff_input);
-    opengl::FramebufferData fbuff_data {
+    opengl::framebuffer_data_t fbuff_data {
         .fbo              = opengl::gen_framebuffer(),
         .attachment_point = GL_COLOR_ATTACHMENT0,
         .texture          = {

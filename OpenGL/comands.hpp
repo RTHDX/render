@@ -75,7 +75,7 @@ struct DrawArrayFramebuffer final {
 };
 
 
-struct FramebufferRenderCtx final {
+struct fbuff_render_ctx_t final {
     GLuint fbo;
     glm::ivec4 viewport;
     glm::ivec4 screen_viewport;
@@ -104,7 +104,7 @@ struct DrawElementInstanced final {
 
 struct DrawElementsInstancedFramebuffer final {
     DrawElementInstanced draw_cmd;
-    FramebufferRenderCtx fb_ctx;
+    fbuff_render_ctx_t fb_ctx;
 };
 
 

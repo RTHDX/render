@@ -159,7 +159,7 @@ void Canvas::append(entity_sptr_t&& entity) {
     entities_.push_back(std::move(entity));
 }
 
-const opengl::FramebufferData& Canvas::fbuff() const {
+const opengl::framebuffer_data_t& Canvas::fbuff() const {
     return fbuff_data_;
 }
 

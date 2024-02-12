@@ -46,14 +46,16 @@ std::vector<GLuint> create_indices() {
 struct map_chunk_layer_t final {
     using model_instanced_f = opengl::mat4_instanced;
 
-    opengl::FramebufferData fbuff;
+    opengl::framebuffer_data_t fbuff;
     opengl::InstantRenderData inst_rdata;
+    maybe_texdata_t texture = std::nullopt;
 
 public:
     static map_chunk_layer_t create(int w, int h,
+                                    maybe_texdata_t tex,
                                     const std::vector<model_instanced_f>& in) {
         map_chunk_layer_t self;
-        self.fbuff = opengl::FramebufferData::create(w, h);
+        self.fbuff = opengl::framebuffer_data_t::create(w, h);
         self.inst_rdata = opengl::InstantRenderData::create(
             std::filesystem::path("./pos3_uv2_mod4.vert"),
             std::filesystem::path("./samp2d.frag"),
@@ -65,20 +67,46 @@ public:
             in,
             2
         );
+        self.inst_rdata.instance_count = in.size();
+        self.texture = tex;
         return self;
     }
 
     opengl::TextureActivationCommand tex_activation() const {
-        ;
+        if (!texture.has_value()) { throw std::runtime_error("No texture"); }
+        const auto& tex = texture.value().get();
+        return {
+            .tex_unit     = GL_TEXTURE0,
+            .sampler_type = tex.target,
+            .id           = tex.id,
+            .program      = inst_rdata.impl.program,
+            .sampler_name = "texture_sampler"
+        };
+    }
+
+    opengl::fbuff_render_ctx_t fbuff_ctx() const {
+        return {
+            .fbo             = fbuff.fbo,
+            .viewport        = {0, 0, fbuff.texture.w, fbuff.texture.h},
+            .screen_viewport = {0, 0, WIDTH, HEIGHT},
+            .background      = {0, 0, 0, 255}
+        };
     }
 
     void render(const opengl::_Camera& cam) {
+        opengl::fbuff_ctx_guard_t fb_guard(fbuff_ctx());
+
         auto program = inst_rdata.impl.program;
         opengl::use(program);
-        {
-            opengl::buffer_bind_guard _({.vao = inst_rdata.impl.vao});
-            //opengl::activate_texture()
-        }
+        opengl::buffer_bind_guard _({.vao = inst_rdata.impl.vao});
+        opengl::activate_texture(tex_activation());
+        opengl::set_mat4(program, "projection", cam.projection());
+        opengl::set_mat4(program, "view", cam.view());
+        opengl::draw_instance_elements({
+            .vao           = inst_rdata.impl.vao,
+            .count         = GLsizei(inst_rdata.impl.ebo_count),
+            .instancecount = inst_rdata.instance_count
+        });
         opengl::use(0);
     }
 };
@@ -92,10 +120,13 @@ struct map_chunk_t final {
     maybe_texdata_t tex = std::nullopt;
     int cells_w_count, cells_h_count;
 
+    map_chunk_layer_t layer;
+
 public:
     static map_chunk_t create(int cwc, int chc,
                               const glm::vec3& pos,
-                              const maybe_texdata_t& tex_data) {
+                              const maybe_texdata_t& tex_data,
+                              const maybe_texdata_t& layer_data) {
         map_chunk_t self;
         self.translation = glm::translate(glm::mat4(1.0), pos);
         self.scale = glm::mat4(1.0);
@@ -112,6 +143,13 @@ public:
         self.cells_h_count = chc;
         self.gen_cell_models();
 
+        self.layer = map_chunk_layer_t::create(
+            self.cells_w_count,
+            self.cells_h_count,
+            layer_data,
+            opengl::mat4_instanced::convert(self.cell_models)
+        );
+
         return self;
     }
 
@@ -123,6 +161,16 @@ public:
         return translation * rotation * scale;
     }
 
+    opengl::TextureActivationCommand tex_activation() const {
+        return {
+            .tex_unit = GL_TEXTURE0,
+            .sampler_type = layer.fbuff.texture.target,
+            .id = layer.fbuff.texture.id,
+            .program = main_render.program,
+            .sampler_name = "texture_sampler"
+        };
+    }
+
     void render(const opengl::_Camera& cam) {
         auto pr = main_render.program;
         if (!tex.has_value()) {
@@ -130,24 +178,20 @@ public:
             return;
         }
 
+        layer.render(cam);
+
         const auto& texture = tex.value().get();
         opengl::use(pr);
         {
-            opengl::buffer_bind_guard _({.vao = main_render.vao});
-            opengl::activate_texture({
-                .id           = texture.id,
-                .program      = pr,
-                .sampler_name = "texture_sampler",
-                .sampler_type = texture.target,
-                .tex_unit     = GL_TEXTURE0
-            });
-            opengl::set_mat4(pr, "projection", cam.projection());
-            opengl::set_mat4(pr, "view", cam.view());
-            opengl::set_mat4(pr, "model", model());
-            opengl::draw(opengl::DrawElementsCommand {
-                .vao   = main_render.vao,
-                .count = main_render.ebo_count
-            });
+        opengl::buffer_bind_guard _({.vao = main_render.vao});
+        opengl::activate_texture(tex_activation());
+        opengl::set_mat4(pr, "projection", cam.projection());
+        opengl::set_mat4(pr, "view", cam.view());
+        opengl::set_mat4(pr, "model", model());
+        opengl::draw(opengl::DrawElementsCommand {
+            .vao   = main_render.vao,
+            .count = main_render.ebo_count
+        });
         }
         opengl::use(0);
     }
@@ -165,11 +209,12 @@ private:
         for (uint32_t i = 0; i < area; ++i) {
             const uint32_t x = i % cells_w_count;
             const uint32_t z = i / cells_w_count;
-            glm::mat4 model = glm::translate(
+            glm::mat4 loc_model = glm::translate(
                 glm::mat4(1.0),
                 glm::vec3(x + 0.5f, 0.0, z + 0.5f)
             );
-            cell_models[i] = offset * model;
+            cell_models[i] = offset * loc_model;
+            cell_models[i] = cell_models[i] * model();
         }
     }
 };
@@ -214,7 +259,8 @@ int main() {
     map_chunk_t map_chunk = map_chunk_t::create(
         2, 2,
         {0.0, 0.0, 0.0},
-        tex_manager.get<opengl::TextureData>("red")
+        tex_manager.get<opengl::TextureData>("red"),
+        tex_manager.get<opengl::TextureData>("green")
     );
 
     while (!glfwWindowShouldClose(win)) {

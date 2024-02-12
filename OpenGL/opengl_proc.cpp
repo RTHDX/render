@@ -318,13 +318,6 @@ static std::string gl_enum_to_string(GLenum e) {
 #undef ENUM_TO_STR
 }
 
-void attach_texture(const FramebufferData& fbuff, const TextureData& tex) {
-    SAFE_CALL(glBindFramebuffer(fbuff.target, fbuff.fbo))
-    SAFE_CALL(glFramebufferTexture2D(fbuff.target, fbuff.attachment_point,
-                                     tex.target, tex.id, 0));
-    SAFE_CALL(glBindFramebuffer(fbuff.target, 0));
-}
-
 GLuint gen_texture(GLenum target) {
     GLuint tex;
     SAFE_CALL(glGenTextures(1, &tex));

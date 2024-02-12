@@ -40,7 +40,7 @@ public:
     }
 
     DrawElementsInstancedFramebuffer
-    draw_elements(const FramebufferRenderCtx& ctx) const {
+    draw_elements(const fbuff_render_ctx_t& ctx) const {
         return {
             .draw_cmd = draw_elements(),
             .fb_ctx   = ctx

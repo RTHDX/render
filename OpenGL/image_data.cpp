@@ -116,8 +116,7 @@ ImageData ImageData::read(const std::filesystem::path& path) {
     return out;
 }
 
-bool ImageData::write(std::filesystem::path path,
-                      const ImageData& data) {
+bool ImageData::write(std::filesystem::path path, const ImageData& data) {
     int ret = 0;
     std::string str_path;
     int w = data.w;

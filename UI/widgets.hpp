@@ -127,7 +127,7 @@ public:
     void update(GLuint w, GLuint h);
     void append(entity_sptr_t&& entity);
 
-    const opengl::FramebufferData& fbuff() const;
+    const opengl::framebuffer_data_t& fbuff() const;
     const entities_list_t& entities() const;
     const glm::mat4& projection() const;
     const glm::mat4& view() const;
@@ -139,7 +139,7 @@ private:
     using Widget::Widget;
 
 private:
-    opengl::FramebufferData fbuff_data_ {};
+    opengl::framebuffer_data_t fbuff_data_ {};
     entities_list_t entities_           {};
     glm::mat4 projection_               {glm::mat4(1.0)};
     glm::mat4 view_                     {glm::mat4(1.0)};

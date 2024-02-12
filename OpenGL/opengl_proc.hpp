@@ -158,7 +158,7 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
     }
 }
 
-void attach_texture(const FramebufferData& fbuff, const TextureData& tex);
+void attach_texture(const framebuffer_data_t& fbuff, const TextureData& tex);
 
 GLuint gen_texture(GLenum target = GL_TEXTURE_2D);
 void activate_texture(const TextureActivationCommand& cmd);
