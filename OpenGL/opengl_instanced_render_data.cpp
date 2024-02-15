@@ -4,7 +4,7 @@
 
 namespace opengl {
 
-void InstantRenderData::free() {
+void instant_render_data_t::free() {
     impl.free();
     if (Context::instance().is_context_active()) {
         for (auto& [name, buff_id] : buffers) {

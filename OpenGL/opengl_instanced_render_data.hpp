@@ -10,28 +10,28 @@
 
 namespace opengl {
 
-struct InstantRenderData final {
+struct instant_render_data_t final {
     using path_t = std::filesystem::path;
 
-    RenderData impl;
+    render_data_t impl;
     std::unordered_map<std::string, GLuint> buffers;
     GLsizei instance_count;
 
 public:
     template <typename vertex_input_f>
-    static InstantRenderData create(const path_t& v_shader,
-                                    const path_t& f_shader,
-                                    const std::vector<vertex_input_f>& in,
-                                    const std::vector<GLuint>& e_in) {
-        RenderData self_impl = RenderData::create<vertex_input_f>(
+    static instant_render_data_t create(const path_t& v_shader,
+                                        const path_t& f_shader,
+                                        const std::vector<vertex_input_f>& in,
+                                        const std::vector<GLuint>& e_in) {
+        render_data_t self_impl = render_data_t::create<vertex_input_f>(
             v_shader, f_shader, in, e_in
         );
-        InstantRenderData self;
+        instant_render_data_t self;
         self.impl = std::move(self_impl);
         return self;
     }
 
-    DrawElementInstanced draw_elements() const {
+    draw_elements_instanced_t draw_elements() const {
         return {
             .vao           = impl.vao,
             .count         = GLsizei(impl.ebo_count),
@@ -39,7 +39,7 @@ public:
         };
     }
 
-    DrawElementsInstancedFramebuffer
+    draw_elements_instanced_fbuff_t
     draw_elements(const fbuff_render_ctx_t& ctx) const {
         return {
             .draw_cmd = draw_elements(),

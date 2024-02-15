@@ -31,8 +31,8 @@ public:
     ~TextureManager() {
         for (auto& [key, any_texture] : map_) {
             std::visit(overloaded {
-                [](TextureData& tex)        { tex.free(); },
-                [](TextureDataArray2D& tex) { tex.free(); }
+                [](texture_data_t& tex)        { tex.free(); },
+                [](texture_data_array_2d_t& tex) { tex.free(); }
             }, any_texture);
         }
     }

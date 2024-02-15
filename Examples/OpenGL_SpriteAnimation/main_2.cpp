@@ -66,7 +66,7 @@ int main() {
         std::cout << "No image read" << std::endl;
         return EXIT_FAILURE;
     }
-    opengl::TextureDataArray2D tex_data {
+    opengl::texture_data_array_2d_t tex_data {
         .tex_data = {
             .id         = opengl::gen_texture(GL_TEXTURE_2D_ARRAY),
             .target     = GL_TEXTURE_2D_ARRAY,
@@ -106,9 +106,9 @@ int main() {
         opengl::set_mat4(program, "model", model);
         opengl::set_int(program, "total_frames", tex_data.total_tiles());
         opengl::set_int(program, "current_frame", frame);
-        opengl::draw(opengl::DrawElementsCommand {
+        opengl::draw(opengl::draw_elements_command_t {
             .vao = vao,
-            .count = indices.size()
+            .count = GLsizei(indices.size())
         });
         frame = count % tex_data.total_tiles();
         frame_postprocess(window);

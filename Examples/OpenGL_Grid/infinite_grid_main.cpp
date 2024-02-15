@@ -3,6 +3,8 @@
 
 #include <glm/gtx/transform.hpp>
 
+#include <OpenGL/camera.hpp>
+
 #include "infinite_grid_decls.hpp"
 
 
@@ -51,10 +53,11 @@ int main() {
     auto ebo = opengl::gen_element_buffer();
     auto vbos = vertex_t::gen_buffers(vao, vertex_data, ebo, element_data);
 
-    opengl::OrthoCamera camera(
-        {0.0, 10.0, 0.0},
-        float(WIDTH), float(HEIGHT),
-        0.1
+    opengl::Camera camera = opengl::Camera::create_topdown(
+        float(WIDTH),
+        float(HEIGHT),
+        0.1f,
+        glm::vec3{0.0, 10.0, 0.0}
     );
     listener.camera = &camera;
     listener.win = win;
@@ -72,9 +75,9 @@ int main() {
         opengl::set_vec3(program, "grid_color", {1.0, 1.0, 0.801});
         opengl::set_float(program, "grid_size", 10.0f);
         opengl::set_float(program, "line_width", 0.3f);
-        opengl::draw(opengl::DrawElementsCommand{
+        opengl::draw(opengl::draw_elements_command_t{
             .vao = vao,
-            .count = element_data.size()
+            .count = GLsizei(element_data.size())
         });
         opengl::use(0);
 

@@ -11,7 +11,7 @@ namespace opengl {
 struct framebuffer_data_t final {
     GLuint fbo;
     GLenum attachment_point; // GL_COLOR_ATTACHMENT0 ... GL_COLOR_ATTACHMENT31
-    TextureData texture;
+    texture_data_t texture;
     GLenum target {GL_FRAMEBUFFER};
 
 public:

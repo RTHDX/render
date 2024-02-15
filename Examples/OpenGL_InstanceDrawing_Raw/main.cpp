@@ -96,7 +96,7 @@ int main() {
     glBindVertexArray(0);
 
     glm::mat4 proj(1.0), view(1.0);
-    const opengl::TextureData tex_data {
+    const opengl::texture_data_t tex_data {
         .id         = opengl::gen_texture(GL_TEXTURE_2D),
         .target     = GL_TEXTURE_2D,
         .w          = 1,
@@ -109,7 +109,7 @@ int main() {
         .mag_filter = GL_LINEAR
     };
 
-    const opengl::TextureActivationCommand tex_activation {
+    const opengl::texture_activation_command_t tex_activation {
         .tex_unit = GL_TEXTURE0,
         .sampler_type = tex_data.target,
         .id = tex_data.id,

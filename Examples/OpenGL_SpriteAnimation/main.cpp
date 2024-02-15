@@ -80,7 +80,7 @@ int main() {
         opengl::set_mat4(program, "model", model);
         opengl::set_int(program, "total_frames", texture.total_tiles());
         opengl::set_int(program, "current_frame", frame);
-        opengl::draw(opengl::DrawElementsCommand {
+        opengl::draw(opengl::draw_elements_command_t {
             .vao=vao,
             .count=indices.size()
         });

@@ -94,16 +94,16 @@ public:
         return self;
     }
 
-    const opengl::RenderData& render_data() const;
+    const opengl::render_data_t& render_data() const;
     void model(const glm::mat4& v);
     const glm::mat4& model() const;
 
-    opengl::DrawElementsCommand draw_command() const;
+    opengl::draw_elements_command_t draw_command() const;
 
 private:
-    opengl::RenderData render_data_;
+    opengl::render_data_t render_data_;
     glm::mat4 model_ {glm::mat4(1.0)};
-    size_t count_    {0};
+    GLsizei count_    {0};
 };
 using entity_sptr_t = std::shared_ptr<CanvasEntity>;
 using entities_list_t = std::vector<entity_sptr_t>;

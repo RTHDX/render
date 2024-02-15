@@ -77,7 +77,7 @@ int main() {
     auto ebo = opengl::gen_element_buffer();
     auto vbos = vertex_t::gen_buffers(vao, create_vertices_xz(),
                                       ebo, create_indices());
-    opengl::TextureData tex_data {
+    opengl::texture_data_t tex_data {
         .id         = opengl::gen_texture(),
         .target     = GL_TEXTURE_2D,
         .w          = 1,
@@ -124,7 +124,7 @@ int main() {
         opengl::set_mat4(program, "projection", projection);
         opengl::set_mat4(program, "view", view);
         opengl::set_mat4(program, "model", model);
-        opengl::draw(opengl::DrawElementsCommand {
+        opengl::draw(opengl::draw_elements_command_t {
             .vao = vao,
             .count = 6
         });

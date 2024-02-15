@@ -90,7 +90,7 @@ void Window::is_visible(bool v) {
 }
 
 
-const opengl::RenderData& CanvasEntity::render_data() const {
+const opengl::render_data_t& CanvasEntity::render_data() const {
     return render_data_;
 }
 
@@ -102,7 +102,7 @@ const glm::mat4& CanvasEntity::model() const {
     return model_;
 }
 
-opengl::DrawElementsCommand CanvasEntity::draw_command() const {
+opengl::draw_elements_command_t CanvasEntity::draw_command() const {
     return {
         .vao = render_data_.vao,
         .count = count_,

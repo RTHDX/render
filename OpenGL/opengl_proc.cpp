@@ -332,7 +332,7 @@ void dump_image_part(byte_t* data, GLsizei stride) {
     }
 }
 
-void activate_texture(const TextureActivationCommand& cmd) {
+void activate_texture(const texture_activation_command_t& cmd) {
     SAFE_CALL(glActiveTexture(cmd.tex_unit));
     SAFE_CALL(glBindTexture(cmd.sampler_type, cmd.id));
     set_int(cmd.program, cmd.sampler_name, 0);
@@ -343,7 +343,7 @@ void free_texture(GLuint id) {
     SAFE_CALL(glDeleteTextures(1, &id));
 }
 
-void apply_stencil(StencilCommand&& cmd) {
+void apply_stencil(stencil_command_t&& cmd) {
     SAFE_CALL(glStencilOp(cmd.s_fail, cmd.dp_fail, cmd.dp_pass));
     SAFE_CALL(glStencilFunc(cmd.function, cmd.ref, cmd.mask));
 }
@@ -353,7 +353,7 @@ void use(GLuint id) {
 }
 
 
-void draw(const DrawArrayCommand& cmd) {
+void draw(const draw_array_command_t& cmd) {
     assert(cmd.vao != 0);
     assert(opengl::Context::instance().active_program() != 0);
     bind_vao(cmd.vao);
@@ -361,7 +361,7 @@ void draw(const DrawArrayCommand& cmd) {
     bind_vao(0);
 }
 
-void draw(const DrawElementsCommand& cmd) {
+void draw(const draw_elements_command_t& cmd) {
     assert(cmd.vao != 0);
     assert(opengl::Context::instance().active_program() != 0);
 
@@ -370,7 +370,7 @@ void draw(const DrawElementsCommand& cmd) {
     bind_vao(0);
 }
 
-void draw_array_framebuffer(const DrawArrayFramebuffer& cmd) {
+void draw_array_framebuffer(const draw_array_fbuff_t& cmd) {
     SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, cmd.fbo));
     SAFE_CALL(glClearColor(cmd.background.r, cmd.background.g,
                            cmd.background.b, cmd.background.a));
@@ -385,7 +385,7 @@ void draw_array_framebuffer(const DrawArrayFramebuffer& cmd) {
     SAFE_CALL(glViewport(screen_v.x, screen_v.y, screen_v.z, screen_v.w));
 }
 
-void draw_instance_array(const DrawArrayInstanced& cmd) {
+void draw_instance_array(const draw_array_instanced_t& cmd) {
     assert(cmd.vao != 0);
     assert(opengl::Context::instance().active_program() != 0);
 
@@ -395,7 +395,7 @@ void draw_instance_array(const DrawArrayInstanced& cmd) {
     bind_vao(0);
 }
 
-void draw_instance_elements(const DrawElementInstanced& cmd) {
+void draw_instance_elements(const draw_elements_instanced_t& cmd) {
     assert(cmd.vao != 0);
     assert(opengl::Context::instance().active_program() != 0);
 

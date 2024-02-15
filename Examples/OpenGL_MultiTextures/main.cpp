@@ -22,7 +22,7 @@ static constexpr int HEIGHT = 600;
 
 using vertex_t = opengl::vec3pos_vec2tex_t;
 using maybe_texture_t = opengl::TextureManager::maybe_texture_t<
-    opengl::TextureData
+    opengl::texture_data_t
 >;
 
 std::vector<vertex_t> create_vertices_xz() {
@@ -45,15 +45,15 @@ std::vector<GLuint> create_indices() {
 struct item_2d {
     glm::mat4 rotation, scale, translation;
 
-    opengl::RenderData render_data;
+    opengl::render_data_t render_data;
     maybe_texture_t tex_data = std::nullopt;
 
 public:
-    opengl::DrawElementsCommand draw() const {
+    opengl::draw_elements_command_t draw() const {
         return render_data.draw_elements();
     }
 
-    opengl::TextureActivationCommand tex_activation() const {
+    opengl::texture_activation_command_t tex_activation() const {
         if (!tex_data.has_value()) {
             throw std::runtime_error("No texture assigned");
         }
@@ -78,13 +78,13 @@ std::vector<item_2d> create_items(const std::string& tex_id,
                                   size_t count) {
     std::vector<item_2d> out(count);
     for (auto& item : out) {
-        item.render_data = opengl::RenderData::create<vertex_t>(
+        item.render_data = opengl::render_data_t::create<vertex_t>(
             std::filesystem::path("./pos3_uv2.vert"),
             std::filesystem::path("./samp2d.frag"),
             create_vertices_xz(),
             create_indices()
         );
-        item.tex_data = tex_manager.get<opengl::TextureData>(tex_id);
+        item.tex_data = tex_manager.get<opengl::texture_data_t>(tex_id);
         item.rotation = glm::mat4(1.0);
         item.scale = glm::scale(glm::mat4(1.0), {0.3, 0.0, 0.3});
     }
@@ -99,7 +99,7 @@ void update_pos(std::vector<item_2d>& items, glm::vec3 pos, glm::vec3 step) {
 }
 
 void render(const std::vector<item_2d>& items,
-            const opengl::OrthoCamera& camera) {
+            const opengl::Camera& camera) {
     for (const auto& item : items) {
         auto program = item.render_data.program;
         opengl::use(program);
@@ -131,7 +131,7 @@ int main() {
     });
     opengl::TextureManager tex_manager;
     for (const auto& [key, image] : image_manager) {
-        opengl::TextureData tex_data {
+        opengl::texture_data_t tex_data {
             .id         = opengl::gen_texture(),
             .target     = GL_TEXTURE_2D,
             .w          = image.w,
@@ -160,11 +160,11 @@ int main() {
     all_items_refs = {red_items, blue_items, green_items};
 
     glm::vec3 cam_pos {0.0, 30.0, 0.0};
-    opengl::OrthoCamera camera (
-        cam_pos,
+    opengl::Camera camera = opengl::Camera::create_topdown(
         WIDTH,
         HEIGHT,
-        cam_pos.y / 1000
+        cam_pos.y / 1000,
+        cam_pos
     );
 
     glfwSetWindowPos(win, 0, 30);

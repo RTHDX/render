@@ -11,7 +11,7 @@
 
 namespace opengl {
 
-struct TextureData final {
+struct texture_data_t final {
     GLuint id = 0;
     GLenum target; // GL_TEXTURE_1D, GL_TEXTURE_2D ...
     GLint w, h;
@@ -25,8 +25,8 @@ struct TextureData final {
 };
 
 
-struct TextureDataArray2D final {
-    TextureData tex_data;
+struct texture_data_array_2d_t final {
+    texture_data_t tex_data;
     size_t tile_count_w {0}, tile_count_h {0};
 
     GLsizei tile_w() const; // pixels
@@ -36,13 +36,17 @@ struct TextureDataArray2D final {
     GLenum internal_format() const;
     GLsizei tile_offset(int x, int y) const;
 
+    void bind_with_image(const ImageData& image);
     void free();
 };
 
-using any_texture_t = std::variant<TextureData, TextureDataArray2D>;
+using any_texture_t = std::variant<texture_data_t, texture_data_array_2d_t>;
 
-void set_texture_meta(byte_t* raw_data, const TextureData& params);
-void set_texture_2d_array_meta(byte_t* raw_data, const TextureDataArray2D&);
+void set_texture_meta(byte_t* raw_data, const texture_data_t& params);
+void set_texture_2d_array_meta(
+    byte_t* raw_data,
+    const texture_data_array_2d_t&
+);
 
 
 }

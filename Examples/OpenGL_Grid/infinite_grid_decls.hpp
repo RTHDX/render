@@ -37,9 +37,9 @@ struct LocalListener final : public ui::Listener {
         std::cout << event << std::endl;
         if (!camera) { return; }
         if (event.yoffset > 0) {
-            camera->zoom_in();
+            //camera->zoom_in();
         } else {
-            camera->zoom_out();
+            //camera->zoom_out();
         }
     }
 
@@ -51,12 +51,12 @@ struct LocalListener final : public ui::Listener {
         std::cout << event << std::endl;
         opengl::viewport(event.width, event.height);
         if (camera) {
-            camera->update_sizes(event.width, event.height);
+            camera->update_viewport({event.width, event.height});
         }
     }
 
     GLFWwindow* win = nullptr;
-    opengl::OrthoCamera* camera = nullptr;
+    opengl::Camera* camera = nullptr;
 
 private:
     bool is_press(int action) {

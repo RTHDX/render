@@ -42,7 +42,7 @@ void framebuffer_data_t::free() {
 }
 
 
-void attach_texture(const framebuffer_data_t& fbuff, const TextureData& tex) {
+void attach_texture(const framebuffer_data_t& fbuff, const texture_data_t& tex) {
     SAFE_CALL(glBindFramebuffer(fbuff.target, fbuff.fbo))
     SAFE_CALL(glFramebufferTexture2D(fbuff.target, fbuff.attachment_point,
                                      tex.target, tex.id, 0));
@@ -54,17 +54,21 @@ fbuff_ctx_guard_t::fbuff_ctx_guard_t(const fbuff_render_ctx_t& ctx)
     : ctx_(ctx)
 {
     SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, ctx.fbo));
-    SAFE_CALL(glClearColor(ctx.background.r, ctx.background.g,
-                           ctx.background.b, ctx.background.a));
+    SAFE_CALL(glClearColor(
+        ctx.background.r,
+        ctx.background.g,
+        ctx.background.b,
+        ctx.background.a
+    ));
     SAFE_CALL(glClear(ctx.clear_bits));
     SAFE_CALL(glViewport(ctx.viewport.x, ctx.viewport.y,
                          ctx.viewport.z, ctx.viewport.w));
 }
 
 fbuff_ctx_guard_t::~fbuff_ctx_guard_t() {
-    SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     SAFE_CALL(glViewport(ctx_.screen_viewport.x, ctx_.screen_viewport.y,
-                         ctx_.screen_viewport.z, ctx_.screen_viewport.z));
+                         ctx_.screen_viewport.z, ctx_.screen_viewport.w));
+    SAFE_CALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 }
 
 }

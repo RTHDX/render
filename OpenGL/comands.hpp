@@ -6,7 +6,7 @@
 
 namespace opengl {
 
-template <typename T> struct VertexAttribCommand final {
+template <typename T> struct vertex_attrib_command_t final {
     GLuint index;
     GLuint stride;
     void* offset;
@@ -15,14 +15,14 @@ template <typename T> struct VertexAttribCommand final {
 };
 
 
-struct TextureBindCommand final {
+struct texture_bind_command_t final {
     GLenum target;
     GLenum feature;
     GLenum value;
 };
 
 
-struct StencilCommand final {
+struct stencil_command_t final {
     // GL_KEEP, GL_ZERO, GL_REPLACE, GL_INCR, GL_INCR_WRAP, GL_DECR,
     // GL_DECR_WRAP, GL_INVERT
     GLenum s_fail;
@@ -36,7 +36,7 @@ struct StencilCommand final {
 };
 
 
-struct TextureActivationCommand final {
+struct texture_activation_command_t final {
     GLenum tex_unit;     // GL_TEXTURE0, GL_TEXTURE_1, ...
     GLenum sampler_type; // GL_TEXTURE_2D, GL_TEXTURE_2D_ARRAY, ...
     GLuint id;           // texure_id
@@ -45,7 +45,7 @@ struct TextureActivationCommand final {
 };
 
 
-struct DrawArrayCommand final {
+struct draw_array_command_t final {
     GLuint vao;
     size_t count;
     size_t first {0};
@@ -53,16 +53,16 @@ struct DrawArrayCommand final {
 };
 
 
-struct DrawElementsCommand final {
+struct draw_elements_command_t final {
     GLuint vao;
-    size_t count;
+    GLsizei count;
     size_t* indices {nullptr};
     GLenum type     {GL_UNSIGNED_INT};
     GLenum mode     {GL_TRIANGLES};
 };
 
 
-struct DrawArrayFramebuffer final {
+struct draw_array_fbuff_t final {
     GLuint fbo;
     GLuint vao;
     size_t count;
@@ -84,7 +84,7 @@ struct fbuff_render_ctx_t final {
 };
 
 
-struct DrawArrayInstanced final {
+struct draw_array_instanced_t final {
     GLuint vao;
     GLsizei count;
     GLsizei instancecount;
@@ -93,7 +93,7 @@ struct DrawArrayInstanced final {
 };
 
 
-struct DrawElementInstanced final {
+struct draw_elements_instanced_t final {
     GLuint vao;
     GLsizei count;
     GLsizei instancecount;
@@ -102,22 +102,22 @@ struct DrawElementInstanced final {
     GLenum mode     {GL_TRIANGLES};
 };
 
-struct DrawElementsInstancedFramebuffer final {
-    DrawElementInstanced draw_cmd;
+struct draw_elements_instanced_fbuff_t final {
+    draw_elements_instanced_t draw_cmd;
     fbuff_render_ctx_t fb_ctx;
 };
 
 
-struct VertexArrayBindCommand final {
+struct vao_bind_command_t final {
     GLuint vao;
 };
 
-struct BufferBindCommand final {
+struct buff_bind_command_t final {
     GLuint id;
     GLenum type;
 };
 
-struct BufferGenerationCommand final {
+struct buff_gen_command_t final {
     GLenum type; // GL_ARRAY_BUFFER
 };
 

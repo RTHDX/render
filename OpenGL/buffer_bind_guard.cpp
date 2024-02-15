@@ -3,13 +3,13 @@
 
 namespace opengl {
 
-buffer_bind_guard::buffer_bind_guard(VertexArrayBindCommand&& cmd)
+buffer_bind_guard::buffer_bind_guard(vao_bind_command_t&& cmd)
     : mode_(VAO_BINDER)
 {
     SAFE_CALL(glBindVertexArray(cmd.vao))
 }
 
-buffer_bind_guard::buffer_bind_guard(BufferBindCommand&& cmd)
+buffer_bind_guard::buffer_bind_guard(buff_bind_command_t&& cmd)
     : mode_(VBO_BINDER)
     , buff_type_(cmd.type)
 {

@@ -41,7 +41,7 @@ void Item3D::open(const std::string& path) {
 
 void Item3D::draw() const {
     for (size_t i = 0; i < _vertices.size(); ++i) {
-        opengl::draw(opengl::DrawArrayCommand{
+        opengl::draw(opengl::draw_array_command_t{
             .vao   = _vao,
             .count = _vertices[i].size(),
         });

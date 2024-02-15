@@ -140,7 +140,7 @@ void bind_vao(GLuint id);
 void bind_fbo(GLuint id);
 
 template<typename T>
-inline void set_vertex_attrib(const VertexAttribCommand<T>& cmd) {
+inline void set_vertex_attrib(const vertex_attrib_command_t<T>& cmd) {
     SAFE_CALL(glEnableVertexAttribArray(cmd.index));
     SAFE_CALL(glVertexAttribPointer(cmd.index, cmd.stride, GL_FLOAT, GL_FALSE,
                                     cmd.width, cmd.offset));
@@ -158,21 +158,21 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
     }
 }
 
-void attach_texture(const framebuffer_data_t& fbuff, const TextureData& tex);
+void attach_texture(const framebuffer_data_t& fbuff, const texture_data_t& tex);
 
 GLuint gen_texture(GLenum target = GL_TEXTURE_2D);
-void activate_texture(const TextureActivationCommand& cmd);
+void activate_texture(const texture_activation_command_t& cmd);
 void free_texture(GLuint id);
 
-void apply_stencil(StencilCommand&& cmd);
+void apply_stencil(stencil_command_t&& cmd);
 
 void use(GLuint id);
 
-void draw(const DrawArrayCommand& cmd);
-void draw(const DrawElementsCommand& cmd);
-void draw_array_framebuffer(const DrawArrayFramebuffer& cmd);
-void draw_instance_array(const DrawArrayInstanced& cmd);
-void draw_instance_elements(const DrawElementInstanced& cmd);
+void draw(const draw_array_command_t& cmd);
+void draw(const draw_elements_command_t& cmd);
+void draw_array_framebuffer(const draw_array_fbuff_t& cmd);
+void draw_instance_array(const draw_array_instanced_t& cmd);
+void draw_instance_elements(const draw_elements_instanced_t& cmd);
 
 bool set_vec3(GLuint id, const std::string_view name, const glm::vec3& val);
 bool set_vec4(GLuint id, const std::string_view name, const glm::vec4& val);
@@ -202,8 +202,8 @@ struct buffer_bind_guard final {
     buffer_bind_guard(buffer_bind_guard&&) = delete;
     buffer_bind_guard& operator = (buffer_bind_guard&&) = delete;
 
-    buffer_bind_guard(VertexArrayBindCommand&& cmd);
-    buffer_bind_guard(BufferBindCommand&& cmd);
+    buffer_bind_guard(vao_bind_command_t&& cmd);
+    buffer_bind_guard(buff_bind_command_t&& cmd);
     ~buffer_bind_guard();
 
 private:

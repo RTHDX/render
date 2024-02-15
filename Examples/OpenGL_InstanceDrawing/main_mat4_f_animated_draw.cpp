@@ -139,7 +139,7 @@ int main() {
     );
     image.dump();
 
-    opengl::TextureDataArray2D tex2d_data{
+    opengl::texture_data_array_2d_t tex2d_data{
         .tex_data {
             .id         = opengl::gen_texture(GL_TEXTURE_2D_ARRAY),
             .target     = GL_TEXTURE_2D_ARRAY,
@@ -157,7 +157,7 @@ int main() {
     };
     opengl::set_texture_2d_array_meta(image.data, tex2d_data);
 
-    opengl::TextureActivationCommand tex_activation{
+    opengl::texture_activation_command_t tex_activation{
         .tex_unit     = GL_TEXTURE0,
         .sampler_type = tex2d_data.tex_data.target,
         .id           = tex2d_data.tex_data.id,

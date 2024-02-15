@@ -96,7 +96,7 @@ int main() {
         RED, BLUE, GREEN, WHITE
     });
 
-    opengl::TextureDataArray2D tex_data {
+    opengl::texture_data_array_2d_t tex_data {
         .tex_data {
             .id         = opengl::gen_texture(GL_TEXTURE_2D_ARRAY),
             .target     = GL_TEXTURE_2D_ARRAY,
@@ -114,7 +114,7 @@ int main() {
     };
     opengl::set_texture_2d_array_meta(image.data, tex_data);
 
-    opengl::TextureActivationCommand tex_activation {
+    opengl::texture_activation_command_t tex_activation {
         .tex_unit     = GL_TEXTURE0,
         .sampler_type = tex_data.tex_data.target,
         .id           = tex_data.tex_data.id,

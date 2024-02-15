@@ -11,7 +11,7 @@ using buffers_t = std::vector<GLuint>;
 using elements_input_t = std::vector<GLuint>;
 
 struct vec2pos {
-    using vertex_attrib_t = VertexAttribCommand<vec2pos>;
+    using vertex_attrib_t = vertex_attrib_command_t<vec2pos>;
     using commands_t = std::vector<vertex_attrib_t>;
     using this_t = vec2pos;
     using vertex_input_t = std::vector<this_t>;
@@ -29,7 +29,7 @@ public:
 };
 
 struct vec3pos {
-    using vertex_attrib_t = VertexAttribCommand<vec3pos>;
+    using vertex_attrib_t = vertex_attrib_command_t<vec3pos>;
     using commands_t = std::vector<vertex_attrib_t>;
     using this_t = vec3pos;
     using vertex_input_t = std::vector<this_t>;
@@ -48,7 +48,7 @@ public:
 };
 
 struct vec3pos_vec3norm_t {
-    using vertex_attrib_t = VertexAttribCommand<vec3pos_vec3norm_t>;
+    using vertex_attrib_t = vertex_attrib_command_t<vec3pos_vec3norm_t>;
     using commands_t = std::vector<vertex_attrib_t>;
     using this_t = vec3pos_vec3norm_t;
     using vertex_input_t = std::vector<this_t>;
@@ -68,7 +68,7 @@ public:
 
 
 struct vec3pos_vec3norm_vec2tex_t {
-    using vertex_attrib_t = VertexAttribCommand<vec3pos_vec3norm_vec2tex_t>;
+    using vertex_attrib_t = vertex_attrib_command_t<vec3pos_vec3norm_vec2tex_t>;
     using commands_t = std::vector<vertex_attrib_t>;
     using this_t = vec3pos_vec3norm_vec2tex_t;
     using vertex_input_t = std::vector<this_t>;
@@ -88,7 +88,7 @@ public:
 
 
 struct vec3pos_vec2tex_t {
-    using vertex_attrib_t = VertexAttribCommand<vec3pos_vec2tex_t>;
+    using vertex_attrib_t = vertex_attrib_command_t<vec3pos_vec2tex_t>;
     using commands_t = std::vector<vertex_attrib_t>;
     using this_t = vec3pos_vec2tex_t;
     using vertex_input_t = std::vector<this_t>;

@@ -7,11 +7,11 @@
 
 namespace opengl {
 
-void TextureData::bind_with_image(const ImageData& image) {
+void texture_data_t::bind_with_image(const ImageData& image) {
     set_texture_meta(image.data, *this);
 }
 
-void TextureData::free() {
+void texture_data_t::free() {
     if (id != 0 && Context::instance().is_context_active()) {
         SAFE_CALL(glBindTexture(target, 0));
         SAFE_CALL(glDeleteTextures(1, &id));
@@ -19,28 +19,28 @@ void TextureData::free() {
     }
 }
 
-bool TextureData::is_valid() const {
+bool texture_data_t::is_valid() const {
     return id != 0;
 }
 
 
-GLsizei TextureDataArray2D::tile_w() const {
+GLsizei texture_data_array_2d_t::tile_w() const {
     return tex_data.w / tile_count_w;
 }
 
-GLsizei TextureDataArray2D::tile_h() const {
+GLsizei texture_data_array_2d_t::tile_h() const {
     return tex_data.h / tile_count_h;
 }
 
-GLsizei TextureDataArray2D::total_tiles() const {
+GLsizei texture_data_array_2d_t::total_tiles() const {
     return tile_count_h * tile_count_w;
 }
 
-bool TextureDataArray2D::is_valid() const {
+bool texture_data_array_2d_t::is_valid() const {
     return tex_data.is_valid() && tile_count_h != 0 && tile_count_w != 0;
 }
 
-GLenum TextureDataArray2D::internal_format() const {
+GLenum texture_data_array_2d_t::internal_format() const {
     GLenum format = tex_data.format;
     switch (format) {
     case GL_RGB:  return GL_RGB8;
@@ -51,13 +51,12 @@ GLenum TextureDataArray2D::internal_format() const {
     }
 }
 
-GLsizei TextureDataArray2D::tile_offset(int x, int y) const {
+GLsizei texture_data_array_2d_t::tile_offset(int x, int y) const {
     GLenum format = tex_data.format;
     GLsizei stride = 0;
     if (format == GL_RGB) {
         stride = 3;
-    }
-    else if (format == GL_RGBA) {
+    } else if (format == GL_RGBA) {
         stride = 4;
     }
 
@@ -67,17 +66,21 @@ GLsizei TextureDataArray2D::tile_offset(int x, int y) const {
     return (y * tex_data.w + x) * stride;
 }
 
-void TextureDataArray2D::free() {
+void texture_data_array_2d_t::free() {
     tex_data.free();
     tile_count_w = 0;
     tile_count_h = 0;
 }
 
+void texture_data_array_2d_t::bind_with_image(const ImageData& image) {
+    set_texture_2d_array_meta(image.data, *this);
+}
 
-void set_texture_meta(byte_t* raw_data, const TextureData& params) {
+
+void set_texture_meta(byte_t* raw_data, const texture_data_t& params) {
     SAFE_CALL(glBindTexture(params.target, params.id));
     SAFE_CALL(glTexImage2D(params.target, 0, params.format, params.w, params.h,
-        0, params.format, params.type, raw_data));
+                           0, params.format, params.type, raw_data));
     SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_WRAP_S, params.wrap_s));
     SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_WRAP_T, params.wrap_t));
     SAFE_CALL(glTexParameteri(params.target, GL_TEXTURE_MIN_FILTER,
@@ -88,16 +91,16 @@ void set_texture_meta(byte_t* raw_data, const TextureData& params) {
 }
 
 void set_texture_2d_array_meta(byte_t* raw_data,
-                               const TextureDataArray2D& data) {
+                               const texture_data_array_2d_t& data) {
     const GLenum t = data.tex_data.target;
     SAFE_CALL(glBindTexture(t, data.tex_data.id));
 
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_BASE_LEVEL, 0));
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MAX_LEVEL, 1));
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MAG_FILTER,
-        data.tex_data.mag_filter));
+                              data.tex_data.mag_filter));
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_MIN_FILTER,
-        data.tex_data.min_filter));
+                              data.tex_data.min_filter));
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_WRAP_S, data.tex_data.wrap_s));
     SAFE_CALL(glTexParameteri(t, GL_TEXTURE_WRAP_T, data.tex_data.wrap_t));
 

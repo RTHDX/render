@@ -11,7 +11,7 @@
 #include <OpenGL/opengl_vertex_input.hpp>
 
 using VertexData = opengl::vec3pos_vec2tex_t;
-using VertexAttrib = opengl::VertexAttribCommand<VertexData>;
+using VertexAttrib = opengl::vertex_attrib_command_t<VertexData>;
 
 int WIDTH = 1280;
 int HEIGHT = 860;
@@ -96,7 +96,7 @@ int main() {
             .sampler_name = "texture_1"
         });
         opengl::draw(
-            opengl::DrawArrayCommand{.vao = vao, .count = vertices.size()}
+            opengl::draw_array_command_t{.vao = vao, .count = vertices.size()}
         );
 
         glfwSwapBuffers(window);

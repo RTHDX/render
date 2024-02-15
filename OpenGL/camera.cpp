@@ -1,168 +1,136 @@
-#include <iostream>
-
-#include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
-
-#include <UI/io.hpp>
 
 #include "camera.hpp"
 
 
 namespace opengl {
 
-const glm::vec3 Camera::UP(0.0, 1.0, 0.0);
-const glm::vec3 Camera::FORWARD(0.0, 0.0, -1.0);
 
-static float MOVE_SPEED = 0.1;
-static float ROTATION_SPEED = 10;
-static glm::mat4 move_modifiers(Direction dir);
-static Direction convert(int key);
+template<class... Ts>
+struct overloaded : Ts... { using Ts::operator()...; };
+template<class... Ts>
+overloaded(Ts...) -> overloaded<Ts...>;
 
 
-Camera::Camera(float width, float height, float fov,
-               const glm::vec3& position, const glm::vec3& look_at)
-    : _width(width)
-    , _height(height)
-    , _fov(fov)
-    , _projection(glm::perspective(fov, aspect_ratio(), Z_NEAR, Z_FAR))
-    , _position(position)
-    , _target(look_at)
-{}
+Camera Camera::create_perspective(float width,
+                                    float height,
+                                    float field_of_view,
+                                    const glm::vec3& pos,
+                                    const glm::vec3& look_at) {
+    perspective_clip_t clip;
+    clip.width   = width;
+    clip.height  = height;
+    clip.fov     = field_of_view;
+    clip.look_at = look_at;
+    Camera cam;
+    cam.clip_ = std::move(clip);
+    cam.pos_  = pos;
+    return cam;
+}
 
-const glm::mat4& Camera::projection() const {
-    return _projection;
+Camera Camera::create_topdown(float width,
+                              float height,
+                              float factor,
+                              const glm::vec3& pos) {
+    ortho_clip_t clip;
+    clip.width   = width;
+    clip.height  = height;
+    clip.factor  = factor;
+    clip.look_at = {pos.x, 0.0, pos.z};
+    Camera cam;
+    cam.clip_ = std::move(clip);
+    cam.pos_  = pos;
+    return cam;
+}
+
+Camera Camera::create_topdown(float width,
+                              float height,
+                              const glm::vec3& pos) {
+    return Camera::create_topdown(width, height, pos.y / 1'000, pos);
+}
+
+glm::mat4 Camera::projection() const {
+    switch (mode()) {
+    case Mode::PERSPECTIVE:
+        return std::get<perspective_clip_t>(clip_).projection();
+    case Mode::TOP_DOWN:
+        return std::get<ortho_clip_t>(clip_).projection();
+    default: return glm::mat4(1.0);
+    }
 }
 
 glm::mat4 Camera::view() const {
-    return glm::lookAt(_position, _target, up());
-}
-
-glm::vec3 Camera::up() const {
-    return glm::normalize(glm::cross(direction(), right()));
-}
-
-glm::vec3 Camera::right() const {
-    return glm::normalize(glm::cross(UP, direction()));
-}
-
-glm::vec3 Camera::direction() const {
-    return glm::normalize(_position - _target);
-}
-
-void Camera::move(Direction direction) {
-    auto mat = move_modifiers(direction);
-    _position = glm::vec4(_position, 1.0) * mat;
-    if (direction == Direction::FORWARD || direction == Direction::BACKWARD ||
-        direction == Direction::LEFT || direction == Direction::RIGHT ||
-        direction == Direction::UP || direction == Direction::DOWN) {
-        _target = glm::vec4(_target, 1.0) * mat;
+    switch (mode()) {
+    case Mode::PERSPECTIVE:
+        return std::get<perspective_clip_t>(clip_).view(pos_);
+    case Mode::TOP_DOWN:
+        return std::get<ortho_clip_t>(clip_).view(pos_);
+    default: return glm::mat4(1.0);
     }
 }
 
-void Camera::eveal_projection() {
-    _projection = glm::perspective(_fov, aspect_ratio(), Z_NEAR, Z_FAR);
+glm::mat4 Camera::ipv() const {
+    return glm::inverse(projection() * view());
 }
 
-
-CameraHandler::CameraHandler(Camera& camera)
-    : ui::Listener(&ui::io::IO::instance())
-    , _camera(camera)
-{}
-
-void CameraHandler::consume(const ui::KeyEvent& event) {
-    if (event.action == GLFW_RELEASE) { return; }
-
-    _camera.move(convert(event.key));
+const glm::vec3& Camera::position() const {
+    return pos_;
 }
 
-void CameraHandler::consume(const ui::MouseEvent& event) {}
-void CameraHandler::consume(const ui::MouseButtonEvent& event) {}
-
-void CameraHandler::consume(const ui::ScrollEvent& event) {
-    Direction direction = event.yoffset > 0 ? Direction::UP :
-                                              Direction::DOWN;
-    _camera.move(direction);
+void Camera::update_viewport(const glm::vec2& viewport) {
+    std::visit(overloaded {
+        [viewport](ortho_clip_t& clip) {
+            clip.width = viewport.x;
+            clip.height = viewport.y;
+        },
+        [viewport](perspective_clip_t& clip) {
+            clip.width = viewport.x;
+            clip.height = viewport.y;
+        }
+    }, clip_);
 }
 
-void CameraHandler::consume(const ui::DropEvent& event) {}
-
-void CameraHandler::consume(const ui::FramebufferEvent&) {}
-
-static glm::mat4 move_modifiers(Direction dir) {
-    float rot = glm::radians(ROTATION_SPEED);
-    switch (dir) {
-    case Direction::FORWARD:
-        return glm::mat4 {
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, -MOVE_SPEED,
-            0.0, 0.0, 0.0, 1.0
-        };
-    case Direction::BACKWARD:
-        return glm::mat4 {
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, MOVE_SPEED,
-            0.0, 0.0, 0.0, 1.0
-        };
-    case Direction::LEFT:
-        return glm::mat4 {
-            1.0, 0.0, 0.0, -MOVE_SPEED,
-            0.0, 1.0, 0.0,  0.0,
-            0.0, 0.0, 1.0,  0.0,
-            0.0, 0.0, 0.0,  1.0
-        };
-    case Direction::RIGHT:
-        return glm::mat4 {
-            1.0, 0.0, 0.0, MOVE_SPEED,
-            0.0, 1.0, 0.0, 0.0,
-            0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0
-        };
-    case Direction::ROTATE_LEFT:
-        return glm::mat4 {
-            cos(rot),  0.0, sin(rot), 0.0,
-            0.0,       1.0, 0.0,      0.0,
-            -sin(rot), 0.0, cos(rot), 0.0,
-            0.0,       0.0, 0.0,      1.0
-        };
-    case Direction::ROTATE_RIGHT:
-        return glm::mat4 {
-            cos(-rot),   0.0, sin(-rot), 0.0,
-            0.0,         1.0, 0.0,       0.0,
-            -sin(-rot),  0.0, cos(-rot), 0.0,
-            0.0,         0.0, 0.0,       1.0
-        };
-    case Direction::UP:
-        return glm::mat4 {
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, MOVE_SPEED,
-            0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0
-        };
-    case Direction::DOWN:
-        return glm::mat4{
-            1.0, 0.0, 0.0, 0.0,
-            0.0, 1.0, 0.0, -MOVE_SPEED,
-            0.0, 0.0, 1.0, 0.0,
-            0.0, 0.0, 0.0, 1.0
-        };
-    default:;
+Camera::Mode Camera::mode() const {
+    if (std::holds_alternative<ortho_clip_t>(clip_)) {
+        return Mode::TOP_DOWN;
     }
-    return glm::mat4(1.0);
+    if (std::holds_alternative<perspective_clip_t>(clip_)) {
+        return Mode::PERSPECTIVE;
+    }
+
+    return Mode::NONE;
 }
 
-static Direction convert(int key) {
-    switch (key) {
-    case GLFW_KEY_W: return Direction::FORWARD;
-    case GLFW_KEY_S: return Direction::BACKWARD;
-    case GLFW_KEY_A: return Direction::LEFT;
-    case GLFW_KEY_D: return Direction::RIGHT;
-    case GLFW_KEY_Q: return Direction::ROTATE_LEFT;
-    case GLFW_KEY_E: return Direction::ROTATE_RIGHT;
-    }
-    return Direction::NONE;
+float Camera::ortho_clip_t::half_width() const {
+    return (width * factor) / 2.0;
+}
+
+float Camera::ortho_clip_t::half_height() const {
+    return (height * factor) / 2.0;
+}
+
+glm::mat4 Camera::ortho_clip_t::projection() const {
+    return glm::ortho(
+        half_width(),  -half_width(),
+        half_height(), -half_height(),
+        Z_NEAR, Z_FAR
+    );
+}
+
+glm::mat4 Camera::ortho_clip_t::view(const glm::vec3& eye) const {
+    return glm::lookAt(eye, look_at, UP);
+}
+
+float Camera::perspective_clip_t::aspect_ratio() const {
+    return width / height;
+}
+
+glm::mat4 Camera::perspective_clip_t::projection() const {
+    return glm::perspective(fov, aspect_ratio(), Z_NEAR, Z_FAR);
+}
+
+glm::mat4 Camera::perspective_clip_t::view(const glm::vec3& eye) const {
+    return glm::lookAt(eye, look_at, UP);
 }
 
 }

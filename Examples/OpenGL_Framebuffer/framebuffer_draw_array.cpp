@@ -152,7 +152,7 @@ int main() {
             .program      = program,
             .sampler_name = "tex"
         });
-        opengl::draw(opengl::DrawArrayCommand{
+        opengl::draw(opengl::draw_array_command_t{
             .vao = vao,
             .count = scene_input.size()
         });

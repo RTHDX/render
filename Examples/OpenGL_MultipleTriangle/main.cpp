@@ -88,7 +88,7 @@ int main() {
 
         for (size_t i = 0; i < vao.size(); ++i) {
             opengl::use(programs[i]);
-            opengl::draw(opengl::DrawArrayCommand{.vao=vao[i], .count=objects[i].size()});
+            opengl::draw(opengl::draw_array_command_t{.vao=vao[i], .count=objects[i].size()});
         }
 
         glfwSwapBuffers(window);

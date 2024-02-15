@@ -4,7 +4,7 @@
 
 namespace opengl {
 
-void RenderData::free() {
+void render_data_t::free() {
     if (Context::instance().is_context_active()) {
         SAFE_CALL(glDeleteBuffers(1, &ebo));
         SAFE_CALL(glDeleteBuffers(vertex_buffers.size(),
