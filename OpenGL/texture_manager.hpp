@@ -28,10 +28,11 @@ public:
     TextureManager(texture_map_t&& map)
         : map_(std::move(map))
     {}
+
     ~TextureManager() {
         for (auto& [key, any_texture] : map_) {
             std::visit(overloaded {
-                [](texture_data_t& tex)        { tex.free(); },
+                [](texture_data_t& tex)          { tex.free(); },
                 [](texture_data_array_2d_t& tex) { tex.free(); }
             }, any_texture);
         }

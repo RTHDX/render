@@ -73,6 +73,18 @@ glm::mat4 Camera::ipv() const {
     return glm::inverse(projection() * view());
 }
 
+glm::ivec4 Camera::viewport() const {
+    switch (mode()) {
+    case Mode::PERSPECTIVE: {
+        const auto& clip = std::get<perspective_clip_t>(clip_);
+        return {0, 0, clip.width, clip.height};
+    } case Mode::TOP_DOWN: {
+        const auto& clip = std::get<ortho_clip_t>(clip_);
+        return {0, 0, clip.width, clip.height};
+    } default: return {0, 0, 1, 1};
+    }
+}
+
 const glm::vec3& Camera::position() const {
     return pos_;
 }
@@ -88,6 +100,14 @@ void Camera::update_viewport(const glm::vec2& viewport) {
             clip.height = viewport.y;
         }
     }, clip_);
+}
+
+void Camera::zoom_in() {
+    ;
+}
+
+void Camera::zoom_out() {
+    ;
 }
 
 Camera::Mode Camera::mode() const {

@@ -35,9 +35,13 @@ public:
     glm::mat4 view() const;
     glm::mat4 ipv() const;
 
+    glm::ivec4 viewport() const;
     const glm::vec3& position() const;
 
     void update_viewport(const glm::vec2& viewport);
+
+    void zoom_in();
+    void zoom_out();
 
 private:
     static constexpr float Z_NEAR = 0.01;
