@@ -37,11 +37,12 @@ public:
 
     glm::ivec4 viewport() const;
     const glm::vec3& position() const;
+    void position(const glm::vec3& pos);
 
     void update_viewport(const glm::vec2& viewport);
 
-    void zoom_in();
-    void zoom_out();
+    void zoom_in(float zoom_step = 1.0);
+    void zoom_out(float zoom_step = 1.0);
 
 private:
     static constexpr float Z_NEAR = 0.01;
@@ -49,15 +50,16 @@ private:
 
     struct ortho_clip_t final {
         static constexpr glm::vec3 UP {0.0, 0.0, 1.0};
+        static constexpr float HEIGHT_FACTOR = 1'000;
 
         float factor, width, height;
-        glm::vec3 look_at;
 
         float half_width() const;
         float half_height() const;
 
         glm::mat4 projection() const;
         glm::mat4 view(const glm::vec3& eye) const;
+        glm::vec3 look_at(const glm::vec3& eye) const;
     };
 
     struct perspective_clip_t final {

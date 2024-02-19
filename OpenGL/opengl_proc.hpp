@@ -194,6 +194,16 @@ std::ostream& operator << (std::ostream& os, const ShaderProgramInterface& i);
 
 ShaderProgramInterface get_program_interface(GLuint program);
 
+struct program_bind_guard_t final {
+
+    program_bind_guard_t(GLuint id) { opengl::use(id); }
+    ~program_bind_guard_t()         { opengl::use(0); }
+
+    program_bind_guard_t(const program_bind_guard_t&)              = delete;
+    program_bind_guard_t& operator = (const program_bind_guard_t&) = delete;
+    program_bind_guard_t(program_bind_guard_t&&)                   = delete;
+    program_bind_guard_t& operator = (program_bind_guard_t&&)      = delete;
+};
 
 struct buffer_bind_guard final {
     buffer_bind_guard() = delete;
