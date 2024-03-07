@@ -45,8 +45,8 @@ public:
     void zoom_out(float zoom_step = 1.0);
 
 private:
-    static constexpr float Z_NEAR = 0.01;
-    static constexpr float Z_FAR = 100.0;
+    static constexpr float Z_NEAR = 1e-6;
+    static constexpr float Z_FAR  = 1e+6;
 
     struct ortho_clip_t final {
         static constexpr glm::vec3 UP {0.0, 0.0, 1.0};

@@ -1,5 +1,7 @@
 #include <iostream>
+#include <format>
 
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "camera.hpp"
@@ -113,10 +115,15 @@ void Camera::update_viewport(const glm::vec2& viewport) {
 }
 
 void Camera::zoom_in(float zoom_step) {
+    std::cout << "Zoom in\n";
     std::visit(overloaded {
         [this, zoom_step](ortho_clip_t& clip) mutable {
-            clip.factor  -= zoom_step / ortho_clip_t::HEIGHT_FACTOR;
+            clip.factor  -= (zoom_step / ortho_clip_t::HEIGHT_FACTOR);
             this->pos_.y -= zoom_step;
+            std::cout << std::format("F {}, pos {}\n",
+                clip.factor,
+                glm::to_string(this->pos_)
+            );
         },
         [](perspective_clip_t& clip) {
             std::cout << "Zooming behavior implemented only for TOP_DOWN\n";
@@ -125,10 +132,15 @@ void Camera::zoom_in(float zoom_step) {
 }
 
 void Camera::zoom_out(float zoom_step) {
+    std::cout << "Zoom out\n";
     std::visit(overloaded {
         [this, zoom_step](ortho_clip_t& clip) mutable {
-            clip.factor  += zoom_step / ortho_clip_t::HEIGHT_FACTOR;
+            clip.factor  += (zoom_step / ortho_clip_t::HEIGHT_FACTOR);
             this->pos_.y += zoom_step;
+            std::cout << std::format("F {}, pos {}\n",
+                clip.factor,
+                glm::to_string(this->pos_)
+            );
         },
         [](perspective_clip_t& clip) {
             std::cout << "Zooming behavior implemented only for TOP_DOWN\n";
