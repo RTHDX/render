@@ -107,6 +107,11 @@ ImageData ImageData::create(int w,
 }
 
 ImageData ImageData::read(const std::filesystem::path& path) {
+    if (!std::filesystem::exists(path)) {
+        throw std::runtime_error(
+            std::format("No image found {}", path.string())
+        );
+    }
     ImageData out;
     std::string str_path = path.string();
     int depth = 0;

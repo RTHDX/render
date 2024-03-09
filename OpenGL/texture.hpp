@@ -12,6 +12,8 @@
 namespace opengl {
 
 struct texture_data_t final {
+    static texture_data_t create_default_from_image(const ImageData& image);
+
     GLuint id = 0;
     GLenum target; // GL_TEXTURE_1D, GL_TEXTURE_2D ...
     GLint w, h;
@@ -26,6 +28,12 @@ struct texture_data_t final {
 
 
 struct texture_data_array_2d_t final {
+    static texture_data_array_2d_t create_default_from_image(
+        const ImageData& i,
+        size_t tcw,
+        size_t tch
+    );
+
     texture_data_t tex_data;
     size_t tile_count_w {0}, tile_count_h {0};
 

@@ -7,6 +7,23 @@
 
 namespace opengl {
 
+texture_data_t texture_data_t::create_default_from_image(const ImageData& img) {
+    opengl::texture_data_t tex_data {
+        .id         = gen_texture(GL_TEXTURE_2D),
+        .target     = GL_TEXTURE_2D,
+        .w          = img.w,
+        .h          = img.h,
+        .format     = img.mode == ColorMode::RGB ? GL_RGB : GL_RGBA,
+        .type       = GL_UNSIGNED_BYTE,
+        .wrap_s     = GL_CLAMP_TO_EDGE,
+        .wrap_t     = GL_CLAMP_TO_EDGE,
+        .min_filter = GL_LINEAR,
+        .mag_filter = GL_LINEAR
+    };
+    tex_data.bind_with_image(img);
+    return tex_data;
+}
+
 void texture_data_t::bind_with_image(const ImageData& image) {
     set_texture_meta(image.data, *this);
 }
@@ -23,6 +40,30 @@ bool texture_data_t::is_valid() const {
     return id != 0;
 }
 
+
+texture_data_array_2d_t
+texture_data_array_2d_t::create_default_from_image(const ImageData& img,
+                                                   size_t tcw,
+                                                   size_t tch) {
+    texture_data_array_2d_t data {
+        .tex_data {
+            .id         = gen_texture(GL_TEXTURE_2D_ARRAY),
+            .target     = GL_TEXTURE_2D_ARRAY,
+            .w          = img.w,
+            .h          = img.h,
+            .format     = img.mode == ColorMode::RGB ? GL_RGB : GL_RGBA,
+            .type       = GL_UNSIGNED_BYTE,
+            .wrap_s     = GL_CLAMP_TO_EDGE,
+            .wrap_t     = GL_CLAMP_TO_EDGE,
+            .min_filter = GL_LINEAR,
+            .mag_filter = GL_LINEAR
+        },
+        .tile_count_w = tcw,
+        .tile_count_h = tch
+    };
+    data.bind_with_image(img);
+    return data;
+}
 
 GLsizei texture_data_array_2d_t::tile_w() const {
     return tex_data.w / tile_count_w;
