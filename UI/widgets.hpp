@@ -6,8 +6,7 @@
 
 #include <glm/glm.hpp>
 
-#include <OpenGL/opengl_proc.hpp>
-#include <OpenGL/opengl_vertex_input.hpp>
+#include <OpenGL/OpenGL.hpp>
 
 
 struct GLFWwindow;

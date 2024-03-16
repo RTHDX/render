@@ -10,10 +10,7 @@
 #include <glad/glad.h>
 
 #include "comands.hpp"
-#include "texture.hpp"
-#include "opengl_render_data.hpp"
-#include "opengl_instanced_render_data.hpp"
-#include "opengl_framebuffer_data.hpp"
+#include "opengl_context.hpp"
 
 
 namespace opengl {
@@ -21,52 +18,11 @@ using byte_t = unsigned char;
 using stencil_idx_t = GLubyte;
 
 
-class Context {
-public:
-    static Context& instance();
-
-    void initialize(bool = false);
-    void initialize_light(bool = false);
-    void dump() const;
-
-    void viewport(int width, int height) const;
-    glm::vec4& background() { return _background; }
-    void background(const glm::vec4& color);
-    void background(glm::u8vec4 color);
-
-    bool is_initialized() const { return initialized_; }
-    bool is_context_active() const;
-
-    void draw_background() const;
-
-    GLint active_program() const;
-    GLint bound_vao() const;
-    GLint bound_texture_2d() const;
-    GLint bound_texture_2d_array() const;
-    GLint bound_framebuffer() const;
-
-private:
-    Context() = default;
-
-private:
-    glm::vec4 _background;
-    bool initialized_ = false;
-};
-
-
 void on_gl_error(GLenum error_code, const char* call, const char* file,
                  int line);
 #define SAFE_CALL(gl_call)\
     gl_call;\
     opengl::on_gl_error(glGetError(), #gl_call, __FILE__, __LINE__);
-//#define SAFE_CALL(call) call;
-
-
-GLuint create_program(const std::filesystem::path& vertex_path,
-                      const std::filesystem::path& fragment_path);
-GLuint create_program(const std::string& vertex_shader,
-                      const std::string& fragment_shader);
-void free_program(GLuint id);
 
 bool check_shader(GLuint id);
 bool check_program(GLuint id);
@@ -158,8 +114,6 @@ inline void do_vertex_attrib_cmds(Iterable&& comands) {
     }
 }
 
-void attach_texture(const framebuffer_data_t& fbuff, const texture_data_t& tex);
-
 GLuint gen_texture(GLenum target = GL_TEXTURE_2D);
 void activate_texture(const texture_activation_command_t& cmd);
 void free_texture(GLuint id);
@@ -195,7 +149,6 @@ std::ostream& operator << (std::ostream& os, const ShaderProgramInterface& i);
 ShaderProgramInterface get_program_interface(GLuint program);
 
 struct program_bind_guard_t final {
-
     program_bind_guard_t(GLuint id) { opengl::use(id); }
     ~program_bind_guard_t()         { opengl::use(0); }
 

@@ -19,8 +19,9 @@ public:
         : map_(std::move(map))
     {}
 
-    void update(const std::string& key, const ImageData& i) {
+    ImageManager& update(const std::string& key, const ImageData& i) {
         map_[key] = i;
+        return *this;
     }
 
     std::optional<std::reference_wrapper<const ImageData>>

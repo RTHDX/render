@@ -31,6 +31,9 @@ create_library(
         opengl_render_data.hpp
         opengl_instanced_render_data.hpp
         opengl_framebuffer_data.hpp
+        opengl_context.hpp
+
+        OpenGL.hpp
 
     LIBS UI
 )

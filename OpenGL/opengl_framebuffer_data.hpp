@@ -21,6 +21,8 @@ public:
     void free();
 };
 
+void attach_texture(const framebuffer_data_t& fbuff, const texture_data_t& tex);
+
 
 struct fbuff_ctx_guard_t final {
 public:

@@ -1,4 +1,5 @@
 #include "opengl_proc.hpp"
+#include "opengl_context.hpp"
 #include "opengl_framebuffer_data.hpp"
 
 

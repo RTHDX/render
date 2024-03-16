@@ -5,10 +5,18 @@
 #include <glad/glad.h>
 
 #include "comands.hpp"
+#include "opengl_proc.hpp"
 
 
 namespace opengl {
 using stencil_idx_t = GLubyte;
+
+
+GLuint create_program(const std::filesystem::path& vertex_path,
+                      const std::filesystem::path& fragment_path);
+GLuint create_program(const std::string& vertex_shader,
+                      const std::string& fragment_shader);
+void free_program(GLuint id);
 
 
 struct render_data_t final {
